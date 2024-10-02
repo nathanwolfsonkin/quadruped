@@ -1,4 +1,3 @@
-# Base image
 FROM osrf/ros:jazzy-desktop-full
 
 ARG HOME_DIR="/root"
@@ -14,8 +13,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     intel-media-va-driver \
     ocl-icd-libopencl1 \
     opencl-headers \
-    clinfo \
-    && rm -rf /var/lib/apt/lists/*
+    clinfo
+
+RUN apt-get purge -y --no-install-recommends python3-matplotlib
+RUN apt-get update
+RUN apt-get install -y --no-install-recommends python3-matplotlib
+
+RUN rm -rf /var/lib/apt/lists/*
 
 # Setup default user's .bashrc
 RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> ${HOME_DIR}/.bashrc \
@@ -24,6 +28,8 @@ RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> ${HOME_DIR}/.bashrc \
 # Create workspace and source directory
 RUN mkdir -p ${WORKSPACE}/src
 WORKDIR ${WORKSPACE}
+
+USER nathan
 
 # By default hold container open in background
 CMD ["/bin/bash"]

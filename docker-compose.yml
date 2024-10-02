@@ -7,8 +7,16 @@ services:
     environment:
       - LIBVA_DRIVER_NAME=iHD   # Set Intel GPU driver environment
       - DISPLAY=${DISPLAY}       # Set DISPLAY environment variable for X11
+      - MPLBACKEND=TkAgg
     volumes:
       - /etc/OpenCL/vendors:/etc/OpenCL/vendors  # Mount OpenCL vendors
       - ${PWD}/src:/workspace/src  # Mount workspace source
+      - /etc/group:/etc/group:ro  # Read-only mount of /etc/group
+      - /etc/passwd:/etc/passwd:ro  # Read-only mount of /etc/passwd
+      - /etc/shadow:/etc/shadow:ro  # Read-only mount of /etc/shadow
+      - /etc/sudoers.d:/etc/sudoers.d:ro  # Read-only mount of /etc/sudoers.d
       - /tmp/.X11-unix:/tmp/.X11-unix  # Mount X11 socket
     entrypoint: /bin/bash        # Keep the container running
+
+    # Add the display entry for X11 forwarding to allow GUI apps from container
+    network_mode: "host"
