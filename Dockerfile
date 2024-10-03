@@ -32,8 +32,8 @@ RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> ${HOME_DIR}/.bashrc \
 RUN mkdir -p ${WORKSPACE}/src
 WORKDIR ${WORKSPACE}
 
-RUN useradd -ms /bin/bash nathan
-USER nathan
+# RUN useradd -ms /bin/bash nathan
+# USER nathan
 
 # By default hold container open in background
 CMD ["/bin/bash"]
