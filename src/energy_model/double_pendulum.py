@@ -2,22 +2,39 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
+class MainBody:
+    def __init__(self, m=5, l=3, I=2, origin=[0, 0], orientation=0):
+        self.m = m
+        self.l = l
+        self.I = I
+        self.origin = np.array(origin).reshape(2, 1)
+        self.orientation = orientation
+
+    def get_endpoints(self):
+        half_length = self.l / 2
+        R = np.array([[np.cos(self.orientation), -np.sin(self.orientation)],
+                      [np.sin(self.orientation), np.cos(self.orientation)]])
+        left_endpoint = self.origin + R @ np.array([[-half_length], [0]])
+        right_endpoint = self.origin + R @ np.array([[half_length], [0]])
+        return left_endpoint.flatten(), right_endpoint.flatten()
+
 class DoublePendulum:
-    def __init__(self, m=[1,1], l=[1,1], I=[1,1]):
+    def __init__(self, m=[1,1], l=[1,1], I=[1,1], origin=[0,0]):
         # Initialize Parameters
         self.m = m
         self.l = l
         self.I = I
+        self.origin = origin
 
     # positional functions
     # returns position of com1 wrt the origin
     def get_p1(self,t1):
-        return (self.l[0]/2)*np.array([[np.sin(t1)],
-                                [-np.cos(t1)]])
+        return self.origin + (self.l[0]/2)*np.array([[np.sin(t1)],
+                                                     [-np.cos(t1)]])
 
     def get_pA(self,t1):
-        return self.l[0]*np.array([[np.sin(t1)],
-                            [-np.cos(t1)]])
+        return self.origin + self.l[0]*np.array([[np.sin(t1)],
+                                                 [-np.cos(t1)]])
 
     # returns position of com2 wrt the origin
     def get_p2(self, t1, t2):
@@ -79,106 +96,102 @@ class DoublePendulum:
                 self.translational_kinetic_energy(t1,dt1,t2,dt2) + 
                 self.rotational_kinetic_energy(dt1,dt2)
                 ).item()
-    
+
 class PendulumAnimation:
-    def __init__(self, pendulum, t1, t2, dt1, dt2, time):
-        self.pendulum = pendulum
-        self.t1 = t1
-        self.t2 = t2
-        self.dt1 = dt1
-        self.dt2 = dt2
+    def __init__(self, main_body, pendulums, angles, angular_velocities, time):
+        self.main_body = main_body
+        self.pendulums = pendulums
+        self.angles = angles
+        self.angular_velocities = angular_velocities
         self.time = time
 
-        # Create figure with two subplots
         self.fig, (self.ax1, self.ax2) = plt.subplots(1, 2, figsize=(10, 5))
 
-        # Pendulum plot setup
-        self.ax1.set_xlim(-2, 2)
-        self.ax1.set_ylim(-2, 2)
+        self.ax1.set_xlim(-5, 5)
+        self.ax1.set_ylim(-3, 3)
         self.ax1.set_aspect('equal')
 
-        # Energy plot setup
         self.ax2.set_xlim(0, time[-1])
         self.ax2.set_ylim(-40, 40)
-        self.energy_lines = [self.ax2.plot([], [], lw=2, label=label)[0] 
-                             for label in ['Potential Energy', 'Translational KE', 'Rotational KE', 'Total Energy']]
-        self.potential_energy_data = []
-        self.translational_ke_data = []
-        self.rotational_ke_data = []
-        self.total_energy_data = []
 
-        # Pendulum lines
-        self.line1, = self.ax1.plot([], [], lw=2)
-        self.line2, = self.ax1.plot([], [], lw=2)
-        
-        # Add a legend to the energy plot
+        self.energy_lines = [[self.ax2.plot([], [], lw=2, label=f'{label} (Pendulum {i + 1})')[0]
+                              for label in ['Potential Energy', 'Translational KE', 'Rotational KE', 'Total Energy']]
+                              for i in range(len(pendulums))]
+
+        self.energy_data = [[[], [], [], []] for _ in range(len(pendulums))]
+
+        self.lines = [self.ax1.plot([], [], lw=2)[0] for _ in range(2 * len(pendulums))]
+
         self.ax2.legend()
 
-    # Initialization function
     def pend_init(self):
-        self.line1.set_data([], [])
-        self.line2.set_data([], [])
-        for line in self.energy_lines:
+        for line in self.lines:
             line.set_data([], [])
-        return self.line1, self.line2, *self.energy_lines
+        for energy_line_set in self.energy_lines:
+            for energy_line in energy_line_set:
+                energy_line.set_data([], [])
+        return (*self.lines, *[line for energy_line_set in self.energy_lines for line in energy_line_set])
 
-    # Update function
     def pend_update(self, frame):
-        t1_frame = self.t1[frame]
-        t2_frame = self.t2[frame]
-        dt1_frame = self.dt1[frame]
-        dt2_frame = self.dt2[frame]
+        left_endpoint, right_endpoint = self.main_body.get_endpoints()
 
-        # Update pendulum positions
-        pA = self.pendulum.get_pA(t1_frame).flatten()
-        p2 = self.pendulum.get_p2(t1_frame, t2_frame).flatten()
+        for i, pendulum in enumerate(self.pendulums):
+            if i == 0:
+                pendulum.origin = left_endpoint.reshape(2, 1)
+            else:
+                pendulum.origin = right_endpoint.reshape(2, 1)
 
-        self.line1.set_data([0, pA[0]], [0, pA[1]])
-        self.line2.set_data([pA[0], p2[0]], [pA[1], p2[1]])
+            t1_frame = self.angles[i][0][frame]
+            t2_frame = self.angles[i][1][frame]
+            dt1_frame = self.angular_velocities[i][0][frame]
+            dt2_frame = self.angular_velocities[i][1][frame]
 
-        # Calculate and update energy data
-        potential_energy = self.pendulum.potential_energy(t1_frame, t2_frame).item()
-        translational_ke = self.pendulum.translational_kinetic_energy(t1_frame, dt1_frame, t2_frame, dt2_frame).item()
-        rotational_ke = self.pendulum.rotational_kinetic_energy(dt1_frame, dt2_frame).item()
-        total_energy = potential_energy + translational_ke + rotational_ke
-        
-        self.potential_energy_data.append(potential_energy)
-        self.translational_ke_data.append(translational_ke)
-        self.rotational_ke_data.append(rotational_ke)
-        self.total_energy_data.append(total_energy)
+            pA = pendulum.get_pA(t1_frame).flatten()
+            p2 = pendulum.get_p2(t1_frame, t2_frame).flatten()
 
-        # Update energy plot
-        self.energy_lines[0].set_data(self.time[:frame+1], self.potential_energy_data)
-        self.energy_lines[1].set_data(self.time[:frame+1], self.translational_ke_data)
-        self.energy_lines[2].set_data(self.time[:frame+1], self.rotational_ke_data)
-        self.energy_lines[3].set_data(self.time[:frame+1], self.total_energy_data)
+            self.lines[2 * i].set_data([pendulum.origin[0, 0], pA[0]], [pendulum.origin[1, 0], pA[1]])
+            self.lines[2 * i + 1].set_data([pA[0], p2[0]], [pA[1], p2[1]])
 
-        return self.line1, self.line2, *self.energy_lines
+            potential_energy = pendulum.potential_energy(t1_frame, t2_frame)
+            translational_ke = pendulum.translational_kinetic_energy(t1_frame, dt1_frame, t2_frame, dt2_frame)
+            rotational_ke = pendulum.rotational_kinetic_energy(dt1_frame, dt2_frame)
+            total_energy = potential_energy + translational_ke + rotational_ke
 
-    # Start animation
+            self.energy_data[i][0].append(potential_energy)
+            self.energy_data[i][1].append(translational_ke)
+            self.energy_data[i][2].append(rotational_ke)
+            self.energy_data[i][3].append(total_energy)
+
+            self.energy_lines[i][0].set_data(self.time[:frame + 1], self.energy_data[i][0])
+            self.energy_lines[i][1].set_data(self.time[:frame + 1], self.energy_data[i][1])
+            self.energy_lines[i][2].set_data(self.time[:frame + 1], self.energy_data[i][2])
+            self.energy_lines[i][3].set_data(self.time[:frame + 1], self.energy_data[i][3])
+
+        return (*self.lines, *[line for energy_line_set in self.energy_lines for line in energy_line_set])
+
     def start_animation(self):
         pend_animation = FuncAnimation(self.fig, self.pend_update, frames=len(self.time),
-                                       init_func=self.pend_init, blit=True, interval=10,
-                                       repeat=False)
+                                       init_func=self.pend_init, blit=True, interval=10, repeat=False)
         plt.show()
 
 def main():
-    # Initialize the pendulum
-    pendulum = DoublePendulum()
+    main_body = MainBody(origin=[0, 0], orientation=0)
+    pendulums = [DoublePendulum(), DoublePendulum()]
 
-    # Define the time steps and angles for simulation
     frames = 200
-    time = np.linspace(0, 20, frames)  # Simulate for 10 seconds, 200 frames
-    t1 = np.sin(time)  # Example angles for t1
-    t2 = np.cos(time)  # Example angles for t2
-    dt1 = np.gradient(t1, time)  # Time derivative of t1
-    dt2 = np.gradient(t2, time)  # Time derivative of t2 (derivative of cos)
+    time = np.linspace(0, 20, frames)
 
-    # Initialize the animation class
-    pendulum_animation = PendulumAnimation(pendulum, t1, t2, dt1, dt2, time)
+    angles = [
+        [np.sin(time), np.cos(time)],
+        [np.cos(time), np.sin(time)]
+    ]
+    angular_velocities = [
+        [np.cos(time), -np.sin(time)],
+        [-np.sin(time), np.cos(time)]
+    ]
 
-    # Start the animation
-    pendulum_animation.start_animation()
+    animation = PendulumAnimation(main_body, pendulums, angles, angular_velocities, time)
+    animation.start_animation()
 
 if __name__ == "__main__":
     main()

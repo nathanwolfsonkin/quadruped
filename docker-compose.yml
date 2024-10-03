@@ -13,6 +13,4 @@ services:
       - ${PWD}/src:/workspace/src  # Mount workspace source
       - /tmp/.X11-unix:/tmp/.X11-unix  # Mount X11 socket
     entrypoint: /bin/bash
-
-    # Add the display entry for X11 forwarding to allow GUI apps from container
     network_mode: "host"
