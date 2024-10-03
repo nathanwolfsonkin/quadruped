@@ -26,6 +26,10 @@ class DoublePendulum:
     def get_p2(self, t1, t2):
         return self.get_pA(t1) + (self.l2/2)*np.array([[np.sin(t1+t2)],
                                                        [-np.cos(t1+t2)]])
+    
+    def get_pB(self, t1, t2):
+        return self.get_pA(t1) + self.l2*np.array([[np.sin(t1+t2)],
+                                                   [-np.cos(t1+t2)]])
 
     # velocity functions
     def get_v1(self, t1,dt1):
@@ -101,10 +105,10 @@ class PendulumAnimation:
         t1_frame = self.t1[frame]
         t2_frame = self.t2[frame]
         
-        # Get positions of the pendulum's masses
-        p1 = self.pendulum.get_p1(t1_frame)
-        pA = self.pendulum.get_pA(t1_frame)
-        p2 = self.pendulum.get_p2(t1_frame, t2_frame)
+        # Get positions of the pendulum's masses and flatten them to 1D arrays
+        p1 = self.pendulum.get_p1(t1_frame).flatten()
+        pA = self.pendulum.get_pA(t1_frame).flatten()
+        p2 = self.pendulum.get_p2(t1_frame, t2_frame).flatten()
 
         # Update the lines for both arms of the pendulum
         self.line1.set_data([0, pA[0]], [0, pA[1]])  # Arm 1
@@ -114,7 +118,7 @@ class PendulumAnimation:
     # Method to start the animation
     def start_animation(self):
         ani = FuncAnimation(self.fig, self.update, frames=len(self.time),
-                            init_func=self.init, blit=True)
+                            init_func=self.init, blit=True, interval=10)
         plt.show()
 
 def main():
@@ -122,8 +126,9 @@ def main():
     pendulum = DoublePendulum()
 
     # Define the time steps and angles for simulation
-    time = np.linspace(0, 10, 500)  # Simulate for 10 seconds, 500 time steps
-    t1 = np.sin(time)  # Example angles for t1
+    frames = 200
+    time = np.linspace(0, 10, frames)  # Simulate for 10 seconds, 500 time steps
+    t1 = np.linspace(0, 0, frames)  # Example angles for t1
     t2 = np.cos(time)  # Example angles for t2
 
     # Initialize the animation class with the pendulum and angles
