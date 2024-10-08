@@ -206,14 +206,14 @@ def main():
     ]
 
     angles = [
-        leg1_angles,  # First pendulum (FL and BR)
-        leg2_angles   # Second pendulum (FR and BL)
+        leg1_angles,
+        leg2_angles
     ]
 
     # Angular velocities (derivatives of angles)
     angular_velocities = [
-        [np.gradient(angles[0][0], time), np.gradient(angles[0][1], time)],  # FL and BR velocities
-        [np.gradient(angles[1][0], time), np.gradient(angles[1][1], time)]   # FR and BL velocities
+        [np.gradient(angles[0][0], time), np.gradient(angles[0][1], time)],
+        [np.gradient(angles[1][0], time), np.gradient(angles[1][1], time)] 
     ]
 
     animation = PendulumAnimation(main_body, pendulums, angles, angular_velocities, time)
