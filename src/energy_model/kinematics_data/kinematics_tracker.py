@@ -1,7 +1,12 @@
 import cv2
 import numpy as np
 
-def main(video_path, csv_path):
+def video_to_csv(video_local_path, csv_local_path):
+
+    # Update video path
+    video_path = 'src/energy_model/kinematics_data/' + video_local_path
+    csv_path = 'src/energy_model/kinematics_data/' + csv_local_path
+
     # Load video
     video = cv2.VideoCapture(video_path)
 
@@ -65,7 +70,7 @@ def main(video_path, csv_path):
             center_x = int(bbox[0] + bbox[2] / 2)
             center_y = int(bbox[1] + bbox[3] / 2)
             positions.append((center_x, center_y))
-        else:
+        else: 
             cv2.putText(frame, "Tracking failure", (100, 80), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 255), 2)
 
         # Display the frame
@@ -81,5 +86,10 @@ def main(video_path, csv_path):
     # Save the position data to a CSV file for later analysis
     np.savetxt(csv_path, positions, delimiter=",", header="x,y", comments='')
 
+def main():
+    video = 'unitree_a1/unitree_a1_gait.mp4'
+    csv = 'unitree_a1/test.csv'
+    video_to_csv(video, csv)
+
 if __name__ == "__main__":
-    main('src/energy_model/kinematics_data/unitree_a1/unitree_a1_gait.mp4',"src/energy_model/kinematics_data/unitree_a1/rear_hip.csv")
+    main()

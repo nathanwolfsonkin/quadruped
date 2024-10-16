@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
+from energy_model.kinematics_data import angle_converter
 
 class MainBody:
     def __init__(self, m=5, l=3, I=2, origin=[0, 0], orientation=0):
@@ -17,6 +18,7 @@ class MainBody:
         left_endpoint = self.origin + R @ np.array([[-half_length], [0]])
         right_endpoint = self.origin + R @ np.array([[half_length], [0]])
         return left_endpoint.flatten(), right_endpoint.flatten()
+
 
 class DoublePendulum:
     def __init__(self, m=[1,1], l=[1,1], I=[1,1], origin=[0,0]):
@@ -93,6 +95,7 @@ class DoublePendulum:
                 self.rotational_kinetic_energy(dt1,dt2)
                 ).item()
 
+
 class PendulumAnimation:
     def __init__(self, main_body, pendulums, angles, angular_velocities, time):
         self.main_body = main_body
@@ -142,6 +145,9 @@ class PendulumAnimation:
         # Update the main body line
         self.main_body_line.set_data([left_endpoint[0], right_endpoint[0]], [left_endpoint[1], right_endpoint[1]])
 
+        if frame == 299:
+            pass
+
         for i, pendulum in enumerate(self.pendulums):
             if i == 0:
                 pendulum.origin = left_endpoint.reshape(2, 1)
@@ -163,8 +169,14 @@ class PendulumAnimation:
             potential_energy = pendulum.potential_energy(t1_frame, t2_frame)
             translational_ke = pendulum.translational_kinetic_energy(t1_frame, dt1_frame, t2_frame, dt2_frame)
             rotational_ke = pendulum.rotational_kinetic_energy(dt1_frame, dt2_frame)
-            total_energy = potential_energy + translational_ke + rotational_ke
+            total_energy = (potential_energy + translational_ke + rotational_ke).item()
 
+            # Reset energy lines when the system loops
+            if frame == 0:
+                for energy_line_set in self.energy_lines:
+                    for energy_line in energy_line_set:
+                        energy_line.set_data([], [])
+            
             self.energy_data[i][0].append(potential_energy)
             self.energy_data[i][1].append(translational_ke)
             self.energy_data[i][2].append(rotational_ke)
@@ -182,33 +194,21 @@ class PendulumAnimation:
                                        init_func=self.pend_init, blit=True, interval=10, repeat=False)
         plt.show()
 
+
 def main():
     main_body = MainBody(origin=[0, 0], orientation=0)
     pendulums = [DoublePendulum(), DoublePendulum()]
+    
+    theta_list = angle_converter.get_angle_lists()
 
-    frames = 200
-    time = np.linspace(0, 20, frames)
-
-    amp1 = 1.0
-    amp2 = 0.4
-
-    phase1 = 0
-    phase2 = np.pi/2
-
-    leg1_angles = [
-        amp1 * np.sin(time+phase1) - np.pi/6,
-        amp2 * np.sin(time+phase1) + np.pi/8
-    ]
-
-    leg2_angles = [
-        amp1 * np.sin(time+phase2) - np.pi/8,
-        amp2 * np.sin(time+phase2) + np.pi/10
-    ]
+    frames = 299
+    time = np.linspace(0, 10, frames)
 
     angles = [
-        leg1_angles,
-        leg2_angles
+        [theta_list[0][0], theta_list[0][1]],
+        [theta_list[1][0], theta_list[1][1]]
     ]
+    
 
     # Angular velocities (derivatives of angles)
     angular_velocities = [
@@ -218,7 +218,6 @@ def main():
 
     animation = PendulumAnimation(main_body, pendulums, angles, angular_velocities, time)
     animation.start_animation()
-    pass
 
 if __name__ == "__main__":
     main()

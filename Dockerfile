@@ -29,7 +29,12 @@ ENV PATH="${VENV_DIR}/bin:$PATH"
 
 # Upgrade pip and install Python dependencies in the virtual environment
 RUN pip install --upgrade pip
-RUN pip install opencv-python opencv-contrib-python
+RUN pip install \
+    numpy \
+    opencv-python \ 
+    opencv-contrib-python \
+    matplotlib \
+    PyQt5
 
 # Remove apt library folder to save space
 RUN rm -rf /var/lib/apt/lists/*
@@ -38,6 +43,8 @@ RUN rm -rf /var/lib/apt/lists/*
 RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> ${HOME_DIR}/.bashrc \
   && echo "source /etc/profile.d/bash_completion.sh" >> ${HOME_DIR}/.bashrc \
   && echo "source ${VENV_DIR}/bin/activate" >> ${HOME_DIR}/.bashrc
+
+ENV PYTHONPATH="${PYTHONPATH}:/workspace/src"
 
 # Create workspace and source directory
 RUN mkdir -p ${WORKSPACE}/src
