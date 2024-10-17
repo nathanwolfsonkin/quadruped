@@ -7,7 +7,6 @@ services:
     environment:
       - LIBVA_DRIVER_NAME=iHD   # Set Intel GPU driver environment
       - DISPLAY=${DISPLAY}       # Set DISPLAY environment variable for X11
-      - MPLBACKEND=Qt5Agg
     volumes:
       - /etc/OpenCL/vendors:/etc/OpenCL/vendors  # Mount OpenCL vendors
       - ${PWD}/src:/workspace/src  # Mount workspace source

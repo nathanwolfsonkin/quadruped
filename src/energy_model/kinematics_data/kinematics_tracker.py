@@ -13,6 +13,13 @@ def video_to_csv(video_local_path, csv_local_path):
     # Read the first frame of the video
     ret, frame = video.read()
 
+    # Get the width and height of the video frames
+    frame_width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
+    frame_height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
+    print('width: ', frame_width)
+    print('height: ', frame_height)
+
     if frame is None:
         print("Error: Frame is None. Check the video source.")
         exit()

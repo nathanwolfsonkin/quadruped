@@ -26,17 +26,17 @@ class DoublePendulum:
         self.m = m
         self.l = l
         self.I = I
-        self.origin = origin
+        self.origin = np.array(origin).reshape(2,1)
 
     # positional functions
     # returns position of com1 wrt the origin
     def get_p1(self,t1):
-        return self.origin + (self.l[0]/2)*np.array([[np.sin(t1)],
-                                                     [-np.cos(t1)]])
+        return (self.origin + (self.l[0]/2)*np.array([[np.sin(t1)],
+                                                     [-np.cos(t1)]])).reshape(2,1)
 
     def get_pA(self,t1):
-        return self.origin + self.l[0]*np.array([[np.sin(t1)],
-                                                 [-np.cos(t1)]])
+        return (self.origin + self.l[0]*np.array([[np.sin(t1)],
+                                                 [-np.cos(t1)]])).reshape(2,1)
 
     # returns position of com2 wrt the origin
     def get_p2(self, t1, t2):
@@ -144,9 +144,6 @@ class PendulumAnimation:
 
         # Update the main body line
         self.main_body_line.set_data([left_endpoint[0], right_endpoint[0]], [left_endpoint[1], right_endpoint[1]])
-
-        if frame == 299:
-            pass
 
         for i, pendulum in enumerate(self.pendulums):
             if i == 0:

@@ -6,7 +6,7 @@ import os
 import time
 
 from energy_model.double_pendulum import DoublePendulum
-from energy_model.double_pendulum import MainBody
+from energy_model.kinematics_data import angle_converter
 
 class OverlayAnimation:
     def __init__(self):
@@ -19,65 +19,94 @@ class OverlayAnimation:
 
         # Create a DoublePendulum object
         # Initialize the DoublePendulum instance
-        self.pendulum = DoublePendulum()
+        self.pendulum = DoublePendulum(origin=[-3.05,1.15],l=[1.8,1.8])
+
+        # Generate list of angles wrt frame
+        self.theta_list = angle_converter.get_angle_lists()
         
-        # Define initial angles and angular velocities
-        self.t1 = np.pi / 4  # initial angle for pendulum 1
-        self.t2 = np.pi / 4  # initial angle for pendulum 2
+        # Obtain list of hip positions
+        front_hip_filepath = "/workspace/src/energy_model/kinematics_data/unitree_a1/front_hip.csv"
+        rear_hip_filepath = "/workspace/src/energy_model/kinematics_data/unitree_a1/rear_hip.csv"
+        self.front_hip_pos_list = angle_converter.get_positions(front_hip_filepath)
+        self.rear_hip_pos_list = angle_converter.get_positions(rear_hip_filepath)
+
+        self.t1 = self.theta_list[0][0][0]
+        self.t2 = self.theta_list[0][1][0]
         self.dt1 = 0.1       # initial angular velocity for pendulum 1
         self.dt2 = 0.1       # initial angular velocity for pendulum 2
-        
 
         # Create animation
         ani = animation.FuncAnimation(self.fig, self.ani_update, frames=len(self.frame_files), init_func=self.ani_init, blit=False)
         plt.show()
 
 
-    def draw_pendulum(self):
+    def draw_pendulum(self, frame_idx):
         # Calculate positions of the pendulum's centers of mass
-        p1 = self.pendulum.get_p1(self.t1)
         pA = self.pendulum.get_pA(self.t1)
-        p2 = self.pendulum.get_p2(self.t1, self.t2)
         pB = self.pendulum.get_pB(self.t1, self.t2)
 
-        # Draw the pendulum as lines and points
-        self.ax.plot([self.pendulum.origin[0], p1[0, 0]], [self.pendulum.origin[1], p1[1, 0]], 'ro-', label='Pendulum 1')  # First link
-        self.ax.plot([p1[0, 0], pA[0, 0]], [p1[1, 0], pA[1, 0]], 'b-', label='Pendulum 1 Tip')  # First link tip
-        self.ax.plot([pA[0, 0], p2[0, 0]], [pA[1, 0], p2[1, 0]], 'go-', label='Pendulum 2')  # Second link
-        self.ax.plot([p2[0, 0], pB[0, 0]], [p2[1, 0], pB[1, 0]], 'g-', label='Pendulum 2 Tip')  # Second link tip
+        # Update origin position
+        front_hip_x = self.front_hip_pos_list[0][frame_idx]
+        front_hip_y = self.front_hip_pos_list[1][frame_idx]
+
+        # Account for offsets
+        scaled_front_hip_x = front_hip_x
+        scaled_front_hip_y = self.plt_height - front_hip_y
+
+        # scaled_front_hip_x = self.x_scaling_factor*front_hip_x
+        # scaled_front_hip_y = self.y_scaling_factor*front_hip_y
+
+        # # Shift to take into account linear shift to be centered about (0,0) instead of corner at (0,0)
+        # scaled_front_hip_x = scaled_front_hip_x - self.plt_width/2
+        # scaled_front_hip_y = scaled_front_hip_y - self.plt_height/2
+
+        # Scale position of hips along with frame scaling
+        self.pendulum.origin = np.array([scaled_front_hip_x,scaled_front_hip_y]).reshape(2, 1)
+
+        # Draw the pendulum as lines
+        self.ax.plot([self.pendulum.origin[0], pA[0]], [self.pendulum.origin[1], pA[1]], 'b-')  # First link tip
+        self.ax.plot([pA[0], pB[0]], [pA[1], pB[1]], 'g-')  # Second link tip
+
 
     def ani_init(self):
         # Determine aspect ratio
         img = plt.imread(self.frame_files[0])
         img_height, img_width, _ = img.shape
-        aspect_ratio = img_width/img_height
+        aspect_ratio = float(img_width)/float(img_height)
 
         # Define numerical value for height
-        self.plt_height = 6
+        self.plt_height = 1080
         self.plt_width = aspect_ratio*self.plt_height
 
-        self.ax.set_xlim(-self.plt_width/2, self.plt_width/2)
-        self.ax.set_ylim(-self.plt_height/2, self.plt_height/2)
+        self.x_scaling_factor = self.plt_width/img_width
+        self.y_scaling_factor = self.plt_height/img_height
+
+        # self.ax.set_xlim(-self.plt_width/2, self.plt_width/2)
+        # self.ax.set_ylim(-self.plt_height/2, self.plt_height/2)
 
     def ani_update(self, frame_idx):
         # Load the corresponding frame image
         img = plt.imread(self.frame_files[frame_idx])
         self.ax.clear()
-        self.ax.imshow(img, extent=[-self.plt_width / 2, self.plt_width / 2, -self.plt_height / 2, self.plt_height / 2])  # Display the image
+        # self.ax.imshow(img, extent=[-self.plt_width / 2, self.plt_width / 2, -self.plt_height / 2, self.plt_height / 2])  # Display the image
+        self.ax.imshow(img, extent=[0, 1920, 0, 1080])  # Display the image
         plt.pause(.001)
 
         # Draw the pendulum on top of the frame
-        self.draw_pendulum()
-        
-        # Update the angles
-        self.t1 += 0.05  # Increment angle 1
-        self.t2 += 0.05  # Increment angle 2
+        self.draw_pendulum(frame_idx)
 
-        plt.pause(0.001)
+        # Update the angles
+        self.t1 = self.theta_list[0][0][frame_idx]
+        self.t2 = self.theta_list[0][1][frame_idx]
+
         return self.ax
 
 def main():
-    OverlayAnimation()
+    my_ani = OverlayAnimation()
+    # my_ani.ani_init()
+    # for i in range(298):
+    #     my_ani.ani_update(i)
+    #     plt.pause(.01)
 
 
 if __name__ == "__main__":

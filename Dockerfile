@@ -45,6 +45,7 @@ RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> ${HOME_DIR}/.bashrc \
   && echo "source ${VENV_DIR}/bin/activate" >> ${HOME_DIR}/.bashrc
 
 ENV PYTHONPATH="${PYTHONPATH}:/workspace/src"
+ENV MPLBACKEND="Qt5Agg"
 
 # Create workspace and source directory
 RUN mkdir -p ${WORKSPACE}/src
