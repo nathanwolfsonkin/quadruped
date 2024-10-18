@@ -25,7 +25,7 @@ while True:
     if not ret:
         break
 
-    frame = resize_image(frame, 1.0)
+    frame = resize_image(frame, .75)
 
     # Save each frame as an image for Matplotlib script
     cv2.imwrite(os.path.join(frame_folder, f"frame_{frame_count:04d}.png"), frame)
