@@ -19,7 +19,7 @@ class OverlayAnimation:
 
         # Create a DoublePendulum object
         # Initialize the DoublePendulum instance
-        self.pendulum = DoublePendulum(origin=[-3.05,1.15],l=[1.8,1.8])
+        self.pendulum = DoublePendulum(l=[1.9,2])
 
         # Generate list of angles wrt frame
         self.theta_list = angle_converter.get_angle_lists()
@@ -41,31 +41,26 @@ class OverlayAnimation:
 
 
     def draw_pendulum(self, frame_idx):
+        # Update origin position
+        front_hip_x = self.front_hip_pos_list[0][frame_idx]
+        front_hip_y = -self.front_hip_pos_list[1][frame_idx]
+
+        # Scale to plot size
+        scaled_front_hip_x = self.scaling_factor*front_hip_x
+        scaled_front_hip_y = self.scaling_factor*front_hip_y
+
+        # Reassign position of hips
+        self.pendulum.origin = np.array([scaled_front_hip_x,scaled_front_hip_y]).reshape(2, 1)
+
         # Calculate positions of the pendulum's centers of mass
         pA = self.pendulum.get_pA(self.t1)
         pB = self.pendulum.get_pB(self.t1, self.t2)
 
-        # Update origin position
-        front_hip_x = self.front_hip_pos_list[0][frame_idx]
-        front_hip_y = self.front_hip_pos_list[1][frame_idx]
-
-        # Account for offsets
-        scaled_front_hip_x = front_hip_x
-        scaled_front_hip_y = self.plt_height - front_hip_y
-
-        # scaled_front_hip_x = self.x_scaling_factor*front_hip_x
-        # scaled_front_hip_y = self.y_scaling_factor*front_hip_y
-
-        # # Shift to take into account linear shift to be centered about (0,0) instead of corner at (0,0)
-        # scaled_front_hip_x = scaled_front_hip_x - self.plt_width/2
-        # scaled_front_hip_y = scaled_front_hip_y - self.plt_height/2
-
-        # Scale position of hips along with frame scaling
-        self.pendulum.origin = np.array([scaled_front_hip_x,scaled_front_hip_y]).reshape(2, 1)
-
         # Draw the pendulum as lines
         self.ax.plot([self.pendulum.origin[0], pA[0]], [self.pendulum.origin[1], pA[1]], 'b-')  # First link tip
         self.ax.plot([pA[0], pB[0]], [pA[1], pB[1]], 'g-')  # Second link tip
+        plt.pause(.01)
+        pass
 
 
     def ani_init(self):
@@ -73,23 +68,20 @@ class OverlayAnimation:
         img = plt.imread(self.frame_files[0])
         img_height, img_width, _ = img.shape
         aspect_ratio = float(img_width)/float(img_height)
+        self.img_height = img_height
 
         # Define numerical value for height
-        self.plt_height = 1080
+        self.plt_height = 6
         self.plt_width = aspect_ratio*self.plt_height
 
-        self.x_scaling_factor = self.plt_width/img_width
-        self.y_scaling_factor = self.plt_height/img_height
-
-        # self.ax.set_xlim(-self.plt_width/2, self.plt_width/2)
-        # self.ax.set_ylim(-self.plt_height/2, self.plt_height/2)
+        self.scaling_factor = self.plt_height / 1080.0
 
     def ani_update(self, frame_idx):
         # Load the corresponding frame image
         img = plt.imread(self.frame_files[frame_idx])
         self.ax.clear()
         # self.ax.imshow(img, extent=[-self.plt_width / 2, self.plt_width / 2, -self.plt_height / 2, self.plt_height / 2])  # Display the image
-        self.ax.imshow(img, extent=[0, 1920, 0, 1080])  # Display the image
+        self.ax.imshow(img, extent=[0, self.plt_width, -self.plt_height, 0])  # Display the image
         plt.pause(.001)
 
         # Draw the pendulum on top of the frame
