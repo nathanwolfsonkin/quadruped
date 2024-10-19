@@ -21,7 +21,12 @@ cap = cv2.VideoCapture(video_path)
 frame_count = 0
 
 while True:
-    ret, frame = cap.read()
+    if frame_count == 0:
+        ret, frame = cap.read()
+    else:
+        ret, frame = cap.read()
+        ret, frame = cap.read()
+
     if not ret:
         break
 

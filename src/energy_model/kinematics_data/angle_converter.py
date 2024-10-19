@@ -6,7 +6,7 @@ def angle_calc(x, y):
     # y = [hip, knee, foot]
     t1 = (np.arctan2((x[1]-x[0]),(y[1]-y[0]))).item()
     alpha = (np.arctan2((x[2]-x[1]),(y[2]-y[1]))).item()
-    t2 = -t1 - alpha
+    t2 = - t1 + alpha
     return t1, t2
 
 def get_positions(file_path):

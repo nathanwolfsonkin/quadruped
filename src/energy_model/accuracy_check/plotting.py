@@ -19,10 +19,11 @@ class OverlayAnimation:
 
         # Create a DoublePendulum object
         # Initialize the DoublePendulum instance
-        self.pendulum = DoublePendulum(l=[1.9,2])
+        self.front_leg = DoublePendulum(l=[1.9,2])
+        self.rear_leg = DoublePendulum(l=[1.9,2])
 
         # Generate list of angles wrt frame
-        self.theta_list = angle_converter.get_angle_lists()
+        self.leg_angles = angle_converter.get_angle_lists()
         
         # Obtain list of hip positions
         front_hip_filepath = "/workspace/src/energy_model/kinematics_data/unitree_a1/front_hip.csv"
@@ -30,10 +31,15 @@ class OverlayAnimation:
         self.front_hip_pos_list = angle_converter.get_positions(front_hip_filepath)
         self.rear_hip_pos_list = angle_converter.get_positions(rear_hip_filepath)
 
-        self.t1 = self.theta_list[0][0][0]
-        self.t2 = self.theta_list[0][1][0]
-        self.dt1 = 0.1       # initial angular velocity for pendulum 1
-        self.dt2 = 0.1       # initial angular velocity for pendulum 2
+        self.leg1_t1 = self.leg_angles[0][0][0]
+        self.leg1_t2 = self.leg_angles[0][1][0]
+        self.leg1_dt1 = 0.1
+        self.leg1_dt2 = 0.1
+
+        self.leg2_t1 = self.leg_angles[1][0][0]
+        self.leg2_t2 = self.leg_angles[1][1][0]
+        self.leg2_dt1 = 0.1
+        self.leg2_dt2 = 0.1
 
         # Create animation
         ani = animation.FuncAnimation(self.fig, self.ani_update, frames=len(self.frame_files), init_func=self.ani_init, blit=False)
@@ -41,26 +47,39 @@ class OverlayAnimation:
 
 
     def draw_pendulum(self, frame_idx):
-        # Update origin position
+        # Update origin positions
         front_hip_x = self.front_hip_pos_list[0][frame_idx]
         front_hip_y = -self.front_hip_pos_list[1][frame_idx]
+
+        rear_hip_x = self.rear_hip_pos_list[0][frame_idx]
+        rear_hip_y = -self.rear_hip_pos_list[1][frame_idx]
 
         # Scale to plot size
         scaled_front_hip_x = self.scaling_factor*front_hip_x
         scaled_front_hip_y = self.scaling_factor*front_hip_y
 
-        # Reassign position of hips
-        self.pendulum.origin = np.array([scaled_front_hip_x,scaled_front_hip_y]).reshape(2, 1)
+        scaled_rear_hip_x = self.scaling_factor*rear_hip_x
+        scaled_rear_hip_y = self.scaling_factor*rear_hip_y
 
-        # Calculate positions of the pendulum's centers of mass
-        pA = self.pendulum.get_pA(self.t1)
-        pB = self.pendulum.get_pB(self.t1, self.t2)
+        # Reassign position of hips
+        self.front_leg.origin = np.array([scaled_front_hip_x,scaled_front_hip_y]).reshape(2, 1)
+        self.rear_leg.origin = np.array([scaled_rear_hip_x,scaled_rear_hip_y]).reshape(2, 1)
+
+        # Calculate positions of the pendulum ends
+        front_pA = self.front_leg.get_pA(self.leg1_t1)
+        front_pB = self.front_leg.get_pB(self.leg1_t1, self.leg1_t2)
+
+        rear_pA = self.rear_leg.get_pA(self.leg2_t1)
+        rear_pB = self.rear_leg.get_pB(self.leg2_t1, self.leg2_t2)
 
         # Draw the pendulum as lines
-        self.ax.plot([self.pendulum.origin[0], pA[0]], [self.pendulum.origin[1], pA[1]], 'b-')  # First link tip
-        self.ax.plot([pA[0], pB[0]], [pA[1], pB[1]], 'g-')  # Second link tip
+        self.ax.plot([self.front_leg.origin[0], front_pA[0]], [self.front_leg.origin[1], front_pA[1]], 'b-')  # First link tip
+        self.ax.plot([front_pA[0], front_pB[0]], [front_pA[1], front_pB[1]], 'g-')  # Second link tip
+        
+        self.ax.plot([self.rear_leg.origin[0], rear_pA[0]], [self.rear_leg.origin[1], rear_pA[1]], 'b-')  # First link tip
+        self.ax.plot([rear_pA[0], rear_pB[0]], [rear_pA[1], rear_pB[1]], 'g-')  # Second link tip
+        
         plt.pause(.01)
-        pass
 
 
     def ani_init(self):
@@ -88,8 +107,11 @@ class OverlayAnimation:
         self.draw_pendulum(frame_idx)
 
         # Update the angles
-        self.t1 = self.theta_list[0][0][frame_idx]
-        self.t2 = self.theta_list[0][1][frame_idx]
+        self.leg1_t1 = self.leg_angles[0][0][frame_idx]
+        self.leg1_t2 = self.leg_angles[0][1][frame_idx]
+
+        self.leg2_t1 = self.leg_angles[1][0][frame_idx]
+        self.leg2_t2 = self.leg_angles[1][1][frame_idx]
 
         return self.ax
 
