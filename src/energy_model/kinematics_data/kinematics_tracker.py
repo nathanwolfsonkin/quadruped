@@ -95,7 +95,7 @@ def video_to_csv(video_local_path, csv_local_path):
 
 def main():
     video = 'unitree_a1/unitree_a1_gait.mp4'
-    csv = 'unitree_a1/rear_foot.csv'
+    csv = 'unitree_a1/fix_point.csv'
     video_to_csv(video, csv)
  
 if __name__ == "__main__":

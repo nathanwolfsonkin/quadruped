@@ -116,21 +116,28 @@ class PendulumAnimation:
         # Create the line for the main body
         self.main_body_line = self.ax1.plot([], [], lw=4, color='black')[0]
 
-        # Set the colors for the pendulums
-        self.colors = ['blue', 'green']  # top link: blue, bottom link: green
+        # Colors for the pendulums (with darker shades for new ones)
+        self.colors = ['blue', 'darkblue', 'green', 'darkgreen']
 
-        self.energy_lines = [[self.ax2.plot([], [], lw=2, label=f'{label} (Pendulum {i + 1})')[0]
+        self.energy_lines = [[self.ax2.plot([], [], lw=2, label=f'{label} (Leg {i + 1})')[0]
                               for label in ['Potential Energy', 'Translational KE', 'Rotational KE', 'Total Energy']]
                               for i in range(len(pendulums))]
 
         self.energy_data = [[[], [], [], []] for _ in range(len(pendulums))]
 
-        # Set the colors for each pendulum's top and bottom links
-        self.lines = [self.ax1.plot([], [], lw=2, color=self.colors[i % 2])[0] for i in range(2 * len(pendulums))]
-
+        # Define lines for each pendulum segment
+        # Initialize the pendulum lines with the specified colors
+        self.lines = []
+        num_pendulum_lines = 2 * len(pendulums)  # Two lines per pendulum
+        for i in range(num_pendulum_lines):
+            color = self.colors[i % len(self.colors)]
+            line, = self.ax1.plot([], [], lw=2, color=color)
+            self.lines.append(line)
+        
         self.ax2.legend()
 
     def pend_init(self):
+        self.first_run = True
         self.main_body_line.set_data([], [])
         for line in self.lines:
             line.set_data([], [])
@@ -145,8 +152,14 @@ class PendulumAnimation:
         # Update the main body line
         self.main_body_line.set_data([left_endpoint[0], right_endpoint[0]], [left_endpoint[1], right_endpoint[1]])
 
+        if self.first_run == True:
+            for index in range(len(self.energy_data)):
+                self.energy_data[index] = [[], [], [], []]
+                self.first_run = False
+
+        # Update each pendulum
         for i, pendulum in enumerate(self.pendulums):
-            if i == 0:
+            if i < 2:
                 pendulum.origin = left_endpoint.reshape(2, 1)
             else:
                 pendulum.origin = right_endpoint.reshape(2, 1)
@@ -159,14 +172,14 @@ class PendulumAnimation:
             pA = pendulum.get_pA(t1_frame).flatten()
             pB = pendulum.get_pB(t1_frame, t2_frame).flatten()
 
-            # Update the pendulum lines to extend to point B
-            self.lines[2 * i].set_data([pendulum.origin[0, 0], pA[0]], [pendulum.origin[1, 0], pA[1]])  # First link (top)
-            self.lines[2 * i + 1].set_data([pA[0], pB[0]], [pA[1], pB[1]])  # Second link (bottom)
+            # Update pendulum lines
+            self.lines[2 * i].set_data([pendulum.origin[0, 0], pA[0]], [pendulum.origin[1, 0], pA[1]])
+            self.lines[2 * i + 1].set_data([pA[0], pB[0]], [pA[1], pB[1]])
 
             potential_energy = pendulum.potential_energy(t1_frame, t2_frame)
             translational_ke = pendulum.translational_kinetic_energy(t1_frame, dt1_frame, t2_frame, dt2_frame)
             rotational_ke = pendulum.rotational_kinetic_energy(dt1_frame, dt2_frame)
-            total_energy = (potential_energy + translational_ke + rotational_ke).item()
+            total_energy = pendulum.total_energy(t1_frame, t2_frame, dt1_frame, dt2_frame)
 
             # Reset energy lines when the system loops
             if frame == 0:
@@ -179,38 +192,41 @@ class PendulumAnimation:
             self.energy_data[i][2].append(rotational_ke)
             self.energy_data[i][3].append(total_energy)
 
-            self.energy_lines[i][0].set_data(self.time[:frame + 1], self.energy_data[i][0])
-            self.energy_lines[i][1].set_data(self.time[:frame + 1], self.energy_data[i][1])
-            self.energy_lines[i][2].set_data(self.time[:frame + 1], self.energy_data[i][2])
+            # self.energy_lines[i][0].set_data(self.time[:frame + 1], self.energy_data[i][0])
+            # self.energy_lines[i][1].set_data(self.time[:frame + 1], self.energy_data[i][1])
+            # self.energy_lines[i][2].set_data(self.time[:frame + 1], self.energy_data[i][2])
             self.energy_lines[i][3].set_data(self.time[:frame + 1], self.energy_data[i][3])
 
         return (self.main_body_line, *self.lines, *[line for energy_line_set in self.energy_lines for line in energy_line_set])
 
     def start_animation(self):
         pend_animation = FuncAnimation(self.fig, self.pend_update, frames=len(self.time),
-                                       init_func=self.pend_init, blit=True, interval=10, repeat=False)
+                                       init_func=self.pend_init, blit=False, interval=10, repeat=True)
         plt.show()
 
 
 def main():
     main_body = MainBody(origin=[0, 0], orientation=0)
-    pendulums = [DoublePendulum(), DoublePendulum()]
+    pendulums = [DoublePendulum(), DoublePendulum(), DoublePendulum(), DoublePendulum()]
     
     theta_list = angle_converter.get_angle_lists()
 
-    frames = 299
-    time = np.linspace(0, 10, frames)
+    frames = 150
+    time = np.linspace(0, 5, frames) # Total time in seconds
 
     angles = [
-        [theta_list[0][0], theta_list[0][1]],
-        [theta_list[1][0], theta_list[1][1]]
+        [theta_list[0][0], theta_list[0][1]],  # Original front pendulum
+        [theta_list[1][0], theta_list[1][1]],  # Original rear pendulum
+        [theta_list[1][0], theta_list[1][1]],  # New front pendulum (mirroring rear)
+        [theta_list[0][0], theta_list[0][1]]   # New rear pendulum (mirroring front)
     ]
-    
 
-    # Angular velocities (derivatives of angles)
+    # Angular velocities
     angular_velocities = [
-        [np.gradient(angles[0][0], time), np.gradient(angles[0][1], time)],
-        [np.gradient(angles[1][0], time), np.gradient(angles[1][1], time)] 
+        [np.gradient(angles[0][0], time), np.gradient(angles[0][1], time)],  # Original front
+        [np.gradient(angles[1][0], time), np.gradient(angles[1][1], time)],  # Original rear
+        [np.gradient(angles[2][0], time), np.gradient(angles[2][1], time)],  # New front
+        [np.gradient(angles[3][0], time), np.gradient(angles[3][1], time)]   # New rear
     ]
 
     animation = PendulumAnimation(main_body, pendulums, angles, angular_velocities, time)
