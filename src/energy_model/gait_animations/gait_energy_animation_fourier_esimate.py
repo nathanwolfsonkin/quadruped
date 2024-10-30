@@ -1,8 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
+
 import energy_model.quadruped_energy as quad
 from energy_model.kinematics_data import angle_converter
+from energy_model.freq_analysis import fourier_approx
+from energy_model.kinematics_data.ground_velocity import get_frame_time
 
 class GaitAnimation:
     def __init__(self, quadruped, angles, angular_velocities, time):
@@ -89,23 +92,39 @@ def main():
     
     quadruped = quad.Quadruped(leg_params=leg_params, body_params=body_params)
     
-    theta_list = angle_converter.get_angle_lists()
+    legs = angle_converter.get_angle_lists()
 
-    frames = len(theta_list[0][0])
-    time = np.linspace(0, 5, frames)
+    # Get timing information
+    frame_time, total_time, total_frames = get_frame_time()
+
+    frames = len(legs[0][0])
+    time = np.linspace(0, total_time, frames)
+
+    timeseries = np.zeros([total_frames, 1+2*len(legs)*len(legs[0])])
+    timeseries[:, 0] = np.linspace(0, total_time, total_frames)
+    
+    theta_list = [[[],[]],[[],[]],[[],[]],[[],[]]]
+    # convert theta_list to a timeseries
+    for i, link in enumerate(legs):
+        for j, angle_list in enumerate(link):
+            # Create timeseries with time in the first column and the angle in the second column
+            temp_timeseries = np.array([timeseries[:,0],angle_list]).reshape(150,2)
+            approx = fourier_approx(temp_timeseries)
+            theta_list[i][j] = approx
 
     angles = [
-        [theta_list[0][0], theta_list[0][1]],
-        [theta_list[1][0], theta_list[1][1]],
-        [theta_list[1][0], theta_list[1][1]],
-        [theta_list[0][0], theta_list[0][1]]
+        [theta_list[0][0], theta_list[0][1]],  # Original front pendulum
+        [theta_list[1][0], theta_list[1][1]],  # Original rear pendulum
+        [theta_list[1][0], theta_list[1][1]],  # New front pendulum (mirroring rear)
+        [theta_list[0][0], theta_list[0][1]]   # New rear pendulum (mirroring front)
     ]
 
+    # Angular velocities
     angular_velocities = [
-        [np.gradient(angles[0][0], time), np.gradient(angles[0][1], time)],
-        [np.gradient(angles[1][0], time), np.gradient(angles[1][1], time)],
-        [np.gradient(angles[2][0], time), np.gradient(angles[2][1], time)],
-        [np.gradient(angles[3][0], time), np.gradient(angles[3][1], time)]
+        [np.gradient(angles[0][0], time), np.gradient(angles[0][1], time)],  # Original front
+        [np.gradient(angles[1][0], time), np.gradient(angles[1][1], time)],  # Original rear
+        [np.gradient(angles[2][0], time), np.gradient(angles[2][1], time)],  # New front
+        [np.gradient(angles[3][0], time), np.gradient(angles[3][1], time)]   # New rear
     ]
 
     filtered_ang_vels = []
