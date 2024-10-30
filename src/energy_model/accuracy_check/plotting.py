@@ -3,9 +3,8 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import glob
 import os
-import time
 
-from energy_model.double_pendulum import DoublePendulum
+from energy_model.quadruped_energy import Leg
 from energy_model.kinematics_data import angle_converter
 
 class OverlayAnimation:
@@ -19,8 +18,8 @@ class OverlayAnimation:
 
         # Create a DoublePendulum object
         # Initialize the DoublePendulum instance
-        self.front_leg = DoublePendulum(l=[1.9,2])
-        self.rear_leg = DoublePendulum(l=[1.9,2])
+        self.front_leg = Leg(l=[1.9,2])
+        self.rear_leg = Leg(l=[1.9,2])
 
         # Generate list of angles wrt frame
         self.leg_angles = angle_converter.get_angle_lists()
@@ -33,20 +32,20 @@ class OverlayAnimation:
 
         self.leg1_t1 = self.leg_angles[0][0][0]
         self.leg1_t2 = self.leg_angles[0][1][0]
-        self.leg1_dt1 = 0.1
-        self.leg1_dt2 = 0.1
+        self.leg1_dt1 = 1
+        self.leg1_dt2 = 1
 
         self.leg2_t1 = self.leg_angles[1][0][0]
         self.leg2_t2 = self.leg_angles[1][1][0]
-        self.leg2_dt1 = 0.1
-        self.leg2_dt2 = 0.1
+        self.leg2_dt1 = 1
+        self.leg2_dt2 = 1
 
         # Create animation
         ani = animation.FuncAnimation(self.fig, self.ani_update, frames=len(self.frame_files), init_func=self.ani_init, blit=False)
         plt.show()
 
 
-    def draw_pendulum(self, frame_idx):
+    def draw_leg(self, frame_idx):
         # Update origin positions
         front_hip_x = self.front_hip_pos_list[0][frame_idx]
         front_hip_y = -self.front_hip_pos_list[1][frame_idx]
@@ -66,11 +65,11 @@ class OverlayAnimation:
         self.rear_leg.origin = np.array([scaled_rear_hip_x,scaled_rear_hip_y]).reshape(2, 1)
 
         # Calculate positions of the pendulum ends
-        front_pA = self.front_leg.get_pA(self.leg1_t1)
-        front_pB = self.front_leg.get_pB(self.leg1_t1, self.leg1_t2)
+        front_pA = self.front_leg.get_pA()
+        front_pB = self.front_leg.get_pB()
 
-        rear_pA = self.rear_leg.get_pA(self.leg2_t1)
-        rear_pB = self.rear_leg.get_pB(self.leg2_t1, self.leg2_t2)
+        rear_pA = self.rear_leg.get_pA()
+        rear_pB = self.rear_leg.get_pB()
 
         # Draw the pendulum as lines
         self.ax.plot([self.front_leg.origin[0], front_pA[0]], [self.front_leg.origin[1], front_pA[1]], 'b-')  # First link tip
@@ -104,24 +103,19 @@ class OverlayAnimation:
         plt.pause(.001)
 
         # Draw the pendulum on top of the frame
-        self.draw_pendulum(frame_idx)
+        self.draw_leg(frame_idx)
 
         # Update the angles
-        self.leg1_t1 = self.leg_angles[0][0][frame_idx]
-        self.leg1_t2 = self.leg_angles[0][1][frame_idx]
+        self.front_leg.t1 = self.leg_angles[0][0][frame_idx]
+        self.front_leg.t2 = self.leg_angles[0][1][frame_idx]
 
-        self.leg2_t1 = self.leg_angles[1][0][frame_idx]
-        self.leg2_t2 = self.leg_angles[1][1][frame_idx]
+        self.rear_leg.t1 = self.leg_angles[1][0][frame_idx]
+        self.rear_leg.t2 = self.leg_angles[1][1][frame_idx]
 
         return self.ax
 
 def main():
     my_ani = OverlayAnimation()
-    # my_ani.ani_init()
-    # for i in range(298):
-    #     my_ani.ani_update(i)
-    #     plt.pause(.01)
-
 
 if __name__ == "__main__":
     main()

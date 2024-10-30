@@ -70,8 +70,7 @@ def get_angle_lists():
     
     return leg_angles
 
-def moving_filter(file="/workspace/src/energy_model/kinematics_data/unitree_a1/front_hip.csv"):
-    x,y = get_positions(file)
+def moving_filter(x, y): #using this for velocity data
     new_x = []
     new_y = []
     for i in range(len(x)):
@@ -84,7 +83,6 @@ def moving_filter(file="/workspace/src/energy_model/kinematics_data/unitree_a1/f
         new_x.append(x_temp)
         new_y.append(y_temp)
     return new_x, new_y
-        
 
 def main():
     moving_filter()

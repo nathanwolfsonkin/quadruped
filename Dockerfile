@@ -30,11 +30,12 @@ ENV PATH="${VENV_DIR}/bin:$PATH"
 # Upgrade pip and install Python dependencies in the virtual environment
 RUN pip install --upgrade pip
 RUN pip install \
-    numpy \
     opencv-python \ 
     opencv-contrib-python \
     matplotlib \
-    PyQt5
+    numpy \
+    scipy \
+    PyQt5 
 
 # Remove apt library folder to save space
 RUN rm -rf /var/lib/apt/lists/*
