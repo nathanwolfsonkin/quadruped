@@ -1,15 +1,19 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import find_peaks
-from energy_model.kinematics_data.angle_converter import get_angle_lists
-from energy_model.kinematics_data.ground_velocity import get_frame_time
+from energy_model.kinematics_data.data_post_process import DataPostProcess
 
-def fourier_approx(timeseries, N=3):
+def to_timeseries(timelist, datalist):
+    if len(timelist) != len(datalist):
+        raise ValueError("The vectors are not of equal size")
+    
+    return np.column_stack((timelist, datalist))
 
+def fourier_approx(timeseries, N=2):
+    # Extract data from timeseries
     total_frames = len(timeseries[:, 0])
     time_list = timeseries[:, 0]
     frame_time = time_list[1] - time_list[0]
-    total_time = time_list[-1]
     
     # Extract the values (angle data) for FFT analysis
     signal = timeseries[:, 1]
@@ -34,7 +38,6 @@ def fourier_approx(timeseries, N=3):
     
     # Check the zero frequency (DC component) manually
     dc_power = sorted_power_spectrum[positive_half_n]
-    # print(f"DC Component: {positive_freqs[0]:.2f} Hz with power {dc_power:.2f}")
     
     # Find peaks in the power spectrum excluding the DC component
     peaks, _ = find_peaks(positive_power_spectrum[1:])  # Exclude the zero frequency
@@ -50,8 +53,7 @@ def fourier_approx(timeseries, N=3):
     dominant_powers = np.insert(dominant_powers, 0, dc_power)
     
     # Construct continuous approximation function from dominant frequencies
-    time_continuous = np.linspace(0, total_time, len(time_list))  # High-resolution time for smooth plotting
-    approximation = np.zeros_like(time_continuous)
+    approximation = np.zeros_like(time_list)
     
     # Add DC component
     approximation += fft_values_positive[0].real / total_frames  # Average of the signal (DC component)
@@ -63,13 +65,13 @@ def fourier_approx(timeseries, N=3):
         phase = np.angle(fft_values_positive[index])
         
         # Add sinusoidal component to the approximation
-        approximation += amplitude * np.cos(2 * np.pi * freq * time_continuous + phase)
+        approximation += amplitude * np.cos(2 * np.pi * freq * time_list + phase)
 
     if __name__ == "__main__":
         # Plot the power spectrum with dominant frequencies marked
         plt.figure()
-        plt.plot(sorted_fft_freqs, sorted_power_spectrum)
-        plt.plot(dominant_frequencies, dominant_powers, "x", label="Dominant Frequencies")
+        plt.plot(sorted_fft_freqs, np.log10(sorted_power_spectrum))
+        plt.plot(dominant_frequencies, np.log10(dominant_powers), "x", label="Dominant Frequencies")
         plt.xlabel('Frequency (Hz)')
         plt.ylabel('Power')
         plt.title('Power Spectrum')
@@ -77,8 +79,8 @@ def fourier_approx(timeseries, N=3):
         
         # Plot the original signal vs. its approximation
         plt.figure()
-        plt.plot(timeseries[:, 0], signal, label="Original Signal")
-        plt.plot(time_continuous, approximation, label="Approximated Signal", linestyle="--")
+        plt.plot(time_list, signal, label="Original Signal")
+        plt.plot(time_list, approximation, label="Approximated Signal", linestyle="--")
         plt.xlabel('Time (s)')
         plt.ylabel('Signal')
         plt.title('Original Signal vs. Fourier Approximation')
@@ -88,12 +90,14 @@ def fourier_approx(timeseries, N=3):
         return approximation
 
 def main():
+    dataset = DataPostProcess("unitree_a1")
+
     # Get angle data for the legs
-    leg1, leg2 = get_angle_lists()
-    leg1_t1 = leg2[1]
+    leg1, leg2 = dataset.get_angle_lists()
+    leg1_t1 = leg1[0]
     
     # Get timing information
-    frame_time, total_time, total_frames = get_frame_time()
+    frame_time, total_time, total_frames = dataset.get_frame_data()
     
     # Create timeseries with time in the first column and the angle in the second column
     timeseries = np.zeros([total_frames, 2])
@@ -101,7 +105,7 @@ def main():
     timeseries[:, 1] = leg1_t1
 
     # Define number of peaks dominant frequencies to utilize (plus DC gain)
-    N = 3
+    N = 2
     fourier_approx(timeseries, N)
 
 if __name__ == "__main__":

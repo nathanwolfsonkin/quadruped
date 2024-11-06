@@ -5,7 +5,7 @@ import glob
 import os
 
 from energy_model.quadruped_energy import Leg
-from energy_model.kinematics_data import angle_converter
+from energy_model.kinematics_data.data_post_process import DataPostProcess
 
 class OverlayAnimation:
     def __init__(self):
@@ -22,13 +22,14 @@ class OverlayAnimation:
         self.rear_leg = Leg(l=[1.9,2])
 
         # Generate list of angles wrt frame
-        self.leg_angles = angle_converter.get_angle_lists()
+        dataset = DataPostProcess("unitree_a1")
+        self.leg_angles = dataset.get_angle_lists()
         
         # Obtain list of hip positions
         front_hip_filepath = "/workspace/src/energy_model/kinematics_data/unitree_a1/front_hip.csv"
         rear_hip_filepath = "/workspace/src/energy_model/kinematics_data/unitree_a1/rear_hip.csv"
-        self.front_hip_pos_list = angle_converter.get_positions(front_hip_filepath)
-        self.rear_hip_pos_list = angle_converter.get_positions(rear_hip_filepath)
+        self.front_hip_pos_list = dataset.get_positions(front_hip_filepath)
+        self.rear_hip_pos_list = dataset.get_positions(rear_hip_filepath)
 
         self.leg1_t1 = self.leg_angles[0][0][0]
         self.leg1_t2 = self.leg_angles[0][1][0]

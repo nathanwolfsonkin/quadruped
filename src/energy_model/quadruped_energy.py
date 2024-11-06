@@ -1,5 +1,6 @@
 import numpy as np
 
+# Quadrupedal parameters and current state
 class Quadruped:
     def __init__(self, leg_params={'l':1, 'I':1, 'm':1}, 
                  body_params={'l':1, 'I':1, 'm':1, 'origin':[0,0], 'orientation':0}):
@@ -33,8 +34,10 @@ class Quadruped:
         
         return total_energy
 
+
+# Main body parameters and current state
 class MainBody:
-    def __init__(self, m=1, l=1, I=2, origin=[0, 0], orientation=0):
+    def __init__(self, m=1, l=1, I=1, origin=[0, 0], orientation=0):
         self.m = m
         self.l = l
         self.I = I
@@ -64,6 +67,7 @@ class MainBody:
         return U_g + T_k
 
 
+# Leg parameters and current state
 class Leg:
     def __init__(self, m=[1,1], l=[1,1], I=[1,1], origin=[0,0]):
         # Initialize Parameters
@@ -112,6 +116,11 @@ class Leg:
         v = self.get_vA() + (self.l[1]/2)*np.array([[np.cos(self.t1+self.t2)],
                                             [np.sin(self.t1+self.t2)]])*(self.dt1+self.dt2)
         return v
+    
+    def get_vB(self):
+        v = self.get_vA() + (self.l[1])*np.array([[np.cos(self.t1+self.t2)],
+                                            [np.sin(self.t1+self.t2)]])*(self.dt1+self.dt2)
+        return v
         
     # energy functions
     def potential_energy(self):
@@ -144,6 +153,31 @@ class Leg:
                 self.translational_kinetic_energy() + 
                 self.rotational_kinetic_energy()
                 ).item()
+
+
+# Helper class to carry around quadruped state trajectory data
+class QuadrupedData:
+    def __init__(self, timelist, data=[[[],[]],[[],[]],[[],[]],[[],[]]]):
+        leg1, leg2, leg3, leg4 = data
+        leg1_t1, leg1_t2 = leg1
+        leg2_t1, leg2_t2 = leg2
+        leg3_t1, leg3_t2 = leg3
+        leg4_t1, leg4_t2 = leg4
+
+        self.leg_list = [LegData(timelist, leg1_t1, leg1_t2),
+                         LegData(timelist, leg2_t1, leg2_t2),
+                         LegData(timelist, leg3_t1, leg3_t2),
+                         LegData(timelist, leg4_t1, leg4_t2)]
+
+
+# Helper class to carry around leg state trajectory data
+class LegData:
+    def __init__(self, timelist, t1_list, t2_list):
+        self.t1 = t1_list
+        self.t2 = t2_list
+        self.dt1 = np.gradient(self.t1, timelist)
+        self.dt2 = np.gradient(self.t2, timelist)
+
 
 def main():
     pass

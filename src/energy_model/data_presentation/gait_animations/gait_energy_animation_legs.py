@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
 import energy_model.quadruped_energy as quad
-from energy_model.kinematics_data import angle_converter
+from energy_model.kinematics_data.data_post_process import DataPostProcess
 
 class GaitAnimation:
     def __init__(self, quadruped, angles, angular_velocities, time):
@@ -134,7 +134,9 @@ def main():
     body_params = {'l':3, 'I':1, 'm':1, 'origin':[0,0], 'orientation':0}
     quadruped = quad.Quadruped(leg_params=leg_params, body_params=body_params)
     
-    theta_list = angle_converter.get_angle_lists()
+    dataset = DataPostProcess("unitree_a1")
+
+    theta_list = dataset.get_angle_lists()
 
     frames = len(theta_list[0][0])
     time = np.linspace(0, 5, frames) # Total time in seconds
@@ -156,7 +158,7 @@ def main():
 
     filtered_ang_vels = []
     for angular_vel_list in angular_velocities:
-        filt_vel_x, filt_vel_y = angle_converter.moving_filter(angular_vel_list[0],angular_vel_list[1])
+        filt_vel_x, filt_vel_y = DataPostProcess.moving_filter(angular_vel_list[0],angular_vel_list[1])
         filtered_ang_vels.append([filt_vel_x,filt_vel_y])
 
     animation = GaitAnimation(quadruped, angles, filtered_ang_vels, time)
