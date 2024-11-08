@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import find_peaks
-from energy_model.kinematics_data.data_post_process import DataPostProcess
+from energy_model.kinematics_data.data_post_process import VideoDataProcess
 
 def to_timeseries(timelist, datalist):
     if len(timelist) != len(datalist):
@@ -90,7 +90,7 @@ def fourier_approx(timeseries, N=2):
         return approximation
 
 def main():
-    dataset = DataPostProcess("unitree_a1")
+    dataset = VideoDataProcess("unitree_a1")
 
     # Get angle data for the legs
     leg1, leg2 = dataset.get_angle_lists()

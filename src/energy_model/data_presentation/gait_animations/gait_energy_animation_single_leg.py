@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import energy_model.quadruped_energy as quad
-from energy_model.kinematics_data.data_post_process import DataPostProcess
+from energy_model.kinematics_data.data_post_process import VideoDataProcess
 import numpy as np
 import matplotlib.pyplot as plt
 class GaitAnimation:
@@ -89,7 +89,7 @@ def main():
     body_params = {'l': 0.361, 'I': 0.01, 'm': 5.66, 'origin': [0, 0], 'orientation': 0}
     
     quadruped = quad.Quadruped(leg_params=leg_params, body_params=body_params)
-    dataset = DataPostProcess("unitree_a1")
+    dataset = VideoDataProcess("unitree_a1")
 
     theta_list = dataset.get_angle_lists()
 
@@ -110,7 +110,7 @@ def main():
         [np.gradient(angles[3][0], time), np.gradient(angles[3][1], time)]
     ]
 
-    filtered_ang_vels = [DataPostProcess.moving_filter(*vel) for vel in angular_velocities]
+    filtered_ang_vels = [VideoDataProcess.moving_filter(*vel) for vel in angular_velocities]
 
     animation = GaitAnimation(quadruped, angles, filtered_ang_vels, time, leg_index=0)
     animation.start_animation()

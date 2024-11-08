@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
 import energy_model.quadruped_energy as quad
-from energy_model.kinematics_data.data_post_process import DataPostProcess
+from energy_model.kinematics_data.data_post_process import VideoDataProcess
 from energy_model.freq_analysis import fourier_approx
 
 class GaitAnimation:
@@ -91,7 +91,7 @@ def main():
     
     quadruped = quad.Quadruped(leg_params=leg_params, body_params=body_params)
     
-    dataset = DataPostProcess("unitree_a1")
+    dataset = VideoDataProcess("unitree_a1")
 
     legs = dataset.get_angle_lists()
 
@@ -130,7 +130,7 @@ def main():
 
     filtered_ang_vels = []
     for angular_vel_list in angular_velocities:
-        filt_vel_x, filt_vel_y = DataPostProcess.moving_filter(angular_vel_list[0], angular_vel_list[1])
+        filt_vel_x, filt_vel_y = VideoDataProcess.moving_filter(angular_vel_list[0], angular_vel_list[1])
         filtered_ang_vels.append([filt_vel_x, filt_vel_y])
 
     animation = GaitAnimation(quadruped, angles, filtered_ang_vels, time)

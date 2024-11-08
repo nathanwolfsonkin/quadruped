@@ -1,7 +1,7 @@
 import csv
 import numpy as np
 
-class DataPostProcess:
+class VideoDataProcess:
     def __init__(self, unit="unitree_a1"):
         default_filepath = "/workspace/src/energy_model/kinematics_data/"
         
@@ -51,11 +51,11 @@ class DataPostProcess:
     def get_angle_lists(self):
         # Specify joint csv names
         joint_names = ["front_hip.csv",
-                    "front_knee.csv",
-                    "front_foot.csv",
-                    "rear_hip.csv",
-                    "rear_knee.csv",
-                    "rear_foot.csv"]
+                       "front_knee.csv",
+                       "front_foot.csv",
+                       "rear_hip.csv",
+                       "rear_knee.csv",
+                       "rear_foot.csv"]
 
         xlist = []
         ylist = []
@@ -140,7 +140,7 @@ class DataPostProcess:
         return new_x, new_y
 
 def main():
-    dataset = DataPostProcess("unitree_a1")
+    dataset = VideoDataProcess("unitree_a1")
     hip = dataset.get_positions(dataset.filepath + "front_hip.csv")
     knee = dataset.get_positions(dataset.filepath + "front_knee.csv")
     foot = dataset.get_positions(dataset.filepath + "front_foot.csv")

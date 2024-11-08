@@ -25,6 +25,13 @@ class Quadruped:
                          Leg(origin=left_hip, l=l, I=I, m=m), 
                          Leg(origin=right_hip,l=l, I=I, m=m), 
                          Leg(origin=right_hip,l=l, I=I, m=m)]
+        
+        # Calculate quadruped mass for CoT
+        self.m = 0
+        self.m += self.body.m
+        for leg in self.leg_list:
+            # Add up mass of both links
+            self.m += np.sum(leg.m)
 
     def total_energy(self):
         total_energy = 0
@@ -54,7 +61,7 @@ class MainBody:
     
     def potential_energy(self):
         # Approximate the height of the body based on the lowest position of the legs
-        h = .2 ############################################# TEMP VALUE ##########################################################################
+        h = 1 ############################################# TEMP VALUE ##########################################################################
         return self.m * 9.81 * h
 
     def translational_kinetic_energy(self):
@@ -86,11 +93,11 @@ class Leg:
     # returns position of com1 wrt the origin
     def get_p1(self):
         return (self.origin + (self.l[0]/2)*np.array([[np.sin(self.t1)],
-                                                     [-np.cos(self.t1)]])).reshape(2,1)
+                                                      [-np.cos(self.t1)]])).reshape(2,1)
 
     def get_pA(self):
         return (self.origin + self.l[0]*np.array([[np.sin(self.t1)],
-                                                 [-np.cos(self.t1)]])).reshape(2,1)
+                                                  [-np.cos(self.t1)]])).reshape(2,1)
 
     # returns position of com2 wrt the origin
     def get_p2(self):
@@ -104,22 +111,22 @@ class Leg:
     # velocity functions
     def get_v1(self):
         v = (self.l[0]/2)*np.array([[np.cos(self.t1)],
-                            [np.sin(self.t1)]]) * self.dt1
+                                    [np.sin(self.t1)]]) * self.dt1
         return v
 
     def get_vA(self):
         v = self.l[0]*np.array([[np.cos(self.t1)],
-                        [np.sin(self.t1)]]) * self.dt1
+                                [np.sin(self.t1)]]) * self.dt1
         return v
     
     def get_v2(self):
         v = self.get_vA() + (self.l[1]/2)*np.array([[np.cos(self.t1+self.t2)],
-                                            [np.sin(self.t1+self.t2)]])*(self.dt1+self.dt2)
+                                                    [np.sin(self.t1+self.t2)]])*(self.dt1+self.dt2)
         return v
     
     def get_vB(self):
         v = self.get_vA() + (self.l[1])*np.array([[np.cos(self.t1+self.t2)],
-                                            [np.sin(self.t1+self.t2)]])*(self.dt1+self.dt2)
+                                                  [np.sin(self.t1+self.t2)]])*(self.dt1+self.dt2)
         return v
         
     # energy functions
@@ -156,9 +163,22 @@ class Leg:
 
 
 # Helper class to carry around quadruped state trajectory data
+# Used to calculating behavior over time
 class QuadrupedData:
-    def __init__(self, timelist, data=[[[],[]],[[],[]],[[],[]],[[],[]]]):
-        leg1, leg2, leg3, leg4 = data
+    def __init__(self, quadruped: Quadruped, timelist, gait_data=[[[],[]],[[],[]],[[],[]],[[],[]]]):
+        self.quadruped = quadruped
+
+        # append gait_data to be of appropriate size if no initializer is given
+        if gait_data == [[[],[]],[[],[]],[[],[]],[[],[]]]:
+            for leg in gait_data:
+                for link in leg:
+                    for _ in timelist:
+                        link.append(0.)
+
+        self.timelist = timelist
+        
+        # Written for clarity
+        leg1, leg2, leg3, leg4 = gait_data
         leg1_t1, leg1_t2 = leg1
         leg2_t1, leg2_t2 = leg2
         leg3_t1, leg3_t2 = leg3
@@ -168,19 +188,125 @@ class QuadrupedData:
                          LegData(timelist, leg2_t1, leg2_t2),
                          LegData(timelist, leg3_t1, leg3_t2),
                          LegData(timelist, leg4_t1, leg4_t2)]
+        
+    def refresh(self):
+        for leg in self.leg_list:
+            leg.refresh()
+
+    # Helper function to approximate quadruped body velocity based on leg trajectory
+    def calculate_vel(self):
+        # Steps:
+        # 1) Identify stance vs swing phase for each foot
+        stance_list, foot_vel_list = self.find_stance_phase()
+
+        # 3) the average foot velocity between all 4 of the feet during the stance phase is the approximated body velocity
+        foot_average_vel = [0,0,0,0]
+        for leg_index, leg in enumerate(self.quadruped.leg_list):
+            stance_frames = 0
+            for index, stance in enumerate(stance_list[leg_index]):
+                if stance == True:
+                    foot_average_vel[leg_index] += foot_vel_list[leg_index][index]
+                    stance_frames += 1
+            
+            foot_average_vel[leg_index] = abs(foot_average_vel[leg_index]/stance_frames)
+        
+        average_body_vel = np.mean(foot_average_vel)
+        return average_body_vel
+            
+    # returns list of bools defining if the leg is in stance or swing
+    # returns list of velocities for the foot at each time instance
+    def find_stance_phase(self):
+        # Assume quadruped has 4 legs (duh)
+        vB_list = [[],[],[],[]]
+        stance_list = [[],[],[],[]]
+        
+        # itterate through each leg
+        for leg_index, leg in enumerate(self.leg_list):
+            
+            # Itterate through each time index
+            for time_index, time in enumerate(leg.timelist):
+                self.quadruped.leg_list[leg_index].t1 = leg.t1[time_index]
+                self.quadruped.leg_list[leg_index].t2 = leg.t2[time_index]
+                self.quadruped.leg_list[leg_index].dt1 = leg.dt1[time_index]
+                self.quadruped.leg_list[leg_index].dt2 = leg.dt2[time_index]
+                
+                # Record foot velocity in body frame
+                foot_vel_x = self.quadruped.leg_list[leg_index].get_vB()[0]
+                vB_list[leg_index].append(foot_vel_x)
+
+                # Record if foot is in stance or swing
+                if foot_vel_x < 0:
+                    # If the leg is moving in the negative x direction in the body frame
+                    stance_list[leg_index].append(True)
+                else:
+                    stance_list[leg_index].append(False)
+
+        return stance_list, vB_list
+    
+    # Returns list of total quadruped energy over time
+    def energy_trajectory(self):
+                
+        leg_energy = [[],[],[],[]]
+        quad_energy_list = []
+
+        # For each time instance
+        for time_index, time in enumerate(self.timelist):
+            # For each leg
+            for leg_index, leg in enumerate(self.quadruped.leg_list):
+                # Update current state
+                leg.t1 = self.leg_list[leg_index].t1[time_index]
+                leg.t2 = self.leg_list[leg_index].t2[time_index]
+                leg.dt1 = self.leg_list[leg_index].dt1[time_index]
+                leg.dt2 = self.leg_list[leg_index].dt2[time_index]
+
+                # Calculate current energy
+                leg_energy[leg_index].append(leg.total_energy())
+
+            quad_energy_list.append(self.quadruped.total_energy())
+        
+        return quad_energy_list
+    
+    def calc_work_done(self):
+        work_done = 0
+        
+        quad_energy_list = self.energy_trajectory()
+        
+        for energy_index, energy_value in enumerate(quad_energy_list):
+            if energy_index != 0:
+                if energy_value >= quad_energy_list[energy_index-1]:
+                    work_done += energy_value - quad_energy_list[energy_index-1]
+        
+        return work_done
+    
+    def calc_distance(self):
+        v = self.calculate_vel()
+        time = self.timelist[-1]
+        return v * time
+    
+    def cost_of_transport(self):
+        work = self.calc_work_done() 
+        g = 9.81 # m/s^2
+        dist = self.calc_distance()
+        return work / (self.quadruped.m * g * dist)
 
 
 # Helper class to carry around leg state trajectory data
 class LegData:
     def __init__(self, timelist, t1_list, t2_list):
+        self.timelist = timelist
         self.t1 = t1_list
         self.t2 = t2_list
-        self.dt1 = np.gradient(self.t1, timelist)
-        self.dt2 = np.gradient(self.t2, timelist)
+        self.dt1 = np.gradient(self.t1, self.timelist)
+        self.dt2 = np.gradient(self.t2, self.timelist)
+
+    def refresh(self):
+        self.dt1 = np.gradient(self.t1, self.timelist)
+        self.dt2 = np.gradient(self.t2, self.timelist)
 
 
 def main():
     pass
+
 
 if __name__ == "__main__":
     main()

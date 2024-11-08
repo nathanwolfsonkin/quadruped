@@ -5,7 +5,7 @@ import glob
 import os
 
 from energy_model.quadruped_energy import Leg
-from energy_model.kinematics_data.data_post_process import DataPostProcess
+from energy_model.kinematics_data.data_post_process import VideoDataProcess
 
 class OverlayAnimation:
     def __init__(self):
@@ -22,7 +22,7 @@ class OverlayAnimation:
         self.rear_leg = Leg(l=[1.9,2])
 
         # Generate list of angles wrt frame
-        dataset = DataPostProcess("unitree_a1")
+        dataset = VideoDataProcess("unitree_a1")
         self.leg_angles = dataset.get_angle_lists()
         
         # Obtain list of hip positions
