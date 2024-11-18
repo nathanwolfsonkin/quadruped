@@ -15,21 +15,22 @@ class ModelGaitPlots:
 
         # Contains data state trajectory
         self.quadruped_traj = QuadrupedData(self.quadruped, timelist=timelist, gait_data=gait_data)
-        
-        # Define timelist as a class variable for plotting
-        self.timelist = timelist
 
         # Populate quadruped_traj with appropriate trajectory data
         for i, leg in enumerate(gait_data):
             self.quadruped_traj.leg_list[i].t1, self.quadruped_traj.leg_list[i].t2 = leg
 
+        # Define high res timelist
+        res_multiplier = 4
+        high_res_timelist = np.linspace(0,timelist[-1], len(timelist)*res_multiplier)
+
         # Contains state trajctory approximation based on fourier analysis
-        self.quadruped_traj_fourier = QuadrupedData(quadruped=self.quadruped, timelist=timelist)
+        self.quadruped_traj_fourier = QuadrupedData(quadruped=self.quadruped, timelist=high_res_timelist)
 
         # Populate quadruped_traj_fourier with appropriate trajectory data
         for i, leg in enumerate(gait_data):
-            t1_approx = fourier_approx(to_timeseries(self.timelist, self.quadruped_traj.leg_list[i].t1))
-            t2_approx = fourier_approx(to_timeseries(self.timelist, self.quadruped_traj.leg_list[i].t2))
+            t1_approx = fourier_approx(to_timeseries(self.quadruped_traj.timelist, self.quadruped_traj.leg_list[i].t1), resolution_multiplier=res_multiplier)
+            t2_approx = fourier_approx(to_timeseries(self.quadruped_traj.timelist, self.quadruped_traj.leg_list[i].t2), resolution_multiplier=res_multiplier)
             self.quadruped_traj_fourier.leg_list[i].t1 = t1_approx
             self.quadruped_traj_fourier.leg_list[i].t2 = t2_approx
         
@@ -39,10 +40,10 @@ class ModelGaitPlots:
     def leg1_data_approx(self):
         # Leg 1
         plt.figure()
-        plt.plot(self.timelist, self.quadruped_traj.leg_list[0].t1, label='θ_1', color='b')
-        plt.plot(self.timelist, self.quadruped_traj_fourier.leg_list[0].t1, label='θ_1 Fourier Approximation', linestyle='--', color='b')
-        plt.plot(self.timelist, self.quadruped_traj.leg_list[0].t2, label='θ_2', color='r')
-        plt.plot(self.timelist, self.quadruped_traj_fourier.leg_list[0].t2, label='θ_2 Fourier Approximation', linestyle='--', color='r')
+        plt.plot(self.quadruped_traj.timelist, self.quadruped_traj.leg_list[0].t1, label='θ_1', color='b')
+        plt.plot(self.quadruped_traj_fourier.timelist, self.quadruped_traj_fourier.leg_list[0].t1, label='θ_1 Fourier Approximation', linestyle='--', color='b')
+        plt.plot(self.quadruped_traj.timelist, self.quadruped_traj.leg_list[0].t2, label='θ_2', color='r')
+        plt.plot(self.quadruped_traj_fourier.timelist, self.quadruped_traj_fourier.leg_list[0].t2, label='θ_2 Fourier Approximation', linestyle='--', color='r')
         plt.title('Leg 1')
         plt.legend()
         plt.xlabel('time (s)')
@@ -51,10 +52,10 @@ class ModelGaitPlots:
     def leg2_data_approx(self):
         # Leg 2
         plt.figure()
-        plt.plot(self.timelist, self.quadruped_traj.leg_list[1].t1, label='θ_1', color='g')
-        plt.plot(self.timelist, self.quadruped_traj_fourier.leg_list[1].t1, label='θ_1 Fourier Approximation', linestyle='--', color='g')
-        plt.plot(self.timelist, self.quadruped_traj.leg_list[1].t2, label='θ_2', color='y')
-        plt.plot(self.timelist, self.quadruped_traj_fourier.leg_list[1].t2, label='θ_2 Fourier Approximation', linestyle='--', color='y')
+        plt.plot(self.quadruped_traj.timelist, self.quadruped_traj.leg_list[1].t1, label='θ_1', color='g')
+        plt.plot(self.quadruped_traj_fourier.timelist, self.quadruped_traj_fourier.leg_list[1].t1, label='θ_1 Fourier Approximation', linestyle='--', color='g')
+        plt.plot(self.quadruped_traj.timelist, self.quadruped_traj.leg_list[1].t2, label='θ_2', color='y')
+        plt.plot(self.quadruped_traj_fourier.timelist, self.quadruped_traj_fourier.leg_list[1].t2, label='θ_2 Fourier Approximation', linestyle='--', color='y')
         plt.title('Leg 2')
         plt.legend()
         plt.xlabel('time (s)')
@@ -63,14 +64,14 @@ class ModelGaitPlots:
     def all_angles_approx(self): 
         # All angles plot
         plt.figure()
-        plt.plot(self.timelist, self.quadruped_traj.leg_list[0].t1, label='leg1 θ_1', color='b')
-        plt.plot(self.timelist, self.quadruped_traj_fourier.leg_list[0].t1, label='leg1 θ_1 Fourier Approximation', linestyle='--', color='b')
-        plt.plot(self.timelist, self.quadruped_traj.leg_list[0].t2, label='leg1 θ_2', color='r')
-        plt.plot(self.timelist, self.quadruped_traj_fourier.leg_list[0].t2, label='leg1 θ_2 Fourier Approximation', linestyle='--', color='r')
-        plt.plot(self.timelist, self.quadruped_traj.leg_list[1].t1, label='leg2 θ_1', color='g')
-        plt.plot(self.timelist, self.quadruped_traj_fourier.leg_list[1].t1, label='leg2 θ_1 Fourier Approximation', linestyle='--', color='g')
-        plt.plot(self.timelist, self.quadruped_traj.leg_list[1].t2, label='leg2 θ_2', color='y')
-        plt.plot(self.timelist, self.quadruped_traj_fourier.leg_list[1].t2, label='leg2 θ_2 Fourier Approximation', linestyle='--', color='y')
+        plt.plot(self.quadruped_traj.timelist, self.quadruped_traj.leg_list[0].t1, label='leg1 θ_1', color='b')
+        plt.plot(self.quadruped_traj_fourier.timelist, self.quadruped_traj_fourier.leg_list[0].t1, label='leg1 θ_1 Fourier Approximation', linestyle='--', color='b')
+        plt.plot(self.quadruped_traj.timelist, self.quadruped_traj.leg_list[0].t2, label='leg1 θ_2', color='r')
+        plt.plot(self.quadruped_traj_fourier.timelist, self.quadruped_traj_fourier.leg_list[0].t2, label='leg1 θ_2 Fourier Approximation', linestyle='--', color='r')
+        plt.plot(self.quadruped_traj.timelist, self.quadruped_traj.leg_list[1].t1, label='leg2 θ_1', color='g')
+        plt.plot(self.quadruped_traj_fourier.timelist, self.quadruped_traj_fourier.leg_list[1].t1, label='leg2 θ_1 Fourier Approximation', linestyle='--', color='g')
+        plt.plot(self.quadruped_traj.timelist, self.quadruped_traj.leg_list[1].t2, label='leg2 θ_2', color='y')
+        plt.plot(self.quadruped_traj_fourier.timelist, self.quadruped_traj_fourier.leg_list[1].t2, label='leg2 θ_2 Fourier Approximation', linestyle='--', color='y')
         plt.title('All Angles')
         plt.legend()
         plt.xlabel('time (s)')
@@ -102,14 +103,14 @@ class ModelGaitPlots:
 
         # Create the first axis for θ_1
         ax1 = plt.gca()  # Get the current axes
-        ax1.plot(self.timelist, self.quadruped_traj_fourier.leg_list[0].t1, label='θ_1', color='tab:blue')
+        ax1.plot(self.quadruped_traj_fourier.timelist, self.quadruped_traj_fourier.leg_list[0].t1, label='θ_1', color='tab:blue')
         ax1.set_xlabel('Time (s)')  # Label for the x-axis
         ax1.set_ylabel('θ_1', color='tab:blue')  # Label for the first y-axis
         ax1.tick_params(axis='y', labelcolor='tab:blue')  # Color the ticks
 
         # Create the second axis for dθ_1 (using twinx)
         ax2 = ax1.twinx()  # Create a second y-axis
-        ax2.plot(self.timelist, self.quadruped_traj_fourier.leg_list[0].dt1, label='dθ_1', color='tab:red')
+        ax2.plot(self.quadruped_traj_fourier.timelist, self.quadruped_traj_fourier.leg_list[0].dt1, label='dθ_1', color='tab:red')
         ax2.set_ylabel('dθ_1', color='tab:red')  # Label for the second y-axis
         ax2.tick_params(axis='y', labelcolor='tab:red')  # Color the ticks
 
@@ -120,7 +121,7 @@ class ModelGaitPlots:
 
     def leg1_pfoot_vs_time(self):
         pB_list = []
-        for i, _ in enumerate(self.quadruped_traj.leg_list[0].t1):
+        for i, _ in enumerate(self.quadruped_traj_fourier.leg_list[0].t1):
             self.quadruped.leg_list[0].t1 = self.quadruped_traj_fourier.leg_list[0].t1[i]
             self.quadruped.leg_list[0].t2 = self.quadruped_traj_fourier.leg_list[0].t2[i]
             self.quadruped.leg_list[0].dt1 = self.quadruped_traj_fourier.leg_list[0].dt1[i]
@@ -128,14 +129,14 @@ class ModelGaitPlots:
             pB_list.append(self.quadruped.leg_list[0].get_pB()[0])
         
         plt.figure()
-        plt.plot(self.timelist, pB_list, label='P_foot')
+        plt.plot(self.quadruped_traj_fourier.timelist, pB_list, label='P_foot')
         plt.title('Leg 1 Foot Position')
         plt.xlabel('Time (s)')
         plt.ylabel('Foot Position (horizontal direction)')
 
     def leg1_vfoot_vs_time(self):
         vB_list = []
-        for i, _ in enumerate(self.quadruped_traj.leg_list[0].t1):
+        for i, _ in enumerate(self.quadruped_traj_fourier.leg_list[0].t1):
             self.quadruped.leg_list[0].t1 = self.quadruped_traj_fourier.leg_list[0].t1[i]
             self.quadruped.leg_list[0].t2 = self.quadruped_traj_fourier.leg_list[0].t2[i]
             self.quadruped.leg_list[0].dt1 = self.quadruped_traj_fourier.leg_list[0].dt1[i]
@@ -143,18 +144,17 @@ class ModelGaitPlots:
             vB_list.append(self.quadruped.leg_list[0].get_vB()[0])
         
         plt.figure()
-        plt.plot(self.timelist, vB_list, label='V_foot')
+        plt.plot(self.quadruped_traj_fourier.timelist, vB_list, label='V_foot')
         plt.title('Leg 1 Foot Velocity')
         plt.xlabel('Time (s)')
         plt.ylabel('Foot Velocity (horizontal direction)')
 
     def all_energy_plot(self):
-        
         leg_energy = [[],[],[],[]]
         quad_energy = []
 
         # For each time instance
-        for time_index, time in enumerate(self.timelist):
+        for time_index, time in enumerate(self.quadruped_traj_fourier.timelist):
             # For each leg
             for leg_index, leg in enumerate(self.quadruped.leg_list):
                 # Update current state
@@ -176,35 +176,35 @@ class ModelGaitPlots:
 
         # First subplot: spans the top two grid sections (i.e., top-left 2 blocks)
         ax1 = fig.add_subplot(gs[0, :])  # This spans the first row, all columns
-        ax1.plot(self.timelist, quad_energy)
+        ax1.plot(self.quadruped_traj_fourier.timelist, quad_energy)
         ax1.set_title("Total Quadruped Energy")
         ax1.set_xlabel("Time (s)")
         ax1.set_ylabel("Energy (j)")
 
         # Second subplot: bottom-left
         ax2 = fig.add_subplot(gs[1, 0])
-        ax2.plot(self.timelist, leg_energy[0])
+        ax2.plot(self.quadruped_traj_fourier.timelist, leg_energy[0])
         ax2.set_title("Front Leg 1 Energy")
         ax2.set_xlabel("Time (s)")
         ax2.set_ylabel("Energy (j)")
 
         # Third subplot: bottom-right
         ax3 = fig.add_subplot(gs[1, 1])
-        ax3.plot(self.timelist, leg_energy[1])
+        ax3.plot(self.quadruped_traj_fourier.timelist, leg_energy[1])
         ax3.set_title("Front Leg 2 Energy")
         ax3.set_xlabel("Time (s)")
         ax3.set_ylabel("Energy (j)")
 
         # Fourth subplot: bottom-left (this could be a new plot or reused if needed)
         ax4 = fig.add_subplot(gs[2, 0])
-        ax4.plot(self.timelist, leg_energy[2])
+        ax4.plot(self.quadruped_traj_fourier.timelist, leg_energy[2])
         ax4.set_title("Rear Leg 1 Energy")
         ax4.set_xlabel("Time (s)")
         ax4.set_ylabel("Energy (j)")
 
         # Fifth subplot: bottom-right
         ax5 = fig.add_subplot(gs[2, 1])
-        ax5.plot(self.timelist, leg_energy[3])
+        ax5.plot(self.quadruped_traj_fourier.timelist, leg_energy[3])
         ax5.set_title("Rear Leg 2 Energy")
         ax5.set_xlabel("Time (s)")
         ax5.set_ylabel("Energy (j)")

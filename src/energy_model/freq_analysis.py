@@ -9,13 +9,30 @@ def to_timeseries(timelist, datalist):
     
     return np.column_stack((timelist, datalist))
 
-def fourier_approx(timeseries, N=2):
-    # Extract data from timeseries
+def get_dominant_sine_waves(timeseries, N=2):
+    """
+    Analyze the timeseries and extract the N dominant sine waves including the DC component.
+    
+    Parameters:
+        timeseries: np.ndarray
+            A 2D array with time in the first column and signal in the second column.
+        N: int
+            The number of dominant frequencies (plus DC component) to include.
+    
+    Returns:
+        dominant_frequencies: np.ndarray
+            The frequencies of the dominant sine waves.
+        dominant_amplitudes: np.ndarray
+            The amplitudes of the dominant sine waves.
+        dominant_phases: np.ndarray
+            The phases of the dominant sine waves.
+        total_frames: int
+            The total number of frames in the original signal (used for scaling).
+    """
     total_frames = len(timeseries[:, 0])
     time_list = timeseries[:, 0]
     frame_time = time_list[1] - time_list[0]
     
-    # Extract the values (angle data) for FFT analysis
     signal = timeseries[:, 1]
     
     # Perform FFT
@@ -36,7 +53,7 @@ def fourier_approx(timeseries, N=2):
     positive_power_spectrum = sorted_power_spectrum[positive_half_n:]
     fft_values_positive = fft_values[sorted_indices][positive_half_n:]
     
-    # Check the zero frequency (DC component) manually
+    # Check the zero frequency (DC component)
     dc_power = sorted_power_spectrum[positive_half_n]
     
     # Find peaks in the power spectrum excluding the DC component
@@ -52,42 +69,64 @@ def fourier_approx(timeseries, N=2):
     dominant_frequencies = np.insert(dominant_frequencies, 0, positive_freqs[0])
     dominant_powers = np.insert(dominant_powers, 0, dc_power)
     
-    # Construct continuous approximation function from dominant frequencies
-    approximation = np.zeros_like(time_list)
+    # Compute amplitudes and phases for the dominant sine waves
+    dominant_amplitudes = []
+    dominant_phases = []
     
-    # Add DC component
-    approximation += fft_values_positive[0].real / total_frames  # Average of the signal (DC component)
-    
-    # Sum of sinusoids for each dominant frequency
-    for i, freq in enumerate(dominant_frequencies[1:]):  # Exclude DC, start from 1
-        index = dominant_peaks[i]
-        amplitude = (2 * np.abs(fft_values_positive[index])) / total_frames  # Multiply by 2 for positive frequencies
-        phase = np.angle(fft_values_positive[index])
+    for i, freq in enumerate(dominant_frequencies):
+        if i == 0:
+            # DC component
+            amplitude = fft_values_positive[0].real / total_frames
+            phase = 0
+        else:
+            index = dominant_peaks[i - 1]  # Adjust for DC
+            amplitude = (2 * np.abs(fft_values_positive[index])) / total_frames  # Multiply by 2 for positive frequencies
+            phase = np.angle(fft_values_positive[index])
         
-        # Add sinusoidal component to the approximation
-        approximation += amplitude * np.cos(2 * np.pi * freq * time_list + phase)
+        dominant_amplitudes.append(amplitude)
+        dominant_phases.append(phase)
+    
+    return dominant_frequencies, np.array(dominant_amplitudes), np.array(dominant_phases), total_frames
 
-    if __name__ == "__main__":
-        # Plot the power spectrum with dominant frequencies marked
-        plt.figure()
-        plt.plot(sorted_fft_freqs, np.log10(sorted_power_spectrum))
-        plt.plot(dominant_frequencies, np.log10(dominant_powers), "x", label="Dominant Frequencies")
-        plt.xlabel('Frequency (Hz)')
-        plt.ylabel('Power')
-        plt.title('Power Spectrum')
-        plt.legend()
-        
-        # Plot the original signal vs. its approximation
-        plt.figure()
-        plt.plot(time_list, signal, label="Original Signal")
-        plt.plot(time_list, approximation, label="Approximated Signal", linestyle="--")
-        plt.xlabel('Time (s)')
-        plt.ylabel('Signal')
-        plt.title('Original Signal vs. Fourier Approximation')
-        plt.legend()
-        plt.show()
-    else:
-        return approximation
+def fourier_approx(timeseries, N=2, resolution_multiplier=1):
+    """
+    Generate an Nth-order Fourier approximation of the given time series with the desired resolution.
+    
+    Parameters:
+        timeseries: np.ndarray
+            A 2D array with time in the first column and signal in the second column.
+        N: int
+            The number of dominant frequencies (plus DC component) to include.
+        resolution_multiplier: int
+            Factor to increase the resolution of the output time series.
+    
+    Returns:
+        approximation: np.ndarray
+            The approximated signal.
+        high_res_time_list: np.ndarray
+            The time array with increased resolution.
+    """
+    # Extract original time data
+    original_time = timeseries[:, 0]
+    total_time = original_time[-1]
+    total_frames = len(original_time)
+    frame_time = original_time[1] - original_time[0]
+    
+    # Compute dominant sine waves
+    dominant_frequencies, dominant_amplitudes, dominant_phases, _ = get_dominant_sine_waves(timeseries, N)
+    
+    # Generate high-resolution time vector
+    high_res_total_frames = total_frames * resolution_multiplier
+    high_res_time_list = np.linspace(0, total_time, high_res_total_frames)
+    
+    # Construct the approximation
+    approximation = np.zeros_like(high_res_time_list)
+    
+    # Add sine wave components
+    for i, freq in enumerate(dominant_frequencies):
+        approximation += dominant_amplitudes[i] * np.cos(2 * np.pi * freq * high_res_time_list + dominant_phases[i])
+    
+    return approximation.tolist()
 
 def main():
     dataset = VideoDataProcess("unitree_a1")
@@ -104,9 +143,22 @@ def main():
     timeseries[:, 0] = np.linspace(0, total_time, total_frames)
     timeseries[:, 1] = leg1_t1
 
-    # Define number of peaks dominant frequencies to utilize (plus DC gain)
+    # Define number of peaks and resolution multiplier
     N = 2
-    fourier_approx(timeseries, N)
+    resolution_multiplier = 4  # Increase resolution by a factor of 4
+    
+    # Generate Fourier approximation
+    high_res_timeseries = fourier_approx(timeseries, N, resolution_multiplier)
+    
+    # Plot results
+    plt.figure()
+    plt.plot(timeseries[:, 0], timeseries[:, 1], label="Original Signal")
+    plt.plot(high_res_timeseries[:, 0], high_res_timeseries[:, 1], label="High-Resolution Approximation", linestyle="--")
+    plt.xlabel('Time (s)')
+    plt.ylabel('Signal')
+    plt.title('Original Signal vs. Fourier Approximation')
+    plt.legend()
+    plt.show()
 
 if __name__ == "__main__":
     main()

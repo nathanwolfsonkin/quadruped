@@ -163,7 +163,7 @@ class Leg:
 
 
 # Helper class to carry around quadruped state trajectory data
-# Used to calculating behavior over time
+# Used for calculating behavior over time
 class QuadrupedData:
     def __init__(self, quadruped: Quadruped, timelist, gait_data=[[[],[]],[[],[]],[[],[]],[[],[]]]):
         self.quadruped = quadruped
@@ -266,15 +266,22 @@ class QuadrupedData:
         
         return quad_energy_list
     
+    def power_trajectory(self):
+        energy_traj = self.energy_trajectory()
+        power_traj = np.gradient(energy_traj, self.timelist)
+        return power_traj
+    
     def calc_work_done(self):
         work_done = 0
         
-        quad_energy_list = self.energy_trajectory()
-        
-        for energy_index, energy_value in enumerate(quad_energy_list):
-            if energy_index != 0:
-                if energy_value >= quad_energy_list[energy_index-1]:
-                    work_done += energy_value - quad_energy_list[energy_index-1]
+        # Integrate the power consumption over the trajectory duration
+        power_traj = self.power_trajectory()
+
+        # Time between each frame
+        time = self.timelist[1] - self.timelist[0]
+
+        for i in range(len(power_traj) - 1):
+            work_done += abs(power_traj[i] + power_traj[i+1]) * time / 2
         
         return work_done
     
