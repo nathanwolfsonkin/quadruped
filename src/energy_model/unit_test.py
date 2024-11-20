@@ -7,13 +7,8 @@ from energy_model.kinematics_data.data_post_process import VideoDataProcess
 from energy_model.freq_analysis import *
 
 def main():
-    script_calcs()
-    hand_calcs()
-
-
-def hand_calcs():
     # Set parameters 
-    quad_m = 9
+    body_m = 1
     leg_m = 1
     l = 1
     I = 1
@@ -21,12 +16,23 @@ def hand_calcs():
     
     # State trajectory
     t_0 = 0
-    t_f = np.pi/4
+    t_f = -np.pi/4
     time_f = 1
     res = 1000
     timelist = np.linspace(0, time_f, res)
     theta = np.linspace(t_0, t_f, res)
     dtheta = np.gradient(theta,timelist)
+
+    # Hand Calcs
+    hand_calcs(body_m, leg_m, l, I, theta, dtheta)
+
+    # Script Calcs
+    script_calcs(body_m, leg_m, l, I, theta, timelist)
+
+
+def hand_calcs(body_m, leg_m, l, I, theta, dtheta):
+    g = 9.81
+    quad_m = body_m + 8*leg_m
 
     # Calculate total work done
     work = 0
@@ -42,7 +48,7 @@ def hand_calcs():
     # Calculate Cost of Transport
     cot = work / (quad_m*g*dist)
 
-    print('\n Script')
+    print('\n Hand')
     print('W: ', work)
     print('d: ', dist)
     print('m: ', quad_m)
@@ -60,20 +66,18 @@ def calc_energy(m, l, I, theta, dtheta):
 
     return E
 
-def script_calcs():
+def script_calcs(quad_m, leg_m, l, I, theta, timelist):
+    
     # Define quadruped parameters
-    leg_params = {'l': [1, 1], 'I': [1, 1], 'm': [1, 1]}
-    body_params = {'l': 1, 'I': 1, 'm': 1, 'origin': [0, 0], 'orientation': 0}
+    leg_params = {'l': [l, l], 'I': [I, I], 'm': [leg_m, leg_m]}
+    body_params = {'l': l, 'I': I, 'm': quad_m, 'origin': [0, 0], 'orientation': 0}
     quadruped = Quadruped(leg_params, body_params)
 
-    # Generate unit test trajectory
-    res = 100
-    timelist = np.linspace(0, 1, res)
-
     # Create constant velocity trajector
+    res = len(theta)
     unit_traj = [[],[]]
     unit_traj[0] = np.linspace(0, 0, res).tolist()
-    unit_traj[1] = np.linspace(0, -np.pi/4, res).tolist()
+    unit_traj[1] = theta.tolist()
 
     gait_data = [unit_traj, unit_traj, unit_traj, unit_traj]
 
@@ -82,7 +86,6 @@ def script_calcs():
     print('\n Script')
     print('W: ', quad_gait.calc_work_done())
     print('d: ', quad_gait.calc_distance())
-    print('velocity: ', quad_gait.calculate_vel())
     print('m: ', quad_gait.quadruped.m)
     print('cot: ', quad_gait.cost_of_transport())
 

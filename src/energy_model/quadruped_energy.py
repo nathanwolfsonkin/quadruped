@@ -20,6 +20,7 @@ class Quadruped:
         l = leg_params['l']
         I = leg_params['I']
         m = leg_params['m']
+
         # Assume all legs have the same physical properties
         self.leg_list = [Leg(origin=left_hip, l=l, I=I, m=m), 
                          Leg(origin=left_hip, l=l, I=I, m=m), 
@@ -51,6 +52,10 @@ class MainBody:
         self.origin = np.array(origin).reshape(2, 1)
         self.orientation = orientation
 
+        # Initilization value
+        self.vel = 1
+        self.height = 1
+
     def get_endpoints(self):
         half_length = self.l / 2
         R = np.array([[np.cos(self.orientation), -np.sin(self.orientation)],
@@ -60,13 +65,10 @@ class MainBody:
         return left_endpoint.flatten(), right_endpoint.flatten()
     
     def potential_energy(self):
-        # Approximate the height of the body based on the lowest position of the legs
-        h = 1 ############################################# TEMP VALUE ##########################################################################
-        return self.m * 9.81 * h
+        return self.m * 9.81 * self.height
 
     def translational_kinetic_energy(self):
-        v = 3 ############################################# TEMP VALUE #############################################################
-        return .5 * self.m * v**2
+        return .5 * self.m * self.vel**2
 
     def total_energy(self):
         U_g = self.potential_energy()
@@ -193,11 +195,36 @@ class QuadrupedData:
         for leg in self.leg_list:
             leg.refresh()
 
+        # Helper function to approximate quadruped body velocity based on leg trajectory
+    
+    # For completenesss, calculates the body height of the quadruped and updates quadruped
+    def calculate_body_height(self):
+        # Steps:
+        # 1) Identify stance vs swing phase for each foot
+        stance_list, _, foot_height_list = self.find_stance_phase()
+
+        # 3) the average foot velocity between all 4 of the feet during the stance phase is the approximated body velocity
+        foot_average_height = [0,0,0,0]
+        for leg_index, leg in enumerate(self.quadruped.leg_list):
+            stance_frames = 0
+            for index, stance in enumerate(stance_list[leg_index]):
+                if stance == True:
+                    foot_average_height[leg_index] += foot_height_list[leg_index][index]
+                    stance_frames += 1
+            
+            foot_average_height[leg_index] = abs(foot_average_height[leg_index]/stance_frames)
+        
+        average_body_height = np.mean(foot_average_height)
+
+        # Set the current body velocity in the 
+        self.quadruped.body.height = average_body_height
+        return average_body_height
+    
     # Helper function to approximate quadruped body velocity based on leg trajectory
     def calculate_vel(self):
         # Steps:
         # 1) Identify stance vs swing phase for each foot
-        stance_list, foot_vel_list = self.find_stance_phase()
+        stance_list, foot_vel_list, _ = self.find_stance_phase()
 
         # 3) the average foot velocity between all 4 of the feet during the stance phase is the approximated body velocity
         foot_average_vel = [0,0,0,0]
@@ -211,12 +238,16 @@ class QuadrupedData:
             foot_average_vel[leg_index] = abs(foot_average_vel[leg_index]/stance_frames)
         
         average_body_vel = np.mean(foot_average_vel)
+
+        # Set the current body velocity in the 
+        self.quadruped.body.vel = average_body_vel
         return average_body_vel
             
     # returns list of bools defining if the leg is in stance or swing
     # returns list of velocities for the foot at each time instance
     def find_stance_phase(self):
         # Assume quadruped has 4 legs (duh)
+        height_list = [[],[],[],[]]
         vB_list = [[],[],[],[]]
         stance_list = [[],[],[],[]]
         
@@ -234,6 +265,10 @@ class QuadrupedData:
                 foot_vel_x = self.quadruped.leg_list[leg_index].get_vB()[0]
                 vB_list[leg_index].append(foot_vel_x)
 
+                # Record foot distance from body
+                foot_dist_y = self.quadruped.leg_list[leg_index].get_pB()[1]
+                height_list[leg_index].append(foot_dist_y)
+
                 # Record if foot is in stance or swing
                 if foot_vel_x < 0:
                     # If the leg is moving in the negative x direction in the body frame
@@ -241,7 +276,7 @@ class QuadrupedData:
                 else:
                     stance_list[leg_index].append(False)
 
-        return stance_list, vB_list
+        return stance_list, vB_list, height_list
     
     # Returns list of total quadruped energy over time
     def energy_trajectory(self):
@@ -312,6 +347,7 @@ class LegData:
 
 
 def main():
+    # Testing
     pass
 
 
