@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<sdf version="1.8">
+    <world name="default_world">
+
+        <!-- Include Sun -->
+        <include>
+            <uri>package://quadruped_sim/models/environment/sun.sdf</uri>
+        </include>
+
+        <!-- Include Ground -->
+        <include>
+            <uri>package://quadruped_sim/models/environment/ground.sdf</uri>
+        </include>
+
+        <!-- Include the quadruped model -->
+        <!-- MAKE SURE THE QUADRUPED MODEL ABIDES BY THE JOINT NAMING STANDARDS! -->
+        <!-- <include>
+            <pose>0 0 1 0 0 0</pose>
+            <uri>package://a1_description/urdf/a1.urdf</uri>
+        </include> -->
+
+
+        <!-- ROS2_control plugin -->
+        <!-- <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+            <ros> -->
+                
+                <!-- Set namespace for ROS2 topics -->
+                <!-- <namespace>/quadruped</namespace>
+
+                <parameter name="joint_state_controller">
+                    <value>/workspace/src/temp/config/controller_config.yaml</value>
+                </parameter>
+
+                <parameter name="position_controllers">
+                    <value>/workspace/src/temp/config/position_controllers.yaml</value>
+                </parameter>
+
+            </ros>
+        </plugin> -->
+
+
+    </world>
+</sdf>

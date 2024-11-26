@@ -2,20 +2,25 @@ FROM osrf/ros:jazzy-desktop-full
 
 ARG HOME_DIR="/root"
 ARG WORKSPACE="/workspace"
-ARG VENV_DIR="${WORKSPACE}/venv"
+ARG ROS_DISTRO=jazzy
 
-# Install general stuff
+# Set environment variables
+ENV MPLBACKEND="Qt5Agg"
+ENV PYTHONPATH="${PYTHONPATH}:/workspace/src"
+ENV GZ_VERSION="harmonic"
+
+# Install general utilities
 RUN apt-get update && apt-get install -y --no-install-recommends \
     bash-completion \
     python3-pip \
-    python3-venv \
-    python-is-python3
+    python-is-python3 \
+    python3-tk
 
-# Install ros related stuff
+# Install ROS-related dependencies
 RUN apt-get install -y --no-install-recommends \
     ros-${ROS_DISTRO}-ros-gz
 
-# Install OpenCL dependencies (as pip does not provide these)
+# Install OpenCL dependencies
 RUN apt-get install -y --no-install-recommends \
     intel-opencl-icd \
     intel-media-va-driver \
@@ -23,34 +28,39 @@ RUN apt-get install -y --no-install-recommends \
     opencl-headers \
     clinfo
 
-# Create and activate virtual environment
-RUN python3 -m venv ${VENV_DIR}
-ENV PATH="${VENV_DIR}/bin:$PATH"
-
-# Upgrade pip and install Python dependencies in the virtual environment
-RUN pip install --upgrade pip
-RUN pip install \
-    opencv-python \ 
-    opencv-contrib-python \
-    matplotlib \
-    numpy \
-    scipy \
-    PyQt5 
-
-# Remove apt library folder to save space
-RUN rm -rf /var/lib/apt/lists/*
-
-# Setup default user's .bashrc
-RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> ${HOME_DIR}/.bashrc \
-  && echo "source /etc/profile.d/bash_completion.sh" >> ${HOME_DIR}/.bashrc \
-  && echo "source ${VENV_DIR}/bin/activate" >> ${HOME_DIR}/.bashrc
-
-ENV PYTHONPATH="${PYTHONPATH}:/workspace/src"
-ENV MPLBACKEND="Qt5Agg"
+# Install template rosdep tools
+RUN apt install -y --no-install-recommends \
+    python3-vcstool \
+    python3-colcon-common-extensions \
+    git \
+    wget
 
 # Create workspace and source directory
 RUN mkdir -p ${WORKSPACE}/src
 WORKDIR ${WORKSPACE}
 
-# By default hold container open in background
+RUN cd ${WORKSPACE}
+# RUN source /opt/ros/${ROS_DISTRO}/setup.bash
+# RUN rosdep init
+RUN rosdep update
+RUN rosdep install --from-paths ${WORKSPACE}/src --ignore-src -r -i -y --rosdistro ${ROS_DISTRO}
+
+# Upgrade pip and install Python dependencies globally (to avoid venv complexities)
+RUN pip3 install --break-system-packages \
+    opencv-python \
+    opencv-contrib-python \
+    matplotlib \
+    numpy \
+    scipy \
+    PyQt5
+
+# Remove apt library folder to save space
+RUN rm -rf /var/lib/apt/lists/*
+
+# Setup .bashrc to configure ROS and GUI-related environment variables
+RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> ${HOME_DIR}/.bashrc \
+    && echo "source /etc/profile.d/bash_completion.sh" >> ${HOME_DIR}/.bashrc \
+    && echo "export MPLBACKEND='Qt5Agg'" >> ${HOME_DIR}/.bashrc
+
+# Command to keep the container running
 CMD ["/bin/bash"]

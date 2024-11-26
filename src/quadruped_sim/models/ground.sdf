@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<sdf version="1.8">
+
+    <model name="ground_plane">
+        <!-- The ground doesn't move -->
+        <static>true</static>
+        <link name="ground_link">
+            <collision name="collision">
+                <geometry>
+                    <plane>
+                        <normal>0 0 1</normal>
+                        <size>100 100</size>
+                    </plane>
+                </geometry>
+                <surface>
+                    <friction>
+                        <ode>
+                            <mu>1.0</mu>
+                            <mu2>1.0</mu2>
+                        </ode>
+                    </friction>
+                </surface>
+            </collision>
+
+            <visual name="visual">
+                <geometry>
+                    <plane>
+                        <normal>0 0 1</normal>
+                        <size>100 100</size>
+                    </plane>
+                </geometry>
+                <material>
+                    <ambient>0.5 0.5 0.5 1</ambient>
+                    <diffuse>0.5 0.5 0.5 1</diffuse>
+                </material>
+            </visual>
+        </link>
+    </model>
+</sdf>

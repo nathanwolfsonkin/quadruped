@@ -9,10 +9,9 @@ from energy_model.freq_analysis import *
 def main():
     # Set parameters 
     body_m = 1
-    leg_m = 1
+    leg_m = .5
     l = 1
     I = 1
-    g = 9.81
     
     # State trajectory
     t_0 = 0
