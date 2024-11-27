@@ -40,8 +40,6 @@ RUN mkdir -p ${WORKSPACE}/src
 WORKDIR ${WORKSPACE}
 
 RUN cd ${WORKSPACE}
-# RUN source /opt/ros/${ROS_DISTRO}/setup.bash
-# RUN rosdep init
 RUN rosdep update
 RUN rosdep install --from-paths ${WORKSPACE}/src --ignore-src -r -i -y --rosdistro ${ROS_DISTRO}
 

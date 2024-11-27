@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<sdf version="1.8">
+    <include>
+      <uri>package://a1_description/urdf/a1.urdf</uri>
+    </include>
+</sdf>
