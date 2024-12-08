@@ -18,7 +18,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Install ROS-related dependencies
 RUN apt-get install -y --no-install-recommends \
-    ros-${ROS_DISTRO}-ros-gz
+    ros-${ROS_DISTRO}-ros-gz \
+    ros-${ROS_DISTRO}-gz-ros2-control
 
 # Install OpenCL dependencies
 RUN apt-get install -y --no-install-recommends \
