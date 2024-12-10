@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
+import csv
 
 from energy_model.quadruped_energy import Quadruped
 from energy_model.quadruped_energy import QuadrupedData
@@ -215,6 +216,62 @@ class ModelGaitPlots:
         # Show the plot
         plt.show()
 
+    def data_to_cv(self):
+        # Create a list of csv headers
+        raw_headers = [
+            "Raw Timelist",
+            "Leg1_t1",
+            "Leg1_t2",
+            "Leg2_t1", 
+            "Leg2_t2",
+        ]
+
+        approx_headers = [
+            "Approximation Timelist",
+            "Leg1_t1_approximation",
+            "Leg1_t2_approximation",
+            "Leg2_t1_approximation", 
+            "Leg2_t2_approximation",
+        ]
+
+        # Prepare the data
+        raw_data = []
+        for i, time in enumerate(self.quadruped_traj.timelist):
+            row = [
+                time,
+                self.quadruped_traj.leg_list[0].t1[i],
+                self.quadruped_traj.leg_list[0].t2[i],
+                self.quadruped_traj.leg_list[1].t1[i],
+                self.quadruped_traj.leg_list[1].t2[i]
+            ]
+            raw_data.append(row)
+
+        approx_data = []
+        for i, time in enumerate(self.quadruped_traj_fourier.timelist):
+            row = [
+                time,
+                self.quadruped_traj_fourier.leg_list[0].t1[i],
+                self.quadruped_traj_fourier.leg_list[0].t2[i],
+                self.quadruped_traj_fourier.leg_list[1].t1[i],
+                self.quadruped_traj_fourier.leg_list[1].t2[i]
+            ]
+            approx_data.append(row)
+
+        # Write data to CSV file
+        with open('/workspace/src/energy_model/kinematics_data/unitree_a1/raw_leg_traj_data.csv', mode='w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(raw_headers)
+            writer.writerows(raw_data)
+
+        with open('/workspace/src/energy_model/kinematics_data/unitree_a1/approx_leg_traj_data.csv', mode='w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(approx_headers)
+            writer.writerows(approx_data)
+            
+            
+
+        
+
 def main():
     # Define quadruped parameters
     unitree_a1_leg_params = {'l': [.2, .2], 'I': [0.0055, 0.003], 'm': [1.013, 0.166]}
@@ -235,17 +292,19 @@ def main():
                                timelist=timelist)
     
     # Generate plots
-    plots.leg1_data_approx()
-    plots.leg2_data_approx()
-    plots.all_angles_approx()
-    plots.leg1_t1_t2_phase_protrait()
-    plots.leg2_t1_t2_phase_portrait()
-    plots.leg1_t1_dt1()
-    plots.leg1_pfoot_vs_time()
-    plots.leg1_vfoot_vs_time()
-    plots.all_energy_plot()
+    # plots.leg1_data_approx()
+    # plots.leg2_data_approx()
+    # plots.all_angles_approx()
+    # plots.leg1_t1_t2_phase_protrait()
+    # plots.leg2_t1_t2_phase_portrait()
+    # plots.leg1_t1_dt1()
+    # plots.leg1_pfoot_vs_time()
+    # plots.leg1_vfoot_vs_time()
+    # plots.all_energy_plot()
 
-    plt.show()
+    # plt.show()
+
+    plots.data_to_cv()
     
 
 if __name__ == "__main__":
