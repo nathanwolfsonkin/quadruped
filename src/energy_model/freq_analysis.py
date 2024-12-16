@@ -85,6 +85,14 @@ def get_dominant_sine_waves(timeseries, N=2):
         
         dominant_amplitudes.append(amplitude)
         dominant_phases.append(phase)
+
+    if __name__ == "__main__":
+        plt.figure()
+        plt.plot(positive_freqs, np.log10(positive_power_spectrum), label="Power Spectrum Density")
+        plt.scatter(dominant_frequencies, np.log10(dominant_powers), color='red', label="Dominant Frequencies")
+        plt.xlabel('Frequency (Hz)')
+        plt.ylabel('Power')
+        plt.title('Power Spectrum Density')
     
     return dominant_frequencies, np.array(dominant_amplitudes), np.array(dominant_phases), total_frames
 
@@ -148,12 +156,15 @@ def main():
     resolution_multiplier = 4  # Increase resolution by a factor of 4
     
     # Generate Fourier approximation
-    high_res_timeseries = fourier_approx(timeseries, N, resolution_multiplier)
+    high_res_total_frames = total_frames * resolution_multiplier
+    high_res_timelist = np.linspace(0, total_time, high_res_total_frames)
+    high_res_approx = fourier_approx(timeseries, N, resolution_multiplier)
+    high_res_timeseries = np.array([high_res_timelist, high_res_approx])
     
     # Plot results
     plt.figure()
     plt.plot(timeseries[:, 0], timeseries[:, 1], label="Original Signal")
-    plt.plot(high_res_timeseries[:, 0], high_res_timeseries[:, 1], label="High-Resolution Approximation", linestyle="--")
+    plt.plot(high_res_timeseries[0,:], high_res_timeseries[1, :], label="High-Resolution Approximation", linestyle="--")
     plt.xlabel('Time (s)')
     plt.ylabel('Signal')
     plt.title('Original Signal vs. Fourier Approximation')
