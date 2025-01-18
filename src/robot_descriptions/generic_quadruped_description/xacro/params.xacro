@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<robot name="quadruped" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <!-- Base Parameters -->
+    <xacro:property name="base_Lx" value="3" />
+    <xacro:property name="base_Ly" value="2" />
+    <xacro:property name="base_Lz" value="1" />
+    <xacro:property name="base_m" value="1" />
+
+    <!-- FR Leg Parameters -->
+    <xacro:property name="FR_rad" value="0.1" />
+    <xacro:property name="FR_L1" value="0.25" />
+    <xacro:property name="FR_L2" value="1" />
+    <xacro:property name="FR_L3" value="1" />
+    <xacro:property name="FR_m1" value="1" />
+    <xacro:property name="FR_m2" value="1" />
+    <xacro:property name="FR_m3" value="1" />
+    <xacro:property name="FR_m4" value="1" />
+
+    <!-- FL Leg Parameters -->
+    <xacro:property name="FL_rad" value="0.1" />
+    <xacro:property name="FL_L1" value="0.25" />
+    <xacro:property name="FL_L2" value="1" />
+    <xacro:property name="FL_L3" value="1" />
+    <xacro:property name="FL_m1" value="1" />
+    <xacro:property name="FL_m2" value="1" />
+    <xacro:property name="FL_m3" value="1" />
+    <xacro:property name="FL_m4" value="1" />
+
+    <!-- RL Leg Parameters -->
+    <xacro:property name="RL_rad" value="0.1" />
+    <xacro:property name="RL_L1" value="0.25" />
+    <xacro:property name="RL_L2" value="1" />
+    <xacro:property name="RL_L3" value="1" />
+    <xacro:property name="RL_m1" value="1" />
+    <xacro:property name="RL_m2" value="1" />
+    <xacro:property name="RL_m3" value="1" />
+    <xacro:property name="RL_m4" value="1" />
+
+    <!-- RR Leg Parameters -->
+    <xacro:property name="RR_rad" value="0.1" />
+    <xacro:property name="RR_L1" value="0.25" />
+    <xacro:property name="RR_L2" value="1" />
+    <xacro:property name="RR_L3" value="1" />
+    <xacro:property name="RR_m1" value="1" />
+    <xacro:property name="RR_m2" value="1" />
+    <xacro:property name="RR_m3" value="1" />
+    <xacro:property name="RR_m4" value="1" />
+
+</robot>

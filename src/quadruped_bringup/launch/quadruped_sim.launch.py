@@ -1,17 +1,3 @@
-# Copyright 2022 Open Source Robotics Foundation, Inc.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 import os
 
 from ament_index_python.packages import get_package_share_directory
@@ -49,7 +35,7 @@ def generate_launch_description():
     # with open(sdf_file, 'r') as infp:
     #     robot_desc = infp.read()
 
-    # Takes the description and joint angles as inputs and publishes the 3D poses of the robot links
+    # # Takes the description and joint angles as inputs and publishes the 3D poses of the robot links
     # robot_state_publisher = Node(
     #     package='robot_state_publisher',
     #     executable='robot_state_publisher',
@@ -61,30 +47,19 @@ def generate_launch_description():
     #     ]
     # )
 
-    # # Visualize in RViz
-    # rviz = Node(
-    #    package='rviz2',
-    #    executable='rviz2',
-    #    arguments=['-d', os.path.join(pkg_project_bringup, 'config', 'diff_drive.rviz')],
-    #    condition=IfCondition(LaunchConfiguration('rviz'))
-    # )
-
     # Bridge ROS topics and Gazebo messages for establishing communication
-    # bridge = Node(
-    #     package='ros_gz_bridge',
-    #     executable='parameter_bridge',
-    #     parameters=[{
-    #         'config_file': os.path.join(pkg_project_bringup, 'config', 'ros_gz_example_bridge.yaml'),
-    #         'qos_overrides./tf_static.publisher.durability': 'transient_local',
-    #     }],
-    #     output='screen'
-    # )
+    bridge = Node(
+        package='ros_gz_bridge',
+        executable='parameter_bridge',
+        parameters=[{
+            'config_file': os.path.join(pkg_project_bringup, 'config', 'ros_gz_bridge_config.yaml'),
+            'qos_overrides./tf_static.publisher.durability': 'transient_local',
+        }],
+        output='screen'
+    )
 
     return LaunchDescription([
         gz_sim,
-        # DeclareLaunchArgument('rviz', default_value='true',
-        #                       description='Open RViz.'),
-        # bridge,
+        bridge,
         # robot_state_publisher,
-        # rviz
     ])

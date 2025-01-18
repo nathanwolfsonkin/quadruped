@@ -1,0 +1,191 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <xacro:include
+        filename="/workspace/src/robot_descriptions/generic_quadruped_description/xacro/const.xacro" />
+
+    <xacro:macro name="base_to_hip_joint" params="name right parent child Px Py Pz roll pitch yaw">
+        <xacro:if value="${right == True}">
+            <joint name="${name}" type="continuous">
+                <origin
+                    xyz="${Px} ${Py} ${Pz}"
+                    rpy="${roll+PI/2} ${pitch} ${yaw-PI/2}" />
+                <parent
+                    link="${parent}" />
+                <child
+                    link="${child}" />
+                <axis
+                    xyz="0 0 1" />
+            </joint>
+        </xacro:if>
+        <xacro:if value="${right == False}">
+            <joint name="${name}" type="continuous">
+                <origin
+                    xyz="${Px} ${Py} ${Pz}"
+                    rpy="${roll+PI/2} ${pitch} ${yaw+PI/2}" />
+                <parent
+                    link="${parent}" />
+                <child
+                    link="${child}" />
+                <axis
+                    xyz="0 0 1" />
+            </joint>
+        </xacro:if>
+    </xacro:macro>
+
+    <xacro:macro name="rev_joint" params="name parent child length roll pitch yaw">
+        <joint name="${name}" type="continuous">
+            <origin
+                xyz="${length} 0 0"
+                rpy="${roll} ${pitch} ${yaw}" />
+            <parent
+                link="${parent}" />
+            <child
+                link="${child}" />
+            <axis
+                xyz="0 0 1" />
+        </joint>
+    </xacro:macro>
+
+    <xacro:macro name="fixed_joint" params="name parent child length">
+        <joint name="${name}" type="fixed">
+            <origin
+                xyz="${length} 0 0"
+                rpy="0.0 0.0 0.0" />
+            <parent
+                link="${parent}" />
+            <child
+                link="${child}" />
+        </joint>
+    </xacro:macro>
+
+    <xacro:macro name="base_link" params="name L_x L_y L_z mass inertial_link">
+        <link name="${name}">
+            <xacro:if value="${inertial_link == True}">
+                <inertial>
+                    <origin
+                        xyz="0 0 0"
+                        rpy="0 0 0" />
+                    <mass
+                        value="${mass}" />
+                    <inertia
+                        ixx="${(mass / 12) * (L_y*L_y + L_z*L_z)}"
+                        ixy="0"
+                        ixz="0"
+                        iyy="${(mass / 12) * (L_x*L_x + L_z*L_z)}"
+                        iyz="0"
+                        izz="${(mass / 12) * (L_x*L_x + L_y*L_y)}" />
+                </inertial>
+            </xacro:if>
+            <xacro:if value="${inertial_link == False}">
+                <visual>
+                    <origin
+                        xyz="0 0 0"
+                        rpy="0 0 0" />
+                    <geometry>
+                        <box size="${L_x} ${L_y} ${L_z}" />
+                    </geometry>
+                    <material name="red" />
+                </visual>
+            </xacro:if>
+            <xacro:no_collision/>
+        </link>
+    </xacro:macro>
+
+    <xacro:macro name="link" params="link_name mass rad length">
+        <link name="${link_name}">
+            <inertial>
+                <origin
+                    xyz="${length/2} 0 0"
+                    rpy="0 0 0" />
+                <mass value="${mass}" />
+                <inertia
+                    ixx="${.5 * mass * rad*rad}"
+                    ixy="0"
+                    ixz="0"
+                    iyy="${(1/12) * (length*length + 3*rad*rad) * mass}"
+                    iyz="0"
+                    izz="${(1/12) * (length*length + 3*rad*rad) * mass}" />
+            </inertial>
+            <visual>
+                <origin
+                    xyz="${length/2} 0 0"
+                    rpy="0 ${PI/2} 0" />
+                <geometry>
+                    <cylinder length="${length}" radius="${rad}" />
+                </geometry>
+                <material name="grey" />
+            </visual>
+            <xacro:no_collision/>
+        </link>
+    </xacro:macro>
+
+    <xacro:macro name="foot" params="foot_name mass rad">
+        <link name="${foot_name}">
+            <inertial>
+                <origin
+                    xyz="0 0 0"
+                    rpy="0 0 0" />
+                <mass value="${mass}" />
+                <inertia
+                    ixx="${(2/5) * (mass*rad*rad)}"
+                    ixy="0"
+                    ixz="0"
+                    iyy="${(83/320) * (mass*rad*rad)}"
+                    iyz="0"
+                    izz="${(83/320) * (mass*rad*rad)}" />
+            </inertial>
+            <visual>
+                <origin
+                    xyz="0 0 0"
+                    rpy="0 0 0" />
+                <geometry>
+                    <sphere radius="${rad}" />
+                </geometry>
+                <material name="red" />
+            </visual>
+            <collision>
+                <origin
+                    xyz="0 0 0"
+                    rpy="0 0 0" />
+                <geometry>
+                    <sphere radius="${rad}" />
+                </geometry>
+            </collision>
+        </link>
+    </xacro:macro>
+
+    <xacro:macro name="no_collision">
+        <collision>
+            <geometry>
+                <box size="0 0 0" />
+            </geometry>
+        </collision>
+    </xacro:macro>
+
+    <xacro:macro name="leg" params="leg_name right Px Py Pz rad L1 L2 L3 m1 m2 m3 m4">
+
+        <xacro:link link_name="${leg_name}_hip" mass="${m1}" rad="${rad}" length="${L1}" />
+
+        <xacro:base_to_hip_joint name="${leg_name}_hip_joint" right="${right}" parent="base"
+            child="${leg_name}_hip"
+            Px="${Px}" Py="${Py}" Pz="${Pz}" roll="0.0" pitch="0.0" yaw="0.0" />
+
+        <xacro:link link_name="${leg_name}_thigh" mass="${m2}" rad="${rad}" length="${L2}" />
+
+        <xacro:rev_joint name="${leg_name}_thigh_joint" parent="${leg_name}_hip"
+            child="${leg_name}_thigh" length="${L1}" roll="${PI/2}" pitch="0.0" yaw="${-PI/2}" />
+
+        <xacro:link link_name="${leg_name}_calf" mass="${m3}" rad="${rad}" length="${L3}" />
+
+        <xacro:rev_joint name="${leg_name}_calf_joint" parent="${leg_name}_thigh"
+            child="${leg_name}_calf" length="${L2}" roll="0.0" pitch="0.0" yaw="0.0" />
+
+        <xacro:foot foot_name="${leg_name}_foot" mass="${m4}" rad="${rad}" />
+
+        <xacro:fixed_joint name="${leg_name}_foot_joint" parent="${leg_name}_calf"
+            child="${leg_name}_foot" length="${L3}" />
+
+    </xacro:macro>
+</robot>

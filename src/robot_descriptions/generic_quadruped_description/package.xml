@@ -1,17 +1,17 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>quadruped_description</name>
+  <name>generic_quadruped_description</name>
   <version>0.0.0</version>
-  <description>SDFormat description files for the ros_gz_example project</description>
+  <description>Parameterized Quadrupedal Model Description Package</description>
   <maintainer email="nathan.wolfsonkin@cooper.edu">Nathan Wolf-Sonkin</maintainer>
-  <license>Apache 2.0</license>
-  <author>Nathan Wolf-Sonkin</author>
+  <license>Apache-2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
-  <buildtool_depend>xacro</buildtool_depend>
+  <build_depend>xacro</build_depend>
 
   <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
 
   <export>
     <build_type>ament_cmake</build_type>

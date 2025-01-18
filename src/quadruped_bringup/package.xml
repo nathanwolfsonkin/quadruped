@@ -3,11 +3,10 @@
 <package format="3">
   <name>quadruped_bringup</name>
   <version>0.0.0</version>
-  <description>Contains launch files for the ros_gz_example project</description>
-  <maintainer email="michael@openrobotics.org">Michael Carroll</maintainer>
+  <description>Contains launch files for the quadruped simulation testbench</description>
+  <maintainer email="nathan.wolfsonkin@cooper.edu">Nathan Wolf-Sonkin</maintainer>
   <license>Apache 2.0</license>
-  <author>Michael Carroll</author>
-  <author>Dharini Dutia</author>
+  <author>Nathan Wolf-Sonkin</author>
 
   <depend>joint_state_publisher_gui</depend>
 
