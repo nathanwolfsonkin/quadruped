@@ -1,14 +1,7 @@
 import os
 
 from ament_index_python.packages import get_package_share_directory
-
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument
-from launch.actions import IncludeLaunchDescription
-from launch.conditions import IfCondition
-from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
-
 from launch_ros.actions import Node
 
 
@@ -18,7 +11,7 @@ def generate_launch_description():
     # Setup project paths
     pkg_project_description = get_package_share_directory('quadruped_description')
     pkg_project_bringup = get_package_share_directory('quadruped_bringup')
-    pkg_generic_quadruped = get_package_share_directory('generic_quadruped_description')
+    pkg_generic_quadruped = get_package_share_directory('generic_quadruped_description')    
 
     # Load the URDF file from "description" package
     urdf_file  =  os.path.join(pkg_generic_quadruped, 'model', 'quadruped.urdf')

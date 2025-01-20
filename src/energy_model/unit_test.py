@@ -115,7 +115,6 @@ def hand_calcs(body_m, leg_m, l, I, theta, dtheta):
 
     dist = l *  np.abs(np.sin(theta[-1]) - np.sin(theta[0]))
 
-
     # Calculate Cost of Transport
     cot = work / (quad_m*g*dist)
 
