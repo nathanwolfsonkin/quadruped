@@ -3,7 +3,8 @@
     <include>
         <!-- Robot URDF -->
         <uri>/workspace/install/generic_quadruped_description/share/generic_quadruped_description/model/quadruped.urdf</uri>
-
+        <!-- <uri>/workspace/src/robot_descriptions/a1_description/urdf/a1.urdf</uri> -->
+        
         <!-- Plugin for joint state publisher -->
         <plugin
             filename="gz-sim-joint-state-publisher-system"

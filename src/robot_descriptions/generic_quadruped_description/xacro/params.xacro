@@ -10,7 +10,7 @@
     <!-- FR Leg Parameters -->
     <xacro:property name="FR_rad" value="0.1" />
     <xacro:property name="FR_L1" value="0.25" />
-    <xacro:property name="FR_L2" value="1" />
+    <xacro:property name="FR_L2" value="2" />
     <xacro:property name="FR_L3" value="1" />
     <xacro:property name="FR_m1" value="1" />
     <xacro:property name="FR_m2" value="1" />

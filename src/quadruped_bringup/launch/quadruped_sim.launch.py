@@ -31,21 +31,21 @@ def generate_launch_description():
     )
 
     # Load the SDF file from "description" package
-    # sdf_file  =  os.path.join(pkg_project_description, 'models', 'quadruped', 'model.sdf')
-    # with open(sdf_file, 'r') as infp:
-    #     robot_desc = infp.read()
+    sdf_file  =  os.path.join(pkg_project_description, 'models', 'quadruped', 'model.sdf')
+    with open(sdf_file, 'r') as infp:
+        robot_desc = infp.read()
 
-    # # Takes the description and joint angles as inputs and publishes the 3D poses of the robot links
-    # robot_state_publisher = Node(
-    #     package='robot_state_publisher',
-    #     executable='robot_state_publisher',
-    #     name='robot_state_publisher',
-    #     output='both',
-    #     parameters=[
-    #         {'use_sim_time': True},
-    #         {'robot_description': robot_desc},
-    #     ]
-    # )
+    # Takes the description and joint angles as inputs and publishes the 3D poses of the robot links
+    robot_state_publisher = Node(
+        package='robot_state_publisher',
+        executable='robot_state_publisher',
+        name='robot_state_publisher',
+        output='both',
+        parameters=[
+            {'use_sim_time': True},
+            {'robot_description': robot_desc},
+        ]
+    )
 
     # Bridge ROS topics and Gazebo messages for establishing communication
     bridge = Node(
@@ -61,5 +61,5 @@ def generate_launch_description():
     return LaunchDescription([
         gz_sim,
         bridge,
-        # robot_state_publisher,
+        robot_state_publisher,
     ])

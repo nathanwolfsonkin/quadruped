@@ -193,6 +193,12 @@
 
         <xacro:link link_name="${leg_name}_calf" mass="${m3}" rad="${rad}" length="${L3}" />
 
+        <!-- foot sphere at knee position for contact purposes -->
+        <xacro:foot foot_name="${leg_name}_knee" mass="0.0" rad="${rad}" />
+
+        <xacro:fixed_joint name="${leg_name}_knee_joint" parent="${leg_name}_calf"
+            child="${leg_name}_knee" length="0.0" />
+
         <xacro:calf_joint leg_name="${leg_name}" right="${right}" length="${L2}" />
 
         <xacro:foot foot_name="${leg_name}_foot" mass="${m4}" rad="${rad}" />
