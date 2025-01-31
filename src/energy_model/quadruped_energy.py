@@ -2,8 +2,14 @@ import numpy as np
 
 # Quadrupedal parameters and current state
 class Quadruped:
-    def __init__(self, leg_params={'l':1, 'I':1, 'm':1}, 
-                 body_params={'l':1, 'I':1, 'm':1, 'origin':[0,0], 'orientation':0}):
+    default_leg_params={'l':1, 'I':1, 'm':1}
+    def __init__(self, 
+                 leg_params=default_leg_params, 
+                 body_params={'l':1, 'I':1, 'm':1, 'origin':[0,0], 'orientation':0},
+                 FR_params = default_leg_params,
+                 FL_params = default_leg_params,
+                 RL_params = default_leg_params,
+                 RR_params = default_leg_params):
         
         # Define main body
         l=body_params['l']
@@ -16,16 +22,23 @@ class Quadruped:
         # Find mount points for the legs
         left_hip, right_hip = self.body.get_endpoints()
         
-        # Define legs
-        l = leg_params['l']
-        I = leg_params['I']
-        m = leg_params['m']
+        # If specific leg assignments are not set, treat them as default
+        if (FR_params == self.default_leg_params and
+            FL_params == self.default_leg_params and
+            RL_params == self.default_leg_params and
+            RR_params == self.default_leg_params):
+            
+            FR_params = leg_params
+            FL_params = leg_params
+            RL_params = leg_params
+            RR_params = leg_params
 
-        # Assume all legs have the same physical properties
-        self.leg_list = [Leg(origin=left_hip, l=l, I=I, m=m), 
-                         Leg(origin=left_hip, l=l, I=I, m=m), 
-                         Leg(origin=right_hip,l=l, I=I, m=m), 
-                         Leg(origin=right_hip,l=l, I=I, m=m)]
+        self.leg_list = [
+            Leg(origin=right_hip,l=FR_params['l'], I=FR_params['I'], m=FR_params['m']),
+            Leg(origin=left_hip, l=FL_params['l'], I=FL_params['I'], m=FL_params['m']), 
+            Leg(origin=left_hip, l=RL_params['l'], I=RL_params['I'], m=RL_params['m']), 
+            Leg(origin=right_hip,l=RR_params['l'], I=RR_params['I'], m=RR_params['m']), 
+            ]
         
         # Calculate quadruped mass for CoT
         self.m = 0

@@ -10,39 +10,85 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
-# Install models and Xacro files
-install(
-  DIRECTORY models/
-  DESTINATION share/${PROJECT_NAME}/models
-)
+# Define paths
+set(XACRO_QUAD ${CMAKE_CURRENT_SOURCE_DIR}/xacro/quadruped.xacro)
+set(URDF_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/urdf)
+set(URDF_QUAD ${URDF_OUTPUT_DIR}/quadruped.urdf)
 
-install(
-  DIRECTORY xacro/
-  DESTINATION share/${PROJECT_NAME}/xacro
-)
 
-# Set paths to Xacro and SDF files
-set(XACRO_FILE ${CMAKE_CURRENT_SOURCE_DIR}/xacro/model.xacro)
-set(SDF_FILE ${CMAKE_CURRENT_BINARY_DIR}/models/quadruped/model.sdf)
+set(XACRO_QUAD_PLUGINS ${CMAKE_CURRENT_SOURCE_DIR}/xacro/quad_plugins.xacro)
+set(SDF_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/models/quadruped)
+set(SDF_QUAD_PLUGINS ${SDF_OUTPUT_DIR}/model.sdf)
 
-# Custom command to generate SDF from Xacro
+# Ensure the output directory exists
+file(MAKE_DIRECTORY ${URDF_OUTPUT_DIR})
+file(MAKE_DIRECTORY ${SDF_OUTPUT_DIR})
+
+# Add dependency on all Xacro files
+file(GLOB_RECURSE XACRO_DEPENDENCIES ${CMAKE_CURRENT_SOURCE_DIR}/xacro/*.xacro)
+file(GLOB_RECURSE XACRO_DEPENDENCIES ${CMAKE_CURRENT_SOURCE_DIR}/config/params.yaml)
+
+# Generate URDF during build time
 add_custom_command(
-  OUTPUT ${SDF_FILE}
-  COMMAND xacro ${XACRO_FILE} -o ${SDF_FILE}
-  DEPENDS ${XACRO_FILE}
+  OUTPUT ${URDF_QUAD}
+  COMMAND xacro ${XACRO_QUAD} -o ${URDF_QUAD}
+  DEPENDS ${XACRO_DEPENDENCIES}
+  COMMENT "Generating URDF from Xacro"
+)
+
+# Generate SDF during build time
+add_custom_command(
+  OUTPUT ${SDF_QUAD_PLUGINS}
+  COMMAND xacro ${XACRO_QUAD_PLUGINS} -o ${SDF_QUAD_PLUGINS}
+  DEPENDS ${XACRO_DEPENDENCIES}
   COMMENT "Generating SDF from Xacro"
 )
 
-# Custom target to build SDF
-add_custom_target(generate_sdf ALL DEPENDS ${SDF_FILE})
+# Custom target to ensure URDF generation
+add_custom_target(generate_urdf ALL DEPENDS ${URDF_QUAD})
+add_custom_target(generate_sdf ALL DEPENDS ${SDF_QUAD_PLUGINS})
 
-# Install the generated SDF
+# Fill in inertial values for params.yaml
+set(PARAMS_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/config/params.yaml)
+set(PARAMS_BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR}/config)
+set(PARAMS_BUILD ${PARAMS_BUILD_DIR}/params.yaml)
+set(YAML_FILL ${CMAKE_CURRENT_SOURCE_DIR}/build/yaml_fill.py)
+
+# Ensure build directory exists
+file(MAKE_DIRECTORY ${PARAMS_BUILD_DIR})
+
+add_custom_command(
+  OUTPUT ${PARAMS_BUILD}
+  COMMAND python3 ${YAML_FILL} ${PARAMS_SOURCE} ${PARAMS_BUILD}
+  DEPENDS ${YAML_FILL} ${PARAMS_SOURCE}
+  COMMENT "Generating inertial values for unifrom mass distribution in build directory"
+)
+
+# Ensure YAML generation runs durring build process
+add_custom_target(generate_yaml ALL DEPENDS ${PARAMS_BUILD})
+
+#Install the generated YAML file
 install(
-  FILES ${SDF_FILE}
+  FILES ${PARAMS_BUILD}
+  DESTINATION share/${PROJECT_NAME}/config
+)
+
+
+# Install the generated URDF
+install(
+  DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/models/quadruped/
   DESTINATION share/${PROJECT_NAME}/models/quadruped
 )
 
-ament_environment_hooks("${CMAKE_CURRENT_SOURCE_DIR}/hooks/${PROJECT_NAME}.dsv.in")
-ament_environment_hooks("${CMAKE_CURRENT_SOURCE_DIR}/hooks/${PROJECT_NAME}.sh.in")
+install(
+  DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/urdf/
+  DESTINATION share/${PROJECT_NAME}/urdf
+)
+
+# Install the original Xacro files
+install(
+  DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/xacro/
+  DESTINATION share/${PROJECT_NAME}/xacro
+)
 
 ament_package()

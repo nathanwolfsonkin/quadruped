@@ -9,12 +9,11 @@ def generate_launch_description():
     # Configure ROS nodes for launch
 
     # Setup project paths
-    pkg_project_description = get_package_share_directory('quadruped_description')
+    pkg_quadruped_description = get_package_share_directory('quadruped_description')
     pkg_project_bringup = get_package_share_directory('quadruped_bringup')
-    pkg_generic_quadruped = get_package_share_directory('generic_quadruped_description')    
 
     # Load the URDF file from "description" package
-    urdf_file  =  os.path.join(pkg_generic_quadruped, 'model', 'quadruped.urdf')
+    urdf_file  =  os.path.join(pkg_quadruped_description, 'urdf', 'quadruped.urdf')
     with open(urdf_file, 'r') as infp:
         robot_desc = infp.read()
 

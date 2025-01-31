@@ -292,15 +292,15 @@ def main():
                                timelist=timelist)
     
     # Generate plots
-    # plots.leg1_data_approx()
-    # plots.leg2_data_approx()
-    # plots.all_angles_approx()
-    # plots.leg1_t1_t2_phase_protrait()
-    # plots.leg2_t1_t2_phase_portrait()
-    # plots.leg1_t1_dt1()
-    # plots.leg1_pfoot_vs_time()
-    # plots.leg1_vfoot_vs_time()
-    # plots.all_energy_plot()
+    plots.leg1_data_approx()
+    plots.leg2_data_approx()
+    plots.all_angles_approx()
+    plots.leg1_t1_t2_phase_protrait()
+    plots.leg2_t1_t2_phase_portrait()
+    plots.leg1_t1_dt1()
+    plots.leg1_pfoot_vs_time()
+    plots.leg1_vfoot_vs_time()
+    plots.all_energy_plot()
 
     # plt.show()
 

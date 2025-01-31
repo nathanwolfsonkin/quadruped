@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<robot name="quadruped" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <xacro:property name="yaml_file" value="/workspace/src/quadruped_description/config/params.yaml"/>
+    <xacro:property name="quad" value="${xacro.load_yaml(yaml_file)}"/>
+
+    <!-- Base Parameters -->
+    <xacro:property name="base_Lx" value="${quad.base.Lx}" />
+    <xacro:property name="base_Ly" value="${quad.base.Ly}" />
+    <xacro:property name="base_Lz" value="${quad.base.Lz}" />
+    <xacro:property name="base_m" value="${quad.base.m}" />
+
+    <!-- FR Leg Parameters -->
+    <xacro:property name="FR_rad" value="${quad.FR.rad}" />
+    <xacro:property name="FR_L1" value="${quad.FR.L1}" />
+    <xacro:property name="FR_L2" value="${quad.FR.L2}" />
+    <xacro:property name="FR_L3" value="${quad.FR.L3}" />
+    <xacro:property name="FR_m1" value="${quad.FR.m1}" />
+    <xacro:property name="FR_m2" value="${quad.FR.m2}" />
+    <xacro:property name="FR_m3" value="${quad.FR.m3}" />
+    <xacro:property name="FR_m4" value="${quad.FR.m4}" />
+
+    <!-- FL Leg Parameters -->
+    <xacro:property name="FL_rad" value="${quad.FL.rad}" />
+    <xacro:property name="FL_L1" value="${quad.FL.L1}" />
+    <xacro:property name="FL_L2" value="${quad.FL.L2}" />
+    <xacro:property name="FL_L3" value="${quad.FL.L3}" />
+    <xacro:property name="FL_m1" value="${quad.FL.m1}" />
+    <xacro:property name="FL_m2" value="${quad.FL.m2}" />
+    <xacro:property name="FL_m3" value="${quad.FL.m3}" />
+    <xacro:property name="FL_m4" value="${quad.FL.m4}" />
+
+    <!-- RL Leg Parameters -->
+    <xacro:property name="RL_rad" value="${quad.RL.rad}" />
+    <xacro:property name="RL_L1" value="${quad.RL.L1}" />
+    <xacro:property name="RL_L2" value="${quad.RL.L2}" />
+    <xacro:property name="RL_L3" value="${quad.RL.L3}" />
+    <xacro:property name="RL_m1" value="${quad.RL.m1}" />
+    <xacro:property name="RL_m2" value="${quad.RL.m2}" />
+    <xacro:property name="RL_m3" value="${quad.RL.m3}" />
+    <xacro:property name="RL_m4" value="${quad.RL.m4}" />
+
+    <!-- RR Leg Parameters -->
+    <xacro:property name="RR_rad" value="${quad.RR.rad}" />
+    <xacro:property name="RR_L1" value="${quad.RR.L1}" />
+    <xacro:property name="RR_L2" value="${quad.RR.L2}" />
+    <xacro:property name="RR_L3" value="${quad.RR.L3}" />
+    <xacro:property name="RR_m1" value="${quad.RR.m1}" />
+    <xacro:property name="RR_m2" value="${quad.RR.m2}" />
+    <xacro:property name="RR_m3" value="${quad.RR.m3}" />
+    <xacro:property name="RR_m4" value="${quad.RR.m4}" />
+
+</robot>

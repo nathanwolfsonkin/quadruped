@@ -48,7 +48,7 @@
             <pose>0 0 3 0 0 0</pose>
             <include>
                 <!-- MAKE SURE THE QUADRUPED MODEL ABIDES BY THE JOINT NAMING CONVENTIONS! -->
-                <uri>package://quadruped_description/models/quadruped</uri>
+                <uri>/workspace/install/quadruped_description/share/quadruped_description/models/quadruped/model.sdf</uri>
             </include>
         </model>
     </world>
