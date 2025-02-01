@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <sdf version="1.8">
-    <world name="default_world">
+    <world name="quadruped_testbench">
 
         <light name="sun" type="directional">
             <cast_shadows>true</cast_shadows>

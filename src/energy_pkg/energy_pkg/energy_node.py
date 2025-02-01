@@ -1,10 +1,12 @@
 import yaml
+import csv
+from datatime import datetime
+import os
 
 import rclpy
 from rclpy.node import Node
-from tf2_ros import Buffer, TransformListener
-
-from tf2_msgs.msg import TFMessage
+from sensor_msgs.msg import JointState
+from rosgraph_msgs.msg import Clock
 
 from src.energy_model.quadruped_energy import Quadruped
 
@@ -14,39 +16,148 @@ class EnergyNode(Node):
         super().__init__('energy_node')
 
         # Gather quadruped parameters from single source of truth yaml file
-        config_file = "/workspace/src/quadruped_description/config/params.yaml"
+        config_file = "/workspace/install/quadruped_description/share/quadruped_description/config/params.yaml"
 
         with open(config_file, 'r') as file:
             params = yaml.safe_load(file)
+
+        legs = {}
+        
+        for leg in ['FL','FR','RL','RR']:
+            legs[leg] = {
+                'l':[params[leg]['L2'], params[leg]['L3']],
+                'I':[params[leg]['I2']['Izz'], params[leg]['I3']['Izz']],
+                'm':[params[leg]['m2'], params[leg]['m3']],
+            }
+        
+        # Initialize python energy model quadruped
+        self.quadruped = Quadruped(FR_params=legs['FR'],
+                                   FL_params=legs['FL'],
+                                   RL_params=legs['RL'],
+                                   RR_params=legs['RR'],
+                                   body_params={'l':params['base']['Lx'],
+                                                'I':params['base']['I']['Iyy'],
+                                                'm':params['base']['m'], 
+                                                'origin':[0,0], 'orientation':0})
+        
+        self.joint_state_subscriber = self.create_subscription(JointState, '/joint_states', self.joint_state_callback, 10)
+        
+        # Set up clock
+        self.clock_subscriber = self.create_subscription(Clock, '/clock', self.clock_callback, 10)
+        
+        self.time = 0.0
+        
+        self.create_timer(.1, self.log_data, clock=self.time)
+        
+        # Setup logging directory
+        log_dir = os.path.expanduser("/workspace/energy_logs")
+        os.makedirs(log_dir, exist_ok=True)
+
+        # Create a timestamped log file
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        self.csv_filename = os.path.join(log_dir, f"joint_states_{timestamp}.csv")
+
+        # Open CSV file and write headers
+        with open(self.csv_filename, 'w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(["time", "FL_thigh_pos", "FL_calf_pos", "FR_thigh_pos", "FR_calf_pos",
+                             "RL_thigh_pos", "RL_calf_pos", "RR_thigh_pos", "RR_calf_pos",
+                             "FL_thigh_vel", "FL_calf_vel", "FR_thigh_vel", "FR_calf_vel",
+                             "RL_thigh_vel", "RL_calf_vel", "RR_thigh_vel", "RR_calf_vel"])
+
+        
+    def log_data(self):
+        """Logs quadruped joint states at regular intervals."""
+        
+        if self.time == 0.0:
+            return  # Avoid logging before time is set
+
+        data = [
+            self.time,
+            self.quadruped.leg_list[1].t1, self.quadruped.leg_list[1].t2,  # FL
+            self.quadruped.leg_list[0].t1, self.quadruped.leg_list[0].t2,  # FR
+            self.quadruped.leg_list[2].t1, self.quadruped.leg_list[2].t2,  # RL
+            self.quadruped.leg_list[3].t1, self.quadruped.leg_list[3].t2,  # RR
+            self.quadruped.leg_list[1].dt1, self.quadruped.leg_list[1].dt2,  # FL velocities
+            self.quadruped.leg_list[0].dt1, self.quadruped.leg_list[0].dt2,  # FR velocities
+            self.quadruped.leg_list[2].dt1, self.quadruped.leg_list[2].dt2,  # RL velocities
+            self.quadruped.leg_list[3].dt1, self.quadruped.leg_list[3].dt2,  # RR velocities
+        ]
+
+        # Append data to CSV file
+        with open(self.csv_filename, 'a', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(data)
+
+        self.get_logger().info(f"Logged data at {self.time:.2f} sec")
         
         
-        self.quadruped = Quadruped(leg_params={'l':params['LF']['L1'], 'I':1, 'm':1},
-                                   body_params={'l':1, 'I':1, 'm':1, 'origin':[0,0], 'orientation':0})
+    def clock_callback(self, msg_in: Clock):
+        self.time = msg_in.clock.sec + msg_in.clock.nanosec * 1e-9
         
-        # Initialize transfrom values
-        tf = {
-            "FL_hip":   0,
-            "FL_thigh": 0,
-            "FL_calf":  0,
-        }
-
-        self.s = self.create_subscription(TFMessage, '/tf', self.transform_update_callback, 1)
-        self.tf_buffer = Buffer()
-        self.tf_listener = TransformListener(self.tf_buffer, self)
-        self.timer = self.create_timer(1.0, self.print_all_frames)  # Print frames every 1 second
-
-    def print_all_frames(self):
-        try:
-            frames = self.tf_buffer.all_frames_as_yaml()
-            self.get_logger().info(f"All Frames:\n{frames}")
-        except Exception as e:
-            self.get_logger().error(f"Error retrieving frames: {e}")
-
-    def transform_update_callback(self, msg_in):
-
+    # Updates the quadruped state based on the gazebo model
+    def joint_state_callback(self, msg_in: JointState):
+        """
+        0  - FL_hip_joint
+        1  - FL_thigh_joint
+        2  - FL_calf_joint
+        3  - FR_hip_joint
+        4  - FR_thigh_joint
+        5  - FR_calf_joint
+        6  - RL_hip_joint
+        7  - RL_thigh_joint
+        8  - RL_calf_joint
+        9  - RR_hip_joint
+        10 - RR_thigh_joint
+        11 - RR_calf_joint
+        """
         
-        pass
-
+        # FL_hip_pos = msg_in.position[0]
+        FL_thigh_pos = msg_in.position[1]
+        FL_calf_pos = msg_in.position[2]
+        # FR_hip_pos = msg_in.position[3]
+        FR_thigh_pos = msg_in.position[4]
+        FR_calf_pos = msg_in.position[5]
+        # RL_hip_pos = msg_in.position[6]
+        RL_thigh_pos = msg_in.position[7]
+        RL_calf_pos = msg_in.position[8]
+        # RR_hip_pos = msg_in.position[9]
+        RR_thigh_pos = msg_in.position[10]
+        RR_calf_pos = msg_in.position[11]
+        
+        # FL_hip_vel = msg_in.velocity[0]
+        FL_thigh_vel = msg_in.velocity[1]
+        FL_calf_vel = msg_in.velocity[2]
+        # FR_hip_vel = msg_in.velocity[3]
+        FR_thigh_vel = msg_in.velocity[4]
+        FR_calf_vel = msg_in.velocity[5]
+        # RL_hip_vel = msg_in.velocity[6]
+        RL_thigh_vel = msg_in.velocity[7]
+        RL_calf_vel = msg_in.velocity[8]
+        # RR_hip_vel = msg_in.velocity[9]
+        RR_thigh_vel = msg_in.velocity[10]
+        RR_calf_vel = msg_in.velocity[11]
+        
+        # Update model positions
+        self.quadruped.leg_list[0].t1 = FR_thigh_pos # FR_thigh_joint
+        self.quadruped.leg_list[0].t2 = FR_calf_pos  # FR_calf_joint
+        self.quadruped.leg_list[1].t1 = FL_thigh_pos # FL_thigh_joint
+        self.quadruped.leg_list[1].t2 = FL_calf_pos  # FL_calf_joint
+        self.quadruped.leg_list[2].t1 = RL_thigh_pos # RL_thigh_joint
+        self.quadruped.leg_list[2].t2 = RL_calf_pos  # RL_calf_joint
+        self.quadruped.leg_list[3].t1 = RR_thigh_pos # RR_thigh_joint
+        self.quadruped.leg_list[3].t2 = RR_calf_pos  # RR_calf_joint
+        
+        # Update model velocities
+        self.quadruped.leg_list[0].dt1 = FR_thigh_vel # FR_thigh_joint
+        self.quadruped.leg_list[0].dt2 = FR_calf_vel  # FR_calf_joint
+        self.quadruped.leg_list[1].dt1 = FL_thigh_vel # FL_thigh_joint
+        self.quadruped.leg_list[1].dt2 = FL_calf_vel  # FL_calf_joint
+        self.quadruped.leg_list[2].dt1 = RL_thigh_vel # RL_thigh_joint
+        self.quadruped.leg_list[2].dt2 = RL_calf_vel  # RL_calf_joint
+        self.quadruped.leg_list[3].dt1 = RR_thigh_vel # RR_thigh_joint
+        self.quadruped.leg_list[3].dt2 = RR_calf_vel  # RR_calf_joint
+        
 
 def main(args=None):
     rclpy.init(args=args)
@@ -54,12 +165,6 @@ def main(args=None):
     rclpy.spin(energy)
     energy.destroy_node()
     rclpy.shutdown()
-
-
-def test():
-
-    pass
-
     
 if __name__ == '__main__':
-    test()
+    main()

@@ -207,8 +207,6 @@ class QuadrupedData:
     def refresh(self):
         for leg in self.leg_list:
             leg.refresh()
-
-        # Helper function to approximate quadruped body velocity based on leg trajectory
     
     # For completenesss, calculates the body height of the quadruped and updates quadruped
     def calculate_body_height(self):
