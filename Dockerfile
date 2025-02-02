@@ -53,7 +53,8 @@ RUN pip3 install --break-system-packages \
     matplotlib \
     numpy \
     scipy \
-    PyQt5
+    PyQt5 \
+    datetime
 
 # Remove apt library folder to save space
 RUN rm -rf /var/lib/apt/lists/*

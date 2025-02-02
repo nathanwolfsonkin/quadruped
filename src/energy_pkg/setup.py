@@ -21,8 +21,6 @@ setup(
     entry_points={
         'console_scripts': [
             'energy_node = energy_pkg.energy_node:main',
-            'static_subscriber = energy_pkg.static_subscriber:main',
-            'tf_publisher = energy_pkg.tf_publisher:main',
         ],
     },
 )

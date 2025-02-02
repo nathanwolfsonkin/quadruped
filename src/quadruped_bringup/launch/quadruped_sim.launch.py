@@ -62,10 +62,18 @@ def generate_launch_description():
         name='joint_state_publisher',
         output='screen'
     )
+    
+    energy_node = Node(
+        package='energy_pkg',
+        executable='energy_node',
+        name='energy_node',
+        output='screen'
+    )
 
     return LaunchDescription([
         gz_sim,
         bridge,
         robot_state_publisher,
         joint_state_publisher,
+        energy_node,
     ])

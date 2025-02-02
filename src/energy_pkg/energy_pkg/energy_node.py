@@ -1,6 +1,6 @@
 import yaml
 import csv
-from datatime import datetime
+from datetime import datetime
 import os
 
 import rclpy
@@ -43,11 +43,21 @@ class EnergyNode(Node):
         self.joint_state_subscriber = self.create_subscription(JointState, '/joint_states', self.joint_state_callback, 10)
         
         # Set up clock
+        # Use simulated time
+        self.set_parameters([rclpy.parameter.Parameter('use_sim_time', rclpy.Parameter.Type.BOOL, True)])
+        
+        # ROS Clock to use simulation time
+        self.clock = self.get_clock()
+
+        # Subscribe to the /clock topic to update time
         self.clock_subscriber = self.create_subscription(Clock, '/clock', self.clock_callback, 10)
-        
-        self.time = 0.0
-        
-        self.create_timer(.1, self.log_data, clock=self.time)
+
+        # Default time
+        self.sim_time = 0.0  
+
+        # Create timer using the ROS clock (not a Clock message!)
+        self.timer = self.create_timer(0.1, self.log_data, clock=self.clock)
+        self.clock_subscriber = self.create_subscription(Clock, '/clock', self.clock_callback, 10)
         
         # Setup logging directory
         log_dir = os.path.expanduser("/workspace/energy_logs")
@@ -69,11 +79,11 @@ class EnergyNode(Node):
     def log_data(self):
         """Logs quadruped joint states at regular intervals."""
         
-        if self.time == 0.0:
+        if self.sim_time == 0.0:
             return  # Avoid logging before time is set
 
         data = [
-            self.time,
+            self.sim_time,
             self.quadruped.leg_list[1].t1, self.quadruped.leg_list[1].t2,  # FL
             self.quadruped.leg_list[0].t1, self.quadruped.leg_list[0].t2,  # FR
             self.quadruped.leg_list[2].t1, self.quadruped.leg_list[2].t2,  # RL
@@ -89,11 +99,11 @@ class EnergyNode(Node):
             writer = csv.writer(file)
             writer.writerow(data)
 
-        self.get_logger().info(f"Logged data at {self.time:.2f} sec")
+        self.get_logger().info(f"Logged data at {self.sim_time:.2f} sec")
         
         
-    def clock_callback(self, msg_in: Clock):
-        self.time = msg_in.clock.sec + msg_in.clock.nanosec * 1e-9
+    def clock_callback(self, msg_in: Clock):        
+        self.sim_time = msg_in.clock.sec + msg_in.clock.nanosec * 1e-9
         
     # Updates the quadruped state based on the gazebo model
     def joint_state_callback(self, msg_in: JointState):
@@ -125,18 +135,32 @@ class EnergyNode(Node):
         RR_thigh_pos = msg_in.position[10]
         RR_calf_pos = msg_in.position[11]
         
-        # FL_hip_vel = msg_in.velocity[0]
-        FL_thigh_vel = msg_in.velocity[1]
-        FL_calf_vel = msg_in.velocity[2]
-        # FR_hip_vel = msg_in.velocity[3]
-        FR_thigh_vel = msg_in.velocity[4]
-        FR_calf_vel = msg_in.velocity[5]
-        # RL_hip_vel = msg_in.velocity[6]
-        RL_thigh_vel = msg_in.velocity[7]
-        RL_calf_vel = msg_in.velocity[8]
-        # RR_hip_vel = msg_in.velocity[9]
-        RR_thigh_vel = msg_in.velocity[10]
-        RR_calf_vel = msg_in.velocity[11]
+        try: 
+            # FL_hip_vel = msg_in.velocity[0]
+            FL_thigh_vel = msg_in.velocity[1]
+            FL_calf_vel = msg_in.velocity[2]
+            # FR_hip_vel = msg_in.velocity[3]
+            FR_thigh_vel = msg_in.velocity[4]
+            FR_calf_vel = msg_in.velocity[5]
+            # RL_hip_vel = msg_in.velocity[6]
+            RL_thigh_vel = msg_in.velocity[7]
+            RL_calf_vel = msg_in.velocity[8]
+            # RR_hip_vel = msg_in.velocity[9]
+            RR_thigh_vel = msg_in.velocity[10]
+            RR_calf_vel = msg_in.velocity[11]
+        except:
+            # FL_hip_vel = 0.0
+            FL_thigh_vel = 0.0
+            FL_calf_vel = 0.0
+            # FR_hip_vel = 0.0
+            FR_thigh_vel = 0.0
+            FR_calf_vel = 0.0
+            # RL_hip_vel = 0.0
+            RL_thigh_vel = 0.0
+            RL_calf_vel = 0.0
+            # RR_hip_vel = 0.0
+            RR_thigh_vel = 0.0
+            RR_calf_vel = 0.0
         
         # Update model positions
         self.quadruped.leg_list[0].t1 = FR_thigh_pos # FR_thigh_joint
