@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<robot name="quadruped" xmlns:xacro="http://www.ros.org/wiki/xacro">
+<robot name="quadruped_params" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-    <xacro:property name="yaml_file" value="/workspace/src/quadruped_description/config/params.yaml"/>
-    <xacro:property name="quad" value="${xacro.load_yaml(yaml_file)}"/>
+    <xacro:property name="yaml_file"
+        value="/workspace/build/quadruped_description/config/params.yaml" />
+    <xacro:property name="quad" value="${xacro.load_yaml(yaml_file)}" />
 
     <!-- Base Parameters -->
     <xacro:property name="base_Lx" value="${quad.base.Lx}" />
     <xacro:property name="base_Ly" value="${quad.base.Ly}" />
     <xacro:property name="base_Lz" value="${quad.base.Lz}" />
     <xacro:property name="base_m" value="${quad.base.m}" />
+    <xacro:property name="base_Ixx" value="${quad.base.I.Ixx}" />
+    <xacro:property name="base_Iyy" value="${quad.base.I.Iyy}" />
+    <xacro:property name="base_Izz" value="${quad.base.I.Izz}" />
 
     <!-- FR Leg Parameters -->
     <xacro:property name="FR_rad" value="${quad.FR.rad}" />
@@ -19,6 +23,18 @@
     <xacro:property name="FR_m2" value="${quad.FR.m2}" />
     <xacro:property name="FR_m3" value="${quad.FR.m3}" />
     <xacro:property name="FR_m4" value="${quad.FR.m4}" />
+    <xacro:property name="FR_I1xx" value="${quad.FR.I1.Ixx}" />
+    <xacro:property name="FR_I1yy" value="${quad.FR.I1.Iyy}" />
+    <xacro:property name="FR_I1zz" value="${quad.FR.I1.Izz}" />
+    <xacro:property name="FR_I2xx" value="${quad.FR.I2.Ixx}" />
+    <xacro:property name="FR_I2yy" value="${quad.FR.I2.Iyy}" />
+    <xacro:property name="FR_I2zz" value="${quad.FR.I2.Izz}" />
+    <xacro:property name="FR_I3xx" value="${quad.FR.I3.Ixx}" />
+    <xacro:property name="FR_I3yy" value="${quad.FR.I3.Iyy}" />
+    <xacro:property name="FR_I3zz" value="${quad.FR.I3.Izz}" />
+    <xacro:property name="FR_I4xx" value="${quad.FR.I4.Ixx}" />
+    <xacro:property name="FR_I4yy" value="${quad.FR.I4.Iyy}" />
+    <xacro:property name="FR_I4zz" value="${quad.FR.I4.Izz}" />
 
     <!-- FL Leg Parameters -->
     <xacro:property name="FL_rad" value="${quad.FL.rad}" />
@@ -29,6 +45,18 @@
     <xacro:property name="FL_m2" value="${quad.FL.m2}" />
     <xacro:property name="FL_m3" value="${quad.FL.m3}" />
     <xacro:property name="FL_m4" value="${quad.FL.m4}" />
+    <xacro:property name="FL_I1xx" value="${quad.FL.I1.Ixx}" />
+    <xacro:property name="FL_I1yy" value="${quad.FL.I1.Iyy}" />
+    <xacro:property name="FL_I1zz" value="${quad.FL.I1.Izz}" />
+    <xacro:property name="FL_I2xx" value="${quad.FL.I2.Ixx}" />
+    <xacro:property name="FL_I2yy" value="${quad.FL.I2.Iyy}" />
+    <xacro:property name="FL_I2zz" value="${quad.FL.I2.Izz}" />
+    <xacro:property name="FL_I3xx" value="${quad.FL.I3.Ixx}" />
+    <xacro:property name="FL_I3yy" value="${quad.FL.I3.Iyy}" />
+    <xacro:property name="FL_I3zz" value="${quad.FL.I3.Izz}" />
+    <xacro:property name="FL_I4xx" value="${quad.FL.I4.Ixx}" />
+    <xacro:property name="FL_I4yy" value="${quad.FL.I4.Iyy}" />
+    <xacro:property name="FL_I4zz" value="${quad.FL.I4.Izz}" />
 
     <!-- RL Leg Parameters -->
     <xacro:property name="RL_rad" value="${quad.RL.rad}" />
@@ -39,6 +67,18 @@
     <xacro:property name="RL_m2" value="${quad.RL.m2}" />
     <xacro:property name="RL_m3" value="${quad.RL.m3}" />
     <xacro:property name="RL_m4" value="${quad.RL.m4}" />
+    <xacro:property name="RL_I1xx" value="${quad.RL.I1.Ixx}" />
+    <xacro:property name="RL_I1yy" value="${quad.RL.I1.Iyy}" />
+    <xacro:property name="RL_I1zz" value="${quad.RL.I1.Izz}" />
+    <xacro:property name="RL_I2xx" value="${quad.RL.I2.Ixx}" />
+    <xacro:property name="RL_I2yy" value="${quad.RL.I2.Iyy}" />
+    <xacro:property name="RL_I2zz" value="${quad.RL.I2.Izz}" />
+    <xacro:property name="RL_I3xx" value="${quad.RL.I3.Ixx}" />
+    <xacro:property name="RL_I3yy" value="${quad.RL.I3.Iyy}" />
+    <xacro:property name="RL_I3zz" value="${quad.RL.I3.Izz}" />
+    <xacro:property name="RL_I4xx" value="${quad.RL.I4.Ixx}" />
+    <xacro:property name="RL_I4yy" value="${quad.RL.I4.Iyy}" />
+    <xacro:property name="RL_I4zz" value="${quad.RL.I4.Izz}" />
 
     <!-- RR Leg Parameters -->
     <xacro:property name="RR_rad" value="${quad.RR.rad}" />
@@ -49,5 +89,17 @@
     <xacro:property name="RR_m2" value="${quad.RR.m2}" />
     <xacro:property name="RR_m3" value="${quad.RR.m3}" />
     <xacro:property name="RR_m4" value="${quad.RR.m4}" />
+    <xacro:property name="RR_I1xx" value="${quad.RR.I1.Ixx}" />
+    <xacro:property name="RR_I1yy" value="${quad.RR.I1.Iyy}" />
+    <xacro:property name="RR_I1zz" value="${quad.RR.I1.Izz}" />
+    <xacro:property name="RR_I2xx" value="${quad.RR.I2.Ixx}" />
+    <xacro:property name="RR_I2yy" value="${quad.RR.I2.Iyy}" />
+    <xacro:property name="RR_I2zz" value="${quad.RR.I2.Izz}" />
+    <xacro:property name="RR_I3xx" value="${quad.RR.I3.Ixx}" />
+    <xacro:property name="RR_I3yy" value="${quad.RR.I3.Iyy}" />
+    <xacro:property name="RR_I3zz" value="${quad.RR.I3.Izz}" />
+    <xacro:property name="RR_I4xx" value="${quad.RR.I4.Ixx}" />
+    <xacro:property name="RR_I4yy" value="${quad.RR.I4.Iyy}" />
+    <xacro:property name="RR_I4zz" value="${quad.RR.I4.Izz}" />
 
 </robot>

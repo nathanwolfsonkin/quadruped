@@ -15,29 +15,49 @@
 
     <xacro:base_link
         name="base" L_x="${base_Lx}" L_y="${base_Ly}" L_z="${base_Lz}" mass="${base_m}"
-        inertial_link="False" />
+        inertial_link="False" Ixx="${base_Ixx}" Iyy="${base_Iyy}" Izz="${base_Izz}"/>
 
     <!-- Insert dummy link to carry inertia values for base link -->
     <xacro:base_link
         name="base_inertia" L_x="${base_Lx}" L_y="${base_Ly}" L_z="${base_Lz}" mass="${base_m}"
-        inertial_link="True" />
+        inertial_link="True" Ixx="${base_Ixx}" Iyy="${base_Iyy}" Izz="${base_Izz}"/>
 
     <xacro:fixed_joint name="inertial_base_joint" parent="base" child="base_inertia" length="0.0" />
 
     <xacro:leg leg_name="FR" right="True"
-        Px="${base_Lx/2}" Py="${-base_Ly/2}" Pz="0.0" rad="${FR_rad}" L1="${FR_L1}" L2="${FR_L2}"
-        L3="${FR_L3}" m1="${FR_m1}" m2="${FR_m2}" m3="${FR_m3}" m4="${FR_m4}" />
+        Px="${base_Lx/2}" Py="${-base_Ly/2}" Pz="0.0" rad="${FR_rad}"
+        L1="${FR_L1}" L2="${FR_L2}" L3="${FR_L3}"
+        m1="${FR_m1}" m2="${FR_m2}" m3="${FR_m3}" m4="${FR_m4}"
+        I1xx="${FR_I1xx}" I1yy="${FR_I1yy}" I1zz="${FR_I1zz}"
+        I2xx="${FR_I2xx}" I2yy="${FR_I2yy}" I2zz="${FR_I2yy}"
+        I3xx="${FR_I3xx}" I3yy="${FR_I3yy}" I3zz="${FR_I3yy}"
+        I4xx="${FR_I4xx}" I4yy="${FR_I4yy}" I4zz="${FR_I4yy}" />
 
     <xacro:leg leg_name="FL" right="False"
-        Px="${base_Lx/2}" Py="${base_Ly/2}" Pz="0.0" rad="${FL_rad}" L1="${FL_L1}" L2="${FL_L2}"
-        L3="${FL_L3}" m1="${FL_m1}" m2="${FL_m2}" m3="${FL_m3}" m4="${FL_m4}" />
+        Px="${base_Lx/2}" Py="${base_Ly/2}" Pz="0.0" rad="${FL_rad}"
+        L1="${FL_L1}" L2="${FL_L2}" L3="${FL_L3}"
+        m1="${FL_m1}" m2="${FL_m2}" m3="${FL_m3}" m4="${FL_m4}"
+        I1xx="${FL_I1xx}" I1yy="${FL_I1yy}" I1zz="${FL_I1zz}"
+        I2xx="${FL_I2xx}" I2yy="${FL_I2yy}" I2zz="${FL_I2yy}"
+        I3xx="${FL_I3xx}" I3yy="${FL_I3yy}" I3zz="${FL_I3yy}"
+        I4xx="${FL_I4xx}" I4yy="${FL_I4yy}" I4zz="${FL_I4yy}" />
 
     <xacro:leg leg_name="RL" right="False"
-        Px="${-base_Lx/2}" Py="${base_Ly/2}" Pz="0.0" rad="${RL_rad}" L1="${RL_L1}" L2="${RL_L2}"
-        L3="${RL_L3}" m1="${RL_m1}" m2="${RL_m2}" m3="${RL_m3}" m4="${RL_m4}" />
+        Px="${-base_Lx/2}" Py="${base_Ly/2}" Pz="0.0" rad="${RL_rad}"
+        L1="${RL_L1}" L2="${RL_L2}" L3="${RL_L3}"
+        m1="${RL_m1}" m2="${RL_m2}" m3="${RL_m3}" m4="${RL_m4}"
+        I1xx="${RL_I1xx}" I1yy="${RL_I1yy}" I1zz="${RL_I1zz}"
+        I2xx="${RL_I2xx}" I2yy="${RL_I2yy}" I2zz="${RL_I2yy}"
+        I3xx="${RL_I3xx}" I3yy="${RL_I3yy}" I3zz="${RL_I3yy}"
+        I4xx="${RL_I4xx}" I4yy="${RL_I4yy}" I4zz="${RL_I4yy}" />
 
     <xacro:leg leg_name="RR" right="True"
-        Px="${-base_Lx/2}" Py="${-base_Ly/2}" Pz="0.0" rad="${RR_rad}" L1="${RR_L1}" L2="${RR_L2}"
-        L3="${RR_L3}" m1="${RR_m1}" m2="${RR_m2}" m3="${RR_m3}" m4="${RR_m4}" />
+        Px="${-base_Lx/2}" Py="${-base_Ly/2}" Pz="0.0" rad="${RR_rad}" 
+        L1="${RR_L1}" L2="${RR_L2}" L3="${RR_L3}"
+        m1="${RR_m1}" m2="${RR_m2}" m3="${RR_m3}" m4="${RR_m4}"
+        I1xx="${RR_I1xx}" I1yy="${RR_I1yy}" I1zz="${RR_I1zz}"
+        I2xx="${RR_I2xx}" I2yy="${RR_I2yy}" I2zz="${RR_I2yy}"
+        I3xx="${RR_I3xx}" I3yy="${RR_I3yy}" I3zz="${RR_I3yy}"
+        I4xx="${RR_I4xx}" I4yy="${RR_I4yy}" I4zz="${RR_I4yy}" />
 
 </robot>
