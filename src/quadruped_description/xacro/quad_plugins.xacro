@@ -31,9 +31,9 @@
                 name="gz::sim::systems::JointPositionController">
                 <joint_name>${joint_name}</joint_name>
                 <topic>quadruped/cmd_${joint_name}</topic>
-                <p_gain>${Kp}</p_gain>
-                <i_gain>${Ki}</i_gain>
-                <d_gain>${Kd}</d_gain>
+                <p_gain>100000</p_gain>
+                <i_gain>100000</i_gain>
+                <d_gain>100000</d_gain>
             </plugin>
         </xacro:macro>
         <!-- Plugin for joint controllers -->

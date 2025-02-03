@@ -57,7 +57,6 @@ class EnergyNode(Node):
 
         # Create timer using the ROS clock (not a Clock message!)
         self.timer = self.create_timer(0.1, self.log_data, clock=self.clock)
-        self.clock_subscriber = self.create_subscription(Clock, '/clock', self.clock_callback, 10)
         
         # Setup logging directory
         log_dir = os.path.expanduser("/workspace/energy_logs")

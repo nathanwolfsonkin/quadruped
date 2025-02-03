@@ -1,3 +1,5 @@
+import os
+from glob import glob
 from setuptools import find_packages, setup
 
 package_name = 'energy_pkg'
@@ -10,6 +12,8 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
+        (os.path.join('share', package_name, 'gait_trajectory'), glob(os.path.join('gait_trajectory', '*')))
+
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -21,6 +25,7 @@ setup(
     entry_points={
         'console_scripts': [
             'energy_node = energy_pkg.energy_node:main',
+            'gait_loader = energy_pkg.gait_loader:main',
         ],
     },
 )
