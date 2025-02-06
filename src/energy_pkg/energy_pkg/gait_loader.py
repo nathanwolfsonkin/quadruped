@@ -12,37 +12,11 @@ class GaitLoader(Node):
         super().__init__('gait_loader')
         
         # Set up publishers for every quadruped command topic
-        self.FR_hip_publisher = self.create_publisher(Float64, '/quadruped/cmd_FR_hip_joint', 10)
-        self.FR_thigh_publisher = self.create_publisher(Float64, '/quadruped/cmd_FR_thigh_joint', 10)
-        self.FR_calf_publisher = self.create_publisher(Float64, '/quadruped/cmd_FR_calf_joint', 10)
-        
-        self.FL_hip_publisher = self.create_publisher(Float64, '/quadruped/cmd_FL_hip_joint', 10)
-        self.FL_thigh_publisher = self.create_publisher(Float64, '/quadruped/cmd_FL_thigh_joint', 10)
-        self.FL_calf_publisher = self.create_publisher(Float64, '/quadruped/cmd_FL_calf_joint', 10)
-        
-        self.RL_hip_publisher = self.create_publisher(Float64, '/quadruped/cmd_RL_hip_joint', 10)
-        self.RL_thigh_publisher = self.create_publisher(Float64, '/quadruped/cmd_RL_thigh_joint', 10)
-        self.RL_calf_publisher = self.create_publisher(Float64, '/quadruped/cmd_RL_calf_joint', 10)
-        
-        self.RR_hip_publisher = self.create_publisher(Float64, '/quadruped/cmd_RR_hip_joint', 10)
-        self.RR_thigh_publisher = self.create_publisher(Float64, '/quadruped/cmd_RR_thigh_joint', 10)
-        self.RR_calf_publisher = self.create_publisher(Float64, '/quadruped/cmd_RR_calf_joint', 10)
-        
-        self.pub_dict = {
-            'FR_hip':self.FR_hip_publisher,
-            'FR_thigh':self.FR_thigh_publisher,
-            'FR_calf':self.FR_calf_publisher,
-            'FL_hip':self.FL_hip_publisher,
-            'FL_thigh':self.FL_thigh_publisher,
-            'FL_calf':self.FL_calf_publisher,
-            'RL_hip':self.RL_hip_publisher,
-            'RL_thigh':self.RL_thigh_publisher,
-            'RL_calf':self.RL_calf_publisher,
-            'RR_hip':self.RR_hip_publisher,
-            'RR_thigh':self.RR_thigh_publisher,
-            'RR_calf':self.RR_calf_publisher,
-        }
-        
+        self.pub_dict = {}
+        for leg in ['FR', 'FL', 'RL', 'RR']:
+            for joint in ['hip', 'thigh', 'calf']:
+                topic_name = f'/quadruped/cmd_{leg}_{joint}_joint'
+                self.pub_dict[f'{leg}_{joint}'] = self.create_publisher(Float64, topic_name, 10)        
         
         # Set up clock
         # Use simulated time
@@ -61,15 +35,33 @@ class GaitLoader(Node):
         file_path = '/workspace/install/energy_pkg/share/energy_pkg/gait_trajectory/approx_gait_traj.csv'
         self.trajectory_data = self.load_csv(file_path)
         
+        # Delay the inputs by some amount of time
+        self.delay_time = 5 #seconds
+        for index, _ in enumerate(self.trajectory_data['timelist']):
+            if index != 0:
+                self.trajectory_data['timelist'][index] += self.delay_time
+                
+        self.first_reset = True
         self.current_index = 0
+        
+    def loop_trajectory(self):
+        time_offset = self.sim_time - self.trajectory_data['timelist'][0]
+        for index, _ in enumerate(self.trajectory_data['timelist']):
+            if index == 0 and self.first_reset == True:
+                self.trajectory_data['timelist'][index] += time_offset
+            else:
+                self.trajectory_data['timelist'][index] += (time_offset - self.delay_time)
+                
+        self.first_reset = False
 
     def send_command(self):
-        
         if self.current_index != len(self.trajectory_data['timelist']) - 1:
             next_time = self.trajectory_data['timelist'][self.current_index + 1]
             
             if self.sim_time >= next_time:
                 self.current_index += 1
+        else:
+            self.loop_trajectory()
         
         # Publish to quadruped commands
         for leg in ['FR','FL','RL','RR']:
@@ -78,8 +70,6 @@ class GaitLoader(Node):
                 msg_out.data = self.trajectory_data[leg + '_' + joint][self.current_index]
                 self.pub_dict[leg + '_' + joint].publish(msg_out)
                 
-
-
     def update_clock(self, msg_in: Clock):
         self.sim_time = msg_in.clock.sec + msg_in.clock.nanosec * 1e-9
 
@@ -96,10 +86,10 @@ class GaitLoader(Node):
                     for key in row:
                         data[key].append(float(row[key]))  # Convert values to float
 
-            # self.get_logger().info(f"Loaded CSV file with {len(data['timelist'])} rows")
         except Exception as e:
             self.get_logger().error(f"Failed to load CSV file: {e}")
         return data
+
 
 def main(args=None):
     rclpy.init(args=args)

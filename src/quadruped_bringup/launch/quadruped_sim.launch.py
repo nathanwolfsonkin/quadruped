@@ -69,6 +69,13 @@ def generate_launch_description():
         name='energy_node',
         output='screen'
     )
+    
+    gait_loader = Node(
+        package='energy_pkg',
+        executable='gait_loader',
+        name='gait_loader',
+        output='both'
+    )
 
     return LaunchDescription([
         gz_sim,
@@ -76,4 +83,5 @@ def generate_launch_description():
         robot_state_publisher,
         joint_state_publisher,
         energy_node,
+        gait_loader,
     ])
