@@ -31,37 +31,34 @@ class GaitLoader(Node):
         # Create timer using the ROS clock (not a Clock message!)
         self.timer = self.create_timer(0.001, self.send_command, clock=self.get_clock())
         
-        # Load CSV data as a dictionary of lists
-        file_path = '/workspace/install/energy_pkg/share/energy_pkg/gait_trajectory/approx_gait_traj.csv'
-        self.trajectory_data = self.load_csv(file_path)
-        
-        # Delay the inputs by some amount of time
-        self.delay_time = 5 #seconds
-        for index, _ in enumerate(self.trajectory_data['timelist']):
-            if index != 0:
-                self.trajectory_data['timelist'][index] += self.delay_time
-                
-        self.first_reset = True
-        self.current_index = 0
+        self.trajectory_reset()
         
     def loop_trajectory(self):
-        time_offset = self.sim_time - self.trajectory_data['timelist'][0]
-        for index, _ in enumerate(self.trajectory_data['timelist']):
-            if index == 0 and self.first_reset == True:
-                self.trajectory_data['timelist'][index] += time_offset
-            else:
-                self.trajectory_data['timelist'][index] += (time_offset - self.delay_time)
+        # Shift the trajectory data back to it's original position
+        if self.first_reset == True:
+            # self.get_logger().info(f"Entered First Reset")
+            for index, _ in enumerate(self.trajectory_data['timelist']):
+                if index == 0:
+                    self.trajectory_data['timelist'][index] += self.delay_time
+            
+            self.first_reset = False        
+            
+        time_offset = self.sim_time - (self.trajectory_data['timelist'][0])
                 
-        self.first_reset = False
+        for index, _ in enumerate(self.trajectory_data['timelist']):
+            self.trajectory_data['timelist'][index] += time_offset
+                
+        self.current_index = 0
 
     def send_command(self):
-        if self.current_index != len(self.trajectory_data['timelist']) - 1:
+        # If at end of list, loop the list
+        if self.current_index == len(self.trajectory_data['timelist']) - 1:
+            self.loop_trajectory()               
+        else: # else check if next trajectory should be loaded
             next_time = self.trajectory_data['timelist'][self.current_index + 1]
             
             if self.sim_time >= next_time:
                 self.current_index += 1
-        else:
-            self.loop_trajectory()
         
         # Publish to quadruped commands
         for leg in ['FR','FL','RL','RR']:
@@ -72,6 +69,22 @@ class GaitLoader(Node):
                 
     def update_clock(self, msg_in: Clock):
         self.sim_time = msg_in.clock.sec + msg_in.clock.nanosec * 1e-9
+        if self.sim_time == 0.0:
+            self.trajectory_reset()
+            
+    def trajectory_reset(self):
+        # Load CSV data as a dictionary of lists
+        file_path = '/workspace/install/energy_pkg/share/energy_pkg/gait_trajectory/approx_gait_traj.csv'
+        self.trajectory_data = self.load_csv(file_path)
+                
+        # Delay the inputs by some amount of time
+        self.delay_time = 5 #seconds
+        for index, _ in enumerate(self.trajectory_data['timelist']):
+            if index != 0:
+                self.trajectory_data['timelist'][index] += self.delay_time
+                        
+        self.first_reset = True
+        self.current_index = 0
 
     def load_csv(self, file_path):
         """Load CSV data as a dictionary of lists where each column is a key."""

@@ -2,8 +2,8 @@
 <sdf version="1.8" xmlns:xacro="http://www.ros.org/wiki/xacro">
     <include>
         <!-- Robot URDF -->
-        <uri>/workspace/install/quadruped_description/share/quadruped_description/urdf/quadruped.urdf</uri>
-        <!-- <uri>/workspace/src/robot_descriptions/a1_description/urdf/a1.urdf</uri> -->
+        <uri>
+            /workspace/install/quadruped_description/share/quadruped_description/urdf/quadruped.urdf</uri>
         
         <!-- Plugin for joint state publisher -->
         <plugin

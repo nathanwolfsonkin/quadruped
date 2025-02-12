@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<robot name="world_constraints" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <!-- Define a world-fixed frame -->
+    <link name="world_fixed_frame">
+        <gazebo>
+            <static>true</static>  <!-- This ensures it does not move in Gazebo -->
+        </gazebo>
+    </link>
+
+    <!-- Prismatic joint along y-axis to prevent sideways motion -->
+    <joint name="y_planar_constraint" type="prismatic">
+        <parent>world_fixed_frame</parent>
+        <child>base</child>
+        <axis xyz="0 1 0"/>
+        <limit lower="0" upper="0" effort="0" velocity="0"/>
+    </joint>
+
+    <!-- Allow motion in x-direction -->
+    <joint name="x_planar_constraint" type="prismatic">
+        <parent>world_fixed_frame</parent>
+        <child>base</child>
+        <axis xyz="1 0 0"/>
+        <limit lower="-10" upper="10" effort="100" velocity="5"/>
+    </joint>
+
+    <!-- Allow motion in z-direction -->
+    <joint name="z_planar_constraint" type="prismatic">
+        <parent>world_fixed_frame</parent>
+        <child>base</child>
+        <axis xyz="0 0 1"/>
+        <limit lower="-10" upper="10" effort="100" velocity="5"/>
+    </joint>
+
+    <!-- Fixed joint to remove unwanted rotations -->
+    <joint name="rotation_constraint" type="fixed">
+        <parent>world_fixed_frame</parent>
+        <child>base</child>
+    </joint>
+
+</robot>

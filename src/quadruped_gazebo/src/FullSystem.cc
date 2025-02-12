@@ -25,7 +25,7 @@
 #include <gz/plugin/Register.hh>
 
 // Don't forget to include the plugin's header.
-#include "ros_gz_example_gazebo/FullSystem.hh"
+#include "quadruped_gazebo/FullSystem.hh"
 
 // This is required to register the plugin. Make sure the interfaces match
 // what's in the header.

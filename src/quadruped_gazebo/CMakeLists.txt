@@ -29,54 +29,70 @@ else()
 endif()
 
 
-# # Following 'add_library' directive defines a library target named 'BasicSystem'.
-# # The 'SHARED' keyword indicates that a shared library should be compiled, and
-# # is followed by the list of source files for the target.
-# add_library(BasicSystem
-#   SHARED
-#   src/BasicSystem.cc
-# )
+# Following 'add_library' directive defines a library target named 'BasicSystem'.
+# The 'SHARED' keyword indicates that a shared library should be compiled, and
+# is followed by the list of source files for the target.
+add_library(BasicSystem
+  SHARED
+  src/BasicSystem.cc
+)
 
-# # Following 'target_include_directories' directive specifies 'include' as the
-# # include directory to use when compiling the 'BasicSystem' target.
-# # The 'PRIVATE' keyword specifies that this directive will populate the
-# # INCLUDE_DIRECTORIES property for the 'BasicSystem' target.
-# target_include_directories(
-#   BasicSystem PRIVATE include
-# )
+# Following 'target_include_directories' directive specifies 'include' as the
+# include directory to use when compiling the 'BasicSystem' target.
+# The 'PRIVATE' keyword specifies that this directive will populate the
+# INCLUDE_DIRECTORIES property for the 'BasicSystem' target.
+target_include_directories(
+  BasicSystem PRIVATE include
+)
 
-# # Following 'target_link_libraries' directive specifies to use the 
-# # gz-sim library when linking the 'BasicSystem' target.
-# # The 'PRIVATE' keyword stipulates that the gz-sim library will not
-# # automatically be included if the 'BasicSystem' target were to
-# # be linked to anoter target. 
-# # ${GZ_SIM_VER} is substituted by the value that is was set to above.
-# target_link_libraries(BasicSystem PRIVATE
-#   gz-sim${GZ_SIM_VER}::gz-sim${GZ_SIM_VER})
-
-
-# # Following directives similarly specify another target: 'FullSystem'.
-# add_library(FullSystem
-#   SHARED
-#   src/FullSystem.cc
-# )
-
-# target_include_directories(
-#   FullSystem PRIVATE include
-# )
-
-# target_link_libraries(FullSystem PRIVATE
-#   gz-sim${GZ_SIM_VER}::gz-sim${GZ_SIM_VER})
+# Following 'target_link_libraries' directive specifies to use the 
+# gz-sim library when linking the 'BasicSystem' target.
+# The 'PRIVATE' keyword stipulates that the gz-sim library will not
+# automatically be included if the 'BasicSystem' target were to
+# be linked to anoter target. 
+# ${GZ_SIM_VER} is substituted by the value that is was set to above.
+target_link_libraries(BasicSystem PRIVATE
+  gz-sim${GZ_SIM_VER}::gz-sim${GZ_SIM_VER})
 
 
+# Following directives similarly specify another target: 'FullSystem'.
+add_library(FullSystem
+  SHARED
+  src/FullSystem.cc
+)
 
-# # Following 'install' directive ensures that the compiled libraries
-# # of the 'BasicSystem' and 'FullSystem' targets will be copied
-# # to the subfolder 'lib/ros_gz_example_gazebo' of the install directory.
-# install(
-#   TARGETS BasicSystem FullSystem
-#   DESTINATION lib/${PROJECT_NAME}
-# )
+target_include_directories(
+  FullSystem PRIVATE include
+)
+
+target_link_libraries(FullSystem PRIVATE
+  gz-sim${GZ_SIM_VER}::gz-sim${GZ_SIM_VER})
+
+
+############## SPECIFY PlanarConstraint TARGET #####################
+
+add_library(PlanarConstraint
+  SHARED
+  src/PlanarConstraint.cc
+)
+
+target_include_directories(
+  PlanarConstraint PRIVATE include
+)
+
+target_link_libraries(PlanarConstraint PRIVATE
+  gz-sim${GZ_SIM_VER}::gz-sim${GZ_SIM_VER})
+
+####################################################################
+
+
+# Following 'install' directive ensures that the compiled libraries
+# of the 'BasicSystem' and 'FullSystem' targets will be copied
+# to the subfolder 'lib/ros_gz_example_gazebo' of the install directory.
+install(
+  TARGETS BasicSystem FullSystem PlanarConstraint
+  DESTINATION lib/${PROJECT_NAME}
+)
 
 
 # Following 'install' directive ensures that the 'worlds' subfolder

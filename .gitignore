@@ -1,3 +1,4 @@
 src/energy_model/accuracy_check/video_files/*
 src/ros_gz_project_template/*
+energy_logs/*
 .gitignore

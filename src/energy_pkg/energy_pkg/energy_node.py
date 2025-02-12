@@ -98,7 +98,7 @@ class EnergyNode(Node):
             writer = csv.writer(file)
             writer.writerow(data)
 
-        self.get_logger().info(f"Logged data at {self.sim_time:.2f} sec")
+        # self.get_logger().info(f"Logged data at {self.sim_time:.2f} sec")
         
         
     def clock_callback(self, msg_in: Clock):        

@@ -106,7 +106,43 @@ class DataToCSV:
             writer.writerow(headers)
             writer.writerows(approx_data)
 
-
+    def in_phase(self):
+        # Define the 
+        
+        # Define 8 dimensional state for leg positions (ignores hip)
+        state0 = []
+        for leg in self.quadruped_traj_fourier.leg_list:
+            state0.append(leg.t1[0])
+            state0.append(leg.t2[0])
+        
+        vect0 = np.array(state0)
+        opt_error = 100 #pick big number to initialize
+        
+        for index, value in enumerate(self.quadruped_traj_fourier.leg_list[0].t1):
+            state = []
+            for leg in self.quadruped_traj_fourier.leg_list:
+                state.append(leg.t1[index])
+                state.append(leg.t2[index])
+            
+            vect = np.array(state)
+            
+            if index > 20:
+                error = np.linalg.norm(vect - vect0)
+                if error < opt_error:
+                    best_index = index
+                    opt_error = error
+        
+        self.quadruped_traj_fourier.timelist = self.quadruped_traj_fourier.timelist[:best_index]    
+        self.quadruped_traj_fourier.leg_list[0].t1 = self.quadruped_traj_fourier.leg_list[0].t1[:best_index]
+        self.quadruped_traj_fourier.leg_list[0].t2 = self.quadruped_traj_fourier.leg_list[0].t2[:best_index]
+        self.quadruped_traj_fourier.leg_list[1].t1 = self.quadruped_traj_fourier.leg_list[1].t1[:best_index]
+        self.quadruped_traj_fourier.leg_list[1].t2 = self.quadruped_traj_fourier.leg_list[1].t2[:best_index]
+        self.quadruped_traj_fourier.leg_list[2].t1 = self.quadruped_traj_fourier.leg_list[2].t1[:best_index]
+        self.quadruped_traj_fourier.leg_list[2].t2 = self.quadruped_traj_fourier.leg_list[2].t2[:best_index]
+        self.quadruped_traj_fourier.leg_list[3].t1 = self.quadruped_traj_fourier.leg_list[3].t1[:best_index]
+        self.quadruped_traj_fourier.leg_list[3].t2 = self.quadruped_traj_fourier.leg_list[3].t2[:best_index]        
+            
+        
 def main():
     # Define quadruped parameters
     unitree_a1_leg_params = {'l': [.2, .2], 'I': [0.0055, 0.003], 'm': [1.013, 0.166]}
@@ -125,6 +161,8 @@ def main():
                       body_params=unitree_a1_body_params,
                       gait_data=gait_data,
                       timelist=timelist)
+    
+    data_to_csv.in_phase()
 
     data_to_csv.data_to_cv()
     

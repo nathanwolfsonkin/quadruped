@@ -3,5 +3,5 @@
 <!-- RUN THE FOLLOWING TO UPDATE -->
 <!-- xacro /workspace/src/quadruped_description/xacro/model.xacro -o /workspace/src/quadruped_description/models/quadruped/model.sdf -->
 <sdf version="1.8">
-  <!-- IN GENERAL, THE QUADRUPED UTILIZED IN THE TEST BENCH WILL BE DETERMINED BY THE URI IN model.xacro -->
+  <!-- IN GENERAL, THE QUADRUPED UTILIZED IN THE TEST BENCH WILL BE DETERMINED BY THE URI IN quadruped_plugins.xacro -->
 </sdf>

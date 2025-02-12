@@ -2,6 +2,7 @@
 <sdf version="1.8">
     <world name="quadruped_testbench">
 
+
         <light name="sun" type="directional">
             <cast_shadows>true</cast_shadows>
             <pose>0 0 10 0 0 0</pose>
@@ -55,7 +56,6 @@
             </link>
         </model>
 
-
         <!-- Include the quadruped model -->
         <model name="quadruped">
             <pose>0 0 .5 0 0 0</pose>
@@ -64,6 +64,7 @@
                 <uri>
                     /workspace/install/quadruped_description/share/quadruped_description/models/quadruped/model.sdf</uri>
             </include>
+            <!-- <plugin filename="PlanarConstraint" name="quadruped_gazebo::PlanarConstraint" /> -->
         </model>
     </world>
 </sdf>
