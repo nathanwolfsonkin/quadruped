@@ -358,7 +358,6 @@ class LegData:
 
 
 def main():
-    # Testing
     pass
 
 

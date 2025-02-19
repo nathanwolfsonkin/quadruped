@@ -12,5 +12,6 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix # Mount X11 socket
       - ${PWD}/src:/workspace/src # Mount workspace source
       - ${PWD}/energy_logs:/workspace/energy_logs # Mount energy logs
+      - ${PWD}/vscode_config:/workspace/.vscode # Keep VScode configs
     entrypoint: /bin/bash
     network_mode: "host"

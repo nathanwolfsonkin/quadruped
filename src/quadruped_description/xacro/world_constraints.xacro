@@ -1,41 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <robot name="world_constraints" xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <!-- Generate Constraint using these joints -->
+    <gazebo>
+        <!-- UNCOMMENT FOR FLOATING TEST -->
+        <!-- <joint name="world_fixed" type="fixed">
+            <parent>world</parent>
+            <child>base</child>
+        </joint> -->
 
-    <!-- Define a world-fixed frame -->
-    <link name="world_fixed_frame">
-        <gazebo>
-            <static>true</static>  <!-- This ensures it does not move in Gazebo -->
-        </gazebo>
-    </link>
-
-    <!-- Prismatic joint along y-axis to prevent sideways motion -->
-    <joint name="y_planar_constraint" type="prismatic">
-        <parent>world_fixed_frame</parent>
-        <child>base</child>
-        <axis xyz="0 1 0"/>
-        <limit lower="0" upper="0" effort="0" velocity="0"/>
-    </joint>
-
-    <!-- Allow motion in x-direction -->
-    <joint name="x_planar_constraint" type="prismatic">
-        <parent>world_fixed_frame</parent>
-        <child>base</child>
-        <axis xyz="1 0 0"/>
-        <limit lower="-10" upper="10" effort="100" velocity="5"/>
-    </joint>
-
-    <!-- Allow motion in z-direction -->
-    <joint name="z_planar_constraint" type="prismatic">
-        <parent>world_fixed_frame</parent>
-        <child>base</child>
-        <axis xyz="0 0 1"/>
-        <limit lower="-10" upper="10" effort="100" velocity="5"/>
-    </joint>
-
-    <!-- Fixed joint to remove unwanted rotations -->
-    <joint name="rotation_constraint" type="fixed">
-        <parent>world_fixed_frame</parent>
-        <child>base</child>
-    </joint>
-
+        <link name="z_translation" />
+        <joint name="world_z_trans_joint" type="prismatic">
+            <parent>world</parent>
+            <child>z_translation</child>
+            <axis>
+                <xyz>0 0 1</xyz>
+                <limit>
+                    <lower>-10</lower>
+                    <upper>10</upper>
+                </limit>
+            </axis>
+        </joint>
+        <link name="x_translation" />
+        <joint name="z_trans_x_trans_joint" type="prismatic">
+            <parent>z_translation</parent>
+            <child>x_translation</child>
+            <axis>
+                <xyz>1 0 0</xyz>
+                <limit>
+                    <lower>-10</lower>
+                    <upper>100</upper>
+                </limit>
+            </axis>
+        </joint>
+        <joint name="y_rotation" type="revolute">
+            <parent>x_translation</parent>
+            <child>base</child>
+            <axis>
+                <xyz>1 0 0</xyz>
+                <limit>
+                    <lower>${-PI/2}</lower>
+                    <upper>${PI/2}</upper>
+                </limit>
+            </axis>
+        </joint>
+    </gazebo>
 </robot>

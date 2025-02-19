@@ -17,7 +17,7 @@ def generate_launch_description():
     pkg_project_bringup = get_package_share_directory('quadruped_bringup')
     pkg_project_gazebo = get_package_share_directory('quadruped_gazebo')
     pkg_ros_gz_sim = get_package_share_directory('ros_gz_sim')
-    pkg_quadruped_description = get_package_share_directory('quadruped_description')   
+    pkg_quadruped_description = get_package_share_directory('quadruped_description')
 
     # Setup to launch the simulator and Gazebo world
     gz_sim = IncludeLaunchDescription(
@@ -72,8 +72,8 @@ def generate_launch_description():
     
     gait_loader = Node(
         package='energy_pkg',
-        executable='gait_loader',
-        name='gait_loader',
+        executable='analytical_gait_loader',
+        name='analytical_gait_loader',
         output='both'
     )
 

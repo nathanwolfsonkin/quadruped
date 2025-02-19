@@ -1,33 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <robot name="quadruped" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-    <!-- Generate Planar Constraint using these joints -->
-    <gazebo>
-        <link name="z_movement" />
-        <joint name="world_z_joint" type="prismatic">
-            <parent>world</parent>
-            <child>z_movement</child>
-            <axis>
-                <xyz>0 0 1</xyz>
-                <limit>
-                    <lower>-10</lower>
-                    <upper>10</upper>
-                </limit>
-            </axis>
-        </joint>
-        <joint name="x_movement" type="prismatic">
-            <parent>z_movement</parent>
-            <child>base</child>
-            <axis>
-                <xyz>1 0 0</xyz>
-                <limit>
-                    <lower>-10</lower>
-                    <upper>100</upper>
-                </limit>
-            </axis>
-        </joint>
-    </gazebo>
-
     <!-- Define colors for links -->
     <xacro:include
         filename="/workspace/src/quadruped_description/xacro/materials.xacro" />
@@ -39,6 +12,10 @@
     <!-- Define macros for links, joints, and leg -->
     <xacro:include
         filename="/workspace/src/quadruped_description/xacro/leg.xacro" />
+    
+    <!-- Constrain the robot to certain degrees of freedom -->
+    <xacro:include
+        filename="/workspace/src/quadruped_description/xacro/world_constraints.xacro" />
 
     <xacro:base_link
         name="base" L_x="${base_Lx}" L_y="${base_Ly}" L_z="${base_Lz}" mass="${base_m}"

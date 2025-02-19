@@ -123,6 +123,10 @@ def fourier_approx(timeseries, N=2, resolution_multiplier=1):
     # Compute dominant sine waves
     dominant_frequencies, dominant_amplitudes, dominant_phases, _ = get_dominant_sine_waves(timeseries, N)
     
+    # print('freq:  ', dominant_frequencies)
+    # print('amps:  ', dominant_amplitudes)
+    # print('phase: ', dominant_phases)
+    
     # Generate high-resolution time vector
     high_res_total_frames = total_frames * resolution_multiplier
     high_res_time_list = np.linspace(0, total_time, high_res_total_frames)
@@ -142,6 +146,7 @@ def main():
     # Get angle data for the legs
     leg1, leg2 = dataset.get_angle_lists()
     leg1_t1 = leg1[0]
+    leg1_t2 = leg1[1]
     
     # Get timing information
     frame_time, total_time, total_frames = dataset.get_frame_data()
@@ -149,7 +154,7 @@ def main():
     # Create timeseries with time in the first column and the angle in the second column
     timeseries = np.zeros([total_frames, 2])
     timeseries[:, 0] = np.linspace(0, total_time, total_frames)
-    timeseries[:, 1] = leg1_t1
+    timeseries[:, 1] = leg1_t2
 
     # Define number of peaks and resolution multiplier
     N = 2

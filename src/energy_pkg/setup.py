@@ -25,7 +25,8 @@ setup(
     entry_points={
         'console_scripts': [
             'energy_node = energy_pkg.energy_node:main',
-            'gait_loader = energy_pkg.gait_loader:main',
+            'empirical_gait_loader = energy_pkg.empirical_gait_loader:main',
+            'analytical_gait_loader = energy_pkg.analytical_gait_loader:main',
         ],
     },
 )
