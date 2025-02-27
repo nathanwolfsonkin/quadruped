@@ -12,6 +12,13 @@
   gz_type_name: "gz.msgs.Clock"
   direction: "GZ_TO_ROS"
 
+# Initial Condition Actuator
+- ros_topic_name: "/quadruped/initial_condition_force"
+  gz_topic_name: "/model/quadruped/joint/z_trans_x_trans_joint/cmd_force"
+  ros_type_name: "std_msgs/msg/Float64"
+  gz_type_name: "gz.msgs.Double"
+  direction: "ROS_TO_GZ"
+
 # FR Leg Controllers
 - topic_name: "/quadruped/cmd_FR_hip_joint"
   ros_type_name: "std_msgs/msg/Float64"

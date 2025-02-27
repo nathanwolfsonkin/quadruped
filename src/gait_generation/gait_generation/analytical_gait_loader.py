@@ -46,7 +46,7 @@ class GaitLoader(Node):
         return total
 
     def gait_functions(self):
-        filepath = '/workspace/src/energy_pkg/gait_trajectory/gait_sin_waves.yaml'
+        filepath = '/workspace/install/gait_generation/share/gait_generation/gait_trajectory/gait_sin_waves.yaml'
         traj_data = self.load_yaml(filepath)
 
         self.traj_funcs = {}
@@ -64,12 +64,18 @@ class GaitLoader(Node):
                 self.traj_funcs[leg][angle] = trajectory_function
 
     def send_command(self):
-        # Publish to quadruped comma nds
+        start_time = 1.0
+        # Publish to quadruped commands
         for leg in ['FR','FL','RL','RR']:
             for joint in ['hip','thigh','calf']:
                 msg_out = Float64()
-                msg_out.data = self.traj_funcs[leg][joint](self.sim_time)
+                if self.sim_time < start_time:
+                    msg_out.data = self.traj_funcs[leg][joint](start_time)
+                else:
+                    msg_out.data = self.traj_funcs[leg][joint](self.sim_time)
+                
                 self.pub_dict[leg + '_' + joint].publish(msg_out)
+        
 
     def update_clock(self, msg_in: Clock):
         self.sim_time = msg_in.clock.sec + msg_in.clock.nanosec * 1e-9

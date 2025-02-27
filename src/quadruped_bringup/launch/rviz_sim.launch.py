@@ -57,7 +57,7 @@ def generate_launch_description():
     )
     
     gait_loader = Node(
-        package='energy_pkg',
+        package='gait_generation',
         executable='gait_loader',
         name='gait_loader',
         output='both'

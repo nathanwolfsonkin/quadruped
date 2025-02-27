@@ -17,8 +17,8 @@ def generate_launch_description():
     pkg_project_bringup = get_package_share_directory('quadruped_bringup')
     pkg_project_gazebo = get_package_share_directory('quadruped_gazebo')
     pkg_ros_gz_sim = get_package_share_directory('ros_gz_sim')
-    pkg_quadruped_description = get_package_share_directory('quadruped_description')   
-    
+    pkg_quadruped_description = get_package_share_directory('quadruped_description')
+
     # Setup to launch the simulator and Gazebo world
     gz_sim = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -39,23 +39,23 @@ def generate_launch_description():
         output='screen'
     )
     
-    gait_loader = Node(
+    energy_node = Node(
         package='energy_pkg',
-        executable='analytical_gait_loader',
-        name='analytical_gait_loader',
-        output='both'
+        executable='gazebo_energy_node',
+        name='gazebo_energy_node',
+        output='screen'
     )
     
-    cross_correlation = Node(
-        package='gait_analysis',
-        executable='cross_correlation_node',
-        name='cross_correlation',
+    gait_loader = Node(
+        package='gait_generation',
+        executable='analytical_gait_loader',
+        name='analytical_gait_loader',
         output='both'
     )
 
     return LaunchDescription([
         gz_sim,
         bridge,
+        energy_node,
         gait_loader,
-        cross_correlation
     ])

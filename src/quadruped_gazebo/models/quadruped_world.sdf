@@ -58,7 +58,7 @@
 
         <!-- Include the quadruped model -->
         <model name="quadruped">
-            <pose>0 0 .5 0 0 0</pose>
+            <pose>0 0 .45 0 0 0</pose>
             <include>
                 <!-- MAKE SURE THE QUADRUPED MODEL ABIDES BY THE JOINT NAMING CONVENTIONS! -->
                 <uri>

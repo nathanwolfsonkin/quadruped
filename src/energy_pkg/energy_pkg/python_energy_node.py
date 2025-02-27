@@ -10,10 +10,10 @@ from rosgraph_msgs.msg import Clock
 
 from src.energy_model.quadruped_energy import Quadruped
 
-class EnergyNode(Node):
+class PythonEnergyNode(Node):
 
     def __init__(self):
-        super().__init__('energy_node')
+        super().__init__('python_energy_node')
 
         # Gather quadruped parameters from single source of truth yaml file
         config_file = "/workspace/install/quadruped_description/share/quadruped_description/config/params.yaml"
@@ -69,7 +69,8 @@ class EnergyNode(Node):
         # Open CSV file and write headers
         with open(self.csv_filename, 'w', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow(["time", "FL_thigh_pos", "FL_calf_pos", "FR_thigh_pos", "FR_calf_pos",
+            writer.writerow(["time",
+                             "FL_thigh_pos", "FL_calf_pos", "FR_thigh_pos", "FR_calf_pos",
                              "RL_thigh_pos", "RL_calf_pos", "RR_thigh_pos", "RR_calf_pos",
                              "FL_thigh_vel", "FL_calf_vel", "FR_thigh_vel", "FR_calf_vel",
                              "RL_thigh_vel", "RL_calf_vel", "RR_thigh_vel", "RR_calf_vel"])
@@ -97,8 +98,6 @@ class EnergyNode(Node):
         with open(self.csv_filename, 'a', newline='') as file:
             writer = csv.writer(file)
             writer.writerow(data)
-
-        # self.get_logger().info(f"Logged data at {self.sim_time:.2f} sec")
         
         
     def clock_callback(self, msg_in: Clock):        
@@ -184,7 +183,7 @@ class EnergyNode(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    energy = EnergyNode()
+    energy = PythonEnergyNode()
     rclpy.spin(energy)
     energy.destroy_node()
     rclpy.shutdown()

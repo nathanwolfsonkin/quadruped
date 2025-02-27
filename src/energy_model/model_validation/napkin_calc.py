@@ -1,7 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib import gridspec
-import csv
 
 from energy_model.quadruped_energy import Quadruped
 from energy_model.quadruped_energy import QuadrupedData
@@ -57,6 +54,7 @@ def main():
     # convert 2 seconds to 2.5 hours
     max_runtime_hr = 2.5
     work_over_2_5_hours = work_per_hr * max_runtime_hr
+    work_over_2_5_hours_kj = work_over_2_5_hours/1000.
 
     # Total battery capacity in watthours
     total_capacity_wh = 90.72
@@ -64,12 +62,13 @@ def main():
 
     # Total battery capacity in joules
     total_capacity_j = total_capacity_wh * joules_per_wh
+    total_capacity_kj = total_capacity_j/1000
 
     # Total time for approximated gait to expend battery capacity
     approx_time = total_capacity_j / work_per_hr
     
-    print('\n\nTotal work done in joules over 2.5 hours for approximated gait:', work_over_2_5_hours)
-    print('Actual battery capacity in joules:                             ', total_capacity_j)
+    print('\n\nTotal work done in joules over 2.5 hours for approximated gait:', work_over_2_5_hours_kj)
+    print('Actual battery capacity in joules:                             ', total_capacity_kj)
 
     print('\n\nTotal time for approximated gait to expend battery capacity:   ', approx_time)
     print('Actual maximum runtime in hours:                               ', max_runtime_hr)

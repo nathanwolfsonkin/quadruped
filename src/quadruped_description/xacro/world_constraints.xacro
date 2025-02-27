@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <robot name="world_constraints" xmlns:xacro="http://www.ros.org/wiki/xacro">
+    
+
+    <xacro:property name="world_constraints" value="${True}" />
+    
     <!-- Generate Constraint using these joints -->
     <gazebo>
         <!-- UNCOMMENT FOR FLOATING TEST -->

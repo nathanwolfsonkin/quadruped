@@ -96,12 +96,12 @@ class DataToCSV:
             approx_data.append(row)
 
         # Write data to CSV file
-        with open('/workspace/src/energy_pkg/gait_trajectory/raw_gait_traj.csv', mode='w', newline='') as file:
+        with open('/workspace/src/gait_generation/gait_trajectory/raw_gait_traj.csv', mode='w', newline='') as file:
             writer = csv.writer(file)
             writer.writerow(headers)
             writer.writerows(raw_data)
 
-        with open('/workspace/src/energy_pkg/gait_trajectory/approx_gait_traj.csv', mode='w', newline='') as file:
+        with open('/workspace/src/gait_generation/gait_trajectory/approx_gait_traj.csv', mode='w', newline='') as file:
             writer = csv.writer(file)
             writer.writerow(headers)
             writer.writerows(approx_data)

@@ -9,7 +9,8 @@ class Quadruped:
                  FR_params = default_leg_params,
                  FL_params = default_leg_params,
                  RL_params = default_leg_params,
-                 RR_params = default_leg_params):
+                 RR_params = default_leg_params,
+                 gravity = 9.81):
         
         # Define main body
         l=body_params['l']
@@ -34,10 +35,10 @@ class Quadruped:
             RR_params = leg_params
 
         self.leg_list = [
-            Leg(origin=right_hip,l=FR_params['l'], I=FR_params['I'], m=FR_params['m']),
-            Leg(origin=left_hip, l=FL_params['l'], I=FL_params['I'], m=FL_params['m']), 
-            Leg(origin=left_hip, l=RL_params['l'], I=RL_params['I'], m=RL_params['m']), 
-            Leg(origin=right_hip,l=RR_params['l'], I=RR_params['I'], m=RR_params['m']), 
+            Leg(origin=right_hip,l=FR_params['l'], I=FR_params['I'], m=FR_params['m'], gravity=gravity),
+            Leg(origin=left_hip, l=FL_params['l'], I=FL_params['I'], m=FL_params['m'], gravity=gravity), 
+            Leg(origin=left_hip, l=RL_params['l'], I=RL_params['I'], m=RL_params['m'], gravity=gravity), 
+            Leg(origin=right_hip,l=RR_params['l'], I=RR_params['I'], m=RR_params['m'], gravity=gravity), 
             ]
         
         # Calculate quadruped mass for CoT
@@ -91,7 +92,7 @@ class MainBody:
 
 # Leg parameters and current state
 class Leg:
-    def __init__(self, m=[1,1], l=[1,1], I=[1,1], origin=[0,0]):
+    def __init__(self, m=[1,1], l=[1,1], I=[1,1], origin=[0,0], gravity=9.81):
         # Initialize Parameters
         self.m = m
         self.l = l
@@ -103,6 +104,8 @@ class Leg:
         self.t2 = 0.
         self.dt1 = 0.
         self.dt2 = 0.
+        
+        self.gravity = gravity
 
     # positional functions
     # returns position of com1 wrt the origin
@@ -146,7 +149,7 @@ class Leg:
         
     # energy functions
     def potential_energy(self):
-        g = 9.81
+        g = self.gravity
         p1 = self.get_p1()
         p2 = self.get_p2()
 

@@ -30,17 +30,17 @@ def main():
         filename = '/workspace/src/energy_pkg/gait_trajectory/gait_sin_waves_test_case.yaml'
         leg_angles = {
             'FL_hip': zero_list,
-            'FL_thigh': leg1[0], 
-            'FL_calf': leg1[1],
+            'FL_thigh': leg2[0], 
+            'FL_calf': leg2[1],
             'RL_hip': zero_list,
-            'RL_thigh': leg1[0], 
-            'RL_calf': leg1[1],
+            'RL_thigh': leg2[0], 
+            'RL_calf': leg2[1],
             'RR_hip': zero_list,
-            'RR_thigh': leg1[0], 
-            'RR_calf': leg1[1],
+            'RR_thigh': leg2[0], 
+            'RR_calf': leg2[1],
             'FR_hip': zero_list,
-            'FR_thigh': leg1[0], 
-            'FR_calf': leg1[1],
+            'FR_thigh': leg2[0], 
+            'FR_calf': leg2[1],
         }
     else:
         filename = '/workspace/src/energy_pkg/gait_trajectory/gait_sin_waves.yaml'

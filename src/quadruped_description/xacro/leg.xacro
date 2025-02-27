@@ -74,6 +74,8 @@
                 link="${parent}" />
             <child
                 link="${child}" />
+            <!-- <axis xyz="1 0 0" /> -->
+            <!-- <limits effort="0.0" velocity="0.0" lower="0.0" upper="0.0" /> -->
         </joint>
     </xacro:macro>
 

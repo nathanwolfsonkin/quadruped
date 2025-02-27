@@ -17,8 +17,8 @@ def generate_launch_description():
     pkg_project_bringup = get_package_share_directory('quadruped_bringup')
     pkg_project_gazebo = get_package_share_directory('quadruped_gazebo')
     pkg_ros_gz_sim = get_package_share_directory('ros_gz_sim')
-    pkg_quadruped_description = get_package_share_directory('quadruped_description')
-
+    pkg_quadruped_description = get_package_share_directory('quadruped_description')   
+    
     # Setup to launch the simulator and Gazebo world
     gz_sim = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -26,23 +26,6 @@ def generate_launch_description():
         launch_arguments={'gz_args': PathJoinSubstitution([
             pkg_project_gazebo, 'models', 'quadruped_world.sdf'
         ])}.items(),
-    )
-
-    # Load the URDF file from "description" package
-    urdf_file  =  os.path.join(pkg_quadruped_description, 'urdf', 'quadruped.urdf')
-    with open(urdf_file, 'r') as infp:
-        robot_desc = infp.read()
-
-    # Takes the description and joint angles as inputs and publishes the 3D poses of the robot links
-    robot_state_publisher = Node(
-        package='robot_state_publisher',
-        executable='robot_state_publisher',
-        name='robot_state_publisher',
-        output='both',
-        parameters=[
-            {'use_sim_time': True},
-            {'robot_description': robot_desc},
-        ]
     )
 
     # Bridge ROS topics and Gazebo messages for establishing communication
@@ -56,32 +39,23 @@ def generate_launch_description():
         output='screen'
     )
     
-    joint_state_publisher = Node(
-        package='joint_state_publisher',
-        executable='joint_state_publisher',
-        name='joint_state_publisher',
-        output='screen'
-    )
-    
-    energy_node = Node(
-        package='energy_pkg',
-        executable='energy_node',
-        name='energy_node',
-        output='screen'
-    )
-    
     gait_loader = Node(
         package='gait_generation',
         executable='analytical_gait_loader',
         name='analytical_gait_loader',
         output='both'
     )
+    
+    cross_correlation = Node(
+        package='gait_analysis',
+        executable='cross_correlation_node',
+        name='cross_correlation',
+        output='both'
+    )
 
     return LaunchDescription([
         gz_sim,
         bridge,
-        robot_state_publisher,
-        # joint_state_publisher,
-        # energy_node,
         gait_loader,
+        cross_correlation
     ])

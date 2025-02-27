@@ -2,7 +2,7 @@ import os
 from glob import glob
 from setuptools import find_packages, setup
 
-package_name = 'energy_pkg'
+package_name = 'gait_generation'
 
 setup(
     name=package_name,
@@ -19,16 +19,14 @@ setup(
     zip_safe=True,
     maintainer='Nathan Wolf-Sonkin',
     maintainer_email='nathan.wolfsonkin@cooper.edu',
-    description='Energy analysis package for quadrupeds',
+    description='Gait generation package for quadrupeds',
     license='Apache-2.0',
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'python_energy_node = energy_pkg.python_energy_node:main',
-            'gazebo_energy_node = energy_pkg.gazebo_energy_node:main',
-            'empirical_gait_loader = energy_pkg.empirical_gait_loader:main',
-            'analytical_gait_loader = energy_pkg.analytical_gait_loader:main',
-            'initial_conditions = energy_pkg.initial_conditions:main',
+            'empirical_gait_loader = gait_generation.empirical_gait_loader:main',
+            'analytical_gait_loader = gait_generation.analytical_gait_loader:main',
+            'initial_conditions = gait_generation.initial_conditions:main',
         ],
     },
 )

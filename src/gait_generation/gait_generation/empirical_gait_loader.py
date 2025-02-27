@@ -74,7 +74,7 @@ class GaitLoader(Node):
             
     def trajectory_reset(self):
         # Load CSV data as a dictionary of lists
-        file_path = '/workspace/install/energy_pkg/share/energy_pkg/gait_trajectory/approx_gait_traj.csv'
+        file_path = '/workspace/install/gait_generation/share/gait_generation/gait_trajectory/approx_gait_traj.csv'
         self.trajectory_data = self.load_csv(file_path)
                 
         # Delay the inputs by some amount of time
