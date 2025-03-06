@@ -25,10 +25,7 @@ setup(
     entry_points={
         'console_scripts': [
             'python_energy_node = energy_pkg.python_energy_node:main',
-            'gazebo_energy_node = energy_pkg.gazebo_energy_node:main',
-            'empirical_gait_loader = energy_pkg.empirical_gait_loader:main',
-            'analytical_gait_loader = energy_pkg.analytical_gait_loader:main',
-            'initial_conditions = energy_pkg.initial_conditions:main',
+            'log_gazebo_gait = energy_pkg.log_gazebo_gait:main',
         ],
     },
 )

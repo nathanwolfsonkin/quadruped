@@ -3,6 +3,8 @@ from rclpy.node import Node
 from std_msgs.msg import Float64
 from rosgraph_msgs.msg import Clock
 
+import simulation.parameters as params
+
 class ApplyInitialForce(Node):
     def __init__(self):
         super().__init__('initial_conditions')
@@ -27,8 +29,8 @@ class ApplyInitialForce(Node):
     def timer_callback(self):
         # Publish some big force to accelerate the quadruped body to regular velocity during the initalization phase
         msg_out = Float64()
-        if self.sim_time <= 1:
-            msg_out.data = 50.0
+        if self.sim_time <= params.init_time:
+            msg_out.data = params.init_force
         else:
             msg_out.data = 0.0
         

@@ -5,11 +5,6 @@
         <uri>
             /workspace/install/quadruped_description/share/quadruped_description/urdf/quadruped.urdf</uri>
 
-        <plugin filename="libgz-sim-apply-joint-force-system"
-            name="gz::sim::v8::systems::ApplyJointForce">
-            <joint_name>z_trans_x_trans_joint</joint_name>
-        </plugin>
-
         <!-- Plugin for joint state publisher -->
         <plugin
             filename="gz-sim-joint-state-publisher-system"
@@ -32,7 +27,7 @@
         </plugin>
 
         <!-- Macro for Joint Controllers -->
-        <xacro:macro name="add_joint_controller" params="joint_name Kp Ki Kd">
+        <!-- <xacro:macro name="add_joint_controller" params="joint_name">
             <plugin
                 filename="gz-sim-joint-position-controller-system"
                 name="gz::sim::systems::JointPositionController">
@@ -42,21 +37,33 @@
                 <i_gain>0</i_gain>
                 <d_gain>1</d_gain>
             </plugin>
+        </xacro:macro> -->
+
+        <xacro:macro name="add_joint_controller" params="joint_name">
+            <plugin filename="libgz-sim-apply-joint-force-system"
+                name="gz::sim::v8::systems::ApplyJointForce">
+                <joint_name>${joint_name}</joint_name>
+            </plugin>
         </xacro:macro>
 
+        <plugin filename="libgz-sim-apply-joint-force-system"
+            name="gz::sim::v8::systems::ApplyJointForce">
+            <joint_name>z_trans_x_trans_joint</joint_name>
+        </plugin>
+
         <!-- Explicitly Add All Joints -->
-        <xacro:add_joint_controller joint_name="FR_hip_joint" Kp="100.0" Ki="0.1" Kd="10.0" />
-        <xacro:add_joint_controller joint_name="FR_thigh_joint" Kp="100.0" Ki="0.1" Kd="10.0" />
-        <xacro:add_joint_controller joint_name="FR_calf_joint" Kp="100.0" Ki="0.1" Kd="10.0" />
-        <xacro:add_joint_controller joint_name="FL_hip_joint" Kp="100.0" Ki="0.1" Kd="10.0" />
-        <xacro:add_joint_controller joint_name="FL_thigh_joint" Kp="100.0" Ki="0.1" Kd="10.0" />
-        <xacro:add_joint_controller joint_name="FL_calf_joint" Kp="100.0" Ki="0.1" Kd="10.0" />
-        <xacro:add_joint_controller joint_name="RR_hip_joint" Kp="100.0" Ki="0.1" Kd="10.0" />
-        <xacro:add_joint_controller joint_name="RR_thigh_joint" Kp="100.0" Ki="0.1" Kd="10.0" />
-        <xacro:add_joint_controller joint_name="RR_calf_joint" Kp="100.0" Ki="0.1" Kd="10.0" />
-        <xacro:add_joint_controller joint_name="RL_hip_joint" Kp="100.0" Ki="0.1" Kd="10.0" />
-        <xacro:add_joint_controller joint_name="RL_thigh_joint" Kp="100.0" Ki="0.1" Kd="10.0" />
-        <xacro:add_joint_controller joint_name="RL_calf_joint" Kp="100.0" Ki="0.1" Kd="10.0" />
+        <xacro:add_joint_controller joint_name="FR_hip_joint" />
+        <xacro:add_joint_controller joint_name="FR_thigh_joint" />
+        <xacro:add_joint_controller joint_name="FR_calf_joint" />
+        <xacro:add_joint_controller joint_name="FL_hip_joint" />
+        <xacro:add_joint_controller joint_name="FL_thigh_joint" />
+        <xacro:add_joint_controller joint_name="FL_calf_joint" />
+        <xacro:add_joint_controller joint_name="RR_hip_joint" />
+        <xacro:add_joint_controller joint_name="RR_thigh_joint" />
+        <xacro:add_joint_controller joint_name="RR_calf_joint" />
+        <xacro:add_joint_controller joint_name="RL_hip_joint" />
+        <xacro:add_joint_controller joint_name="RL_thigh_joint" />
+        <xacro:add_joint_controller joint_name="RL_calf_joint" />
 
     </include>
 </sdf>

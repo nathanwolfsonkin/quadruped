@@ -27,6 +27,7 @@ setup(
             'empirical_gait_loader = gait_generation.empirical_gait_loader:main',
             'analytical_gait_loader = gait_generation.analytical_gait_loader:main',
             'initial_conditions = gait_generation.initial_conditions:main',
+            'pid_controller = gait_generation.pid_controller:main',
         ],
     },
 )

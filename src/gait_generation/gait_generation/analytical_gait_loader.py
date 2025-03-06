@@ -3,9 +3,10 @@ import numpy as np
 
 import rclpy
 from rclpy.node import Node
-
 from std_msgs.msg import Float64
 from rosgraph_msgs.msg import Clock
+
+import simulation.parameters as params
 
 class GaitLoader(Node):
 
@@ -16,7 +17,7 @@ class GaitLoader(Node):
         self.pub_dict = {}
         for leg in ['FR', 'FL', 'RL', 'RR']:
             for joint in ['hip', 'thigh', 'calf']:
-                topic_name = f'/quadruped/cmd_{leg}_{joint}_joint'
+                topic_name = f'/quadruped/des/{leg}_{joint}_joint'
                 self.pub_dict[f'{leg}_{joint}'] = self.create_publisher(Float64, topic_name, 10)        
         
         # Set up clock
@@ -64,7 +65,7 @@ class GaitLoader(Node):
                 self.traj_funcs[leg][angle] = trajectory_function
 
     def send_command(self):
-        start_time = 1.0
+        start_time = params.start_walking_time
         # Publish to quadruped commands
         for leg in ['FR','FL','RL','RR']:
             for joint in ['hip','thigh','calf']:
