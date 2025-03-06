@@ -58,19 +58,11 @@ def generate_launch_description():
         name='log_gazebo_gait',
         output='both'
     )
-    
-    pid_controller = Node(
-        package='gait_generation',
-        executable='pid_controller',
-        name='pid_controller',
-        output='both'
-    )
 
     return LaunchDescription([
         gz_sim,
         bridge,
         initial_conditions,
         gait_loader,
-        pid_controller,
         log_gazebo_gait,
     ])

@@ -3,3 +3,4 @@ src/ros_gz_project_template/*
 energy_logs/*
 vscode_config/*
 .gitignore
+src/simulation/data_logs/*

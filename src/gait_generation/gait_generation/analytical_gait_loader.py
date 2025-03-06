@@ -17,7 +17,7 @@ class GaitLoader(Node):
         self.pub_dict = {}
         for leg in ['FR', 'FL', 'RL', 'RR']:
             for joint in ['hip', 'thigh', 'calf']:
-                topic_name = f'/quadruped/des/{leg}_{joint}_joint'
+                topic_name = f'/quadruped/cmd_{leg}_{joint}_joint'
                 self.pub_dict[f'{leg}_{joint}'] = self.create_publisher(Float64, topic_name, 10)        
         
         # Set up clock

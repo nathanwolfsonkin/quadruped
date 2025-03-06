@@ -50,16 +50,6 @@
                 </physics>
             </joint>
 
-            <!-- <plugin
-                filename="gz-sim-joint-position-controller-system"
-                name="gz::sim::systems::JointPositionController">
-                <joint_name>pendulum_joint</joint_name>
-                <topic>cmd_pendulum_joint</topic>
-                <p_gain>50</p_gain>
-                <i_gain>10</i_gain>
-                <d_gain>2</d_gain>
-            </plugin> -->
-
             <!-- Custom torque publishing plugin -->
             <plugin
                 filename="libJointPositionControllerTorquePublisher.so"
@@ -69,6 +59,7 @@
                 <p_gain>50</p_gain>
                 <i_gain>10</i_gain>
                 <d_gain>2</d_gain>
+                <torque_topic>topic_name_test</torque_topic>
             </plugin>
         </model>
     </world>

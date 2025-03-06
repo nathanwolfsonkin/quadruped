@@ -10,8 +10,3 @@ init_force = 15.0 # Newtons
 # Logging related parameters
 logging_directory = "/workspace/src/simulation/data_logs/actual_gait_logs"
 logging_interval = .1 # Seconds
-
-# Controller gains
-K_p = 2
-K_i = 0
-K_d = 0

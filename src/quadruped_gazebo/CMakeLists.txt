@@ -69,18 +69,18 @@ target_link_libraries(FullSystem PRIVATE
   gz-sim${GZ_SIM_VER}::gz-sim${GZ_SIM_VER})
 
 
-############## SPECIFY PlanarConstraint TARGET #####################
+############## SPECIFY JointPositionControllerTorquePublisher TARGET #####################
 
-add_library(PlanarConstraint
+add_library(JointPositionControllerTorquePublisher
   SHARED
-  src/PlanarConstraint.cc
+  src/JointPositionControllerTorquePublisher.cc
 )
 
 target_include_directories(
-  PlanarConstraint PRIVATE include
+  JointPositionControllerTorquePublisher PRIVATE include
 )
 
-target_link_libraries(PlanarConstraint PRIVATE
+target_link_libraries(JointPositionControllerTorquePublisher PRIVATE
   gz-sim${GZ_SIM_VER}::gz-sim${GZ_SIM_VER})
 
 ####################################################################
@@ -90,7 +90,7 @@ target_link_libraries(PlanarConstraint PRIVATE
 # of the 'BasicSystem' and 'FullSystem' targets will be copied
 # to the subfolder 'lib/ros_gz_example_gazebo' of the install directory.
 install(
-  TARGETS BasicSystem FullSystem PlanarConstraint
+  TARGETS BasicSystem FullSystem JointPositionControllerTorquePublisher
   DESTINATION lib/${PROJECT_NAME}
 )
 

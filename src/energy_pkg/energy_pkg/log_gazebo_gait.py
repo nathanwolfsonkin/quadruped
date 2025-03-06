@@ -7,6 +7,7 @@ import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import JointState
 from rosgraph_msgs.msg import Clock
+from std_msgs.msg import Float64
 
 import simulation.parameters as sim_params
 
@@ -54,19 +55,52 @@ class GazeboGaitLogger(Node):
                              "FL_thigh_pos", "FL_calf_pos", "FR_thigh_pos", "FR_calf_pos",
                              "RL_thigh_pos", "RL_calf_pos", "RR_thigh_pos", "RR_calf_pos",
                              "FL_thigh_vel", "FL_calf_vel", "FR_thigh_vel", "FR_calf_vel",
-                             "RL_thigh_vel", "RL_calf_vel", "RR_thigh_vel", "RR_calf_vel"])
+                             "RL_thigh_vel", "RL_calf_vel", "RR_thigh_vel", "RR_calf_vel",
+                             "FL_thigh_tor", "FL_calf_tor", "FR_thigh_tor", "FR_calf_tor",
+                             "RL_thigh_tor", "RL_calf_tor", "RR_thigh_tor", "RR_calf_tor",])
         
         ##########################  INITILIZATIONS  #################################################
 
         # Default time
         self.sim_time = 0.0
         self.state_dict = {}
-        self.input_dict = {}
+        self.input_dict = {
+            'FR_hip': 0.0,
+            'FR_thigh': 0.0,
+            'FR_calf': 0.0,
+            'FL_hip': 0.0,
+            'FL_thigh': 0.0,
+            'FL_calf': 0.0,
+            'RL_hip': 0.0,
+            'RL_thigh': 0.0,
+            'RL_calf': 0.0,
+            'RR_hip': 0.0,
+            'RR_thigh': 0.0,
+            'RR_calf': 0.0
+        }
         
         ######################## SUBSCRIPTIONS AND TIMERS  #########################################
         
         self.joint_state_subscriber = self.create_subscription(JointState, '/joint_states', self.joint_state_callback, 10)
         self.logging_timer = self.create_timer(sim_params.logging_interval, self.log_data, clock=self.get_clock())
+        
+        # Joint Torque Subscriptions
+        self.create_subscription(Float64, '/quadruped/FR_hip_joint_torque', self.FR_hip_torque, 10)
+        self.create_subscription(Float64, '/quadruped/FR_thigh_joint_torque', self.FR_thigh_torque, 10)
+        self.create_subscription(Float64, '/quadruped/FR_calf_joint_torque', self.FR_calf_torque, 10)
+        
+        self.create_subscription(Float64, '/quadruped/FL_hip_joint_torque', self.FL_hip_torque, 10)
+        self.create_subscription(Float64, '/quadruped/FL_thigh_joint_torque', self.FL_thigh_torque, 10)
+        self.create_subscription(Float64, '/quadruped/FL_calf_joint_torque', self.FL_calf_torque, 10)
+        
+        self.create_subscription(Float64, '/quadruped/RL_hip_joint_torque', self.RL_hip_torque, 10)
+        self.create_subscription(Float64, '/quadruped/RL_thigh_joint_torque', self.RL_thigh_torque, 10)
+        self.create_subscription(Float64, '/quadruped/RL_calf_joint_torque', self.RL_calf_torque, 10)
+        
+        self.create_subscription(Float64, '/quadruped/RR_hip_joint_torque', self.RR_hip_torque, 10)
+        self.create_subscription(Float64, '/quadruped/RR_thigh_joint_torque', self.RR_thigh_torque, 10)
+        self.create_subscription(Float64, '/quadruped/RR_calf_joint_torque', self.RR_calf_torque, 10)
+        
 
         
     def clock_callback(self, msg_in: Clock):        
@@ -175,12 +209,54 @@ class GazeboGaitLogger(Node):
             self.state_dict['FR']['thigh']['vel'], self.state_dict['FR']['calf']['vel'],  # FR velocity
             self.state_dict['RL']['thigh']['vel'], self.state_dict['RL']['calf']['vel'],  # RL velocity
             self.state_dict['RR']['thigh']['vel'], self.state_dict['RR']['calf']['vel'],  # RR velocity
+            self.input_dict['FL_thigh'], self.input_dict['FL_calf'],                      # FL Torque
+            self.input_dict['FR_thigh'], self.input_dict['FR_calf'],                      # FR Torque
+            self.input_dict['RL_thigh'], self.input_dict['RL_calf'],                      # RL Torque
+            self.input_dict['RR_thigh'], self.input_dict['RR_calf'],                      # RR Torque
         ]
 
         # Append data to CSV file
         with open(self.csv_filename, 'a', newline='') as file:
             writer = csv.writer(file)
             writer.writerow(data)
+            
+    def FR_hip_torque(self, msg:Float64):
+        self.input_dict['FR_hip'] = msg.data
+    
+    def FR_thigh_torque(self, msg:Float64):
+        self.input_dict['FR_thigh'] = msg.data
+    
+    def FR_calf_torque(self, msg:Float64):
+        self.input_dict['FR_calf'] = msg.data
+    
+    def FL_hip_torque(self, msg:Float64):
+        self.input_dict['FL_hip'] = msg.data
+    
+    def FL_thigh_torque(self, msg:Float64):
+        self.input_dict['FL_thigh'] = msg.data
+    
+    def FL_calf_torque(self, msg:Float64):
+        self.input_dict['FL_calf'] = msg.data
+    
+    def RL_hip_torque(self, msg:Float64):
+        self.input_dict['RL_hip'] = msg.data
+    
+    def RL_thigh_torque(self, msg:Float64):
+        self.input_dict['RL_thigh'] = msg.data
+    
+    def RL_calf_torque(self, msg:Float64):
+        self.input_dict['RL_calf'] = msg.data
+    
+    def RR_hip_torque(self, msg:Float64):
+        self.input_dict['RR_hip'] = msg.data
+    
+    def RR_thigh_torque(self, msg:Float64):
+        self.input_dict['RR_thigh'] = msg.data
+    
+    def RR_calf_torque(self, msg:Float64):
+        self.input_dict['RR_calf'] = msg.data
+    
+    
             
 def main(args=None):
     rclpy.init(args=args)

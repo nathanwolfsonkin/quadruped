@@ -16,7 +16,7 @@
  *
  */
 
-#include "torque_test/JointPositionControllerTorquePublisher.hh"
+#include "quadruped_gazebo/JointPositionControllerTorquePublisher.hh"
 
 #include <gz/msgs/actuators.pb.h>
 #include <gz/msgs/double.pb.h>

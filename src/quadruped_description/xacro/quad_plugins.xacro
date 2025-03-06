@@ -27,22 +27,16 @@
         </plugin>
 
         <!-- Macro for Joint Controllers -->
-        <!-- <xacro:macro name="add_joint_controller" params="joint_name">
+        <xacro:macro name="add_joint_controller" params="joint_name">
             <plugin
-                filename="gz-sim-joint-position-controller-system"
-                name="gz::sim::systems::JointPositionController">
+                filename="libJointPositionControllerTorquePublisher.so"
+                name="quadruped_gazebo::JointPositionControllerTorquePublisher">
                 <joint_name>${joint_name}</joint_name>
                 <topic>quadruped/cmd_${joint_name}</topic>
                 <p_gain>20</p_gain>
                 <i_gain>0</i_gain>
                 <d_gain>1</d_gain>
-            </plugin>
-        </xacro:macro> -->
-
-        <xacro:macro name="add_joint_controller" params="joint_name">
-            <plugin filename="libgz-sim-apply-joint-force-system"
-                name="gz::sim::v8::systems::ApplyJointForce">
-                <joint_name>${joint_name}</joint_name>
+                <torque_topic>/quadruped/${joint_name}_torque</torque_topic>
             </plugin>
         </xacro:macro>
 
