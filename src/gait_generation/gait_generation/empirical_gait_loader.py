@@ -5,7 +5,7 @@ from rclpy.node import Node
 from std_msgs.msg import Float64
 from rosgraph_msgs.msg import Clock
 
-import simulation.parameters as params 
+import simulation.parameters as sim_params 
 
 class GaitLoader(Node):
 
@@ -79,7 +79,7 @@ class GaitLoader(Node):
         self.trajectory_data = self.load_csv(file_path)
                 
         # Delay the inputs by some amount of time
-        self.delay_time = params.start_walking_time #seconds
+        self.delay_time = sim_params.start_walking_time #seconds
         for index, _ in enumerate(self.trajectory_data['timelist']):
             if index != 0:
                 self.trajectory_data['timelist'][index] += self.delay_time

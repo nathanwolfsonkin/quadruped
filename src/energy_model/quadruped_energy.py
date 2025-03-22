@@ -210,6 +210,18 @@ class QuadrupedData:
     def refresh(self):
         for leg in self.leg_list:
             leg.refresh()
+            
+    def manual_set_velocity(self, gait_data=[[[],[]],[[],[]],[[],[]],[[],[]]]):
+        leg1, leg2, leg3, leg4 = gait_data
+        leg1_t1, leg1_t2 = leg1
+        leg2_t1, leg2_t2 = leg2
+        leg3_t1, leg3_t2 = leg3
+        leg4_t1, leg4_t2 = leg4
+        
+        self.leg_list[0].manual_set_velocity(leg1_t1, leg1_t2)
+        self.leg_list[1].manual_set_velocity(leg2_t1, leg2_t2)
+        self.leg_list[2].manual_set_velocity(leg3_t1, leg3_t2)
+        self.leg_list[3].manual_set_velocity(leg4_t1, leg4_t2)
     
     # For completenesss, calculates the body height of the quadruped and updates quadruped
     def calculate_body_height(self):
@@ -358,6 +370,10 @@ class LegData:
     def refresh(self):
         self.dt1 = np.gradient(self.t1, self.timelist)
         self.dt2 = np.gradient(self.t2, self.timelist)
+        
+    def manual_set_velocity(self, dt1, dt2):
+        self.dt1 = dt1
+        self.dt2 = dt2
 
 
 def main():

@@ -6,7 +6,7 @@ from rclpy.node import Node
 from std_msgs.msg import Float64
 from rosgraph_msgs.msg import Clock
 
-import simulation.parameters as params
+import simulation.parameters as sim_params
 
 class GaitLoader(Node):
 
@@ -34,7 +34,7 @@ class GaitLoader(Node):
         self.gait_functions()
         
         # Create timer using the ROS clock (not a Clock message!)
-        self.timer = self.create_timer(0.001, self.send_command, clock=self.get_clock())
+        self.timer = self.create_timer(sim_params.gait_command_publishing_rate, self.send_command, clock=self.get_clock())
 
     def compute_trajectory(self, t, data: dict):
         """Computes the sum of sine waves based on frequency, amplitude, and phase."""
@@ -65,7 +65,7 @@ class GaitLoader(Node):
                 self.traj_funcs[leg][angle] = trajectory_function
 
     def send_command(self):
-        start_time = params.start_walking_time
+        start_time = sim_params.start_walking_time
         # Publish to quadruped commands
         for leg in ['FR','FL','RL','RR']:
             for joint in ['hip','thigh','calf']:

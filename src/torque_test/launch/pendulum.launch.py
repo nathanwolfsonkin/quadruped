@@ -15,7 +15,7 @@ def generate_launch_description():
 
     # Setup project paths
     pkg_ros_gz_sim = get_package_share_directory('ros_gz_sim')
-    pkg_description = get_package_share_directory('torque_test')
+    pkg_torque_test = get_package_share_directory('torque_test')
 
     # Setup to launch the simulator and Gazebo world
     gz_sim = IncludeLaunchDescription(
@@ -23,13 +23,22 @@ def generate_launch_description():
             os.path.join(pkg_ros_gz_sim, 'launch', 'gz_sim.launch.py')),
         launch_arguments={
             'gz_args': PathJoinSubstitution([
-                pkg_description, 'models', 'pendulum.sdf'
+                pkg_torque_test, 'models', 'pendulum.sdf'
             ]),
-            'verbose': 'true'  # Enable verbose output for Gazebo
         }.items(),
     )
-
+    
+    bridge = Node(
+        package='ros_gz_bridge',
+        executable='parameter_bridge',
+        parameters=[{
+            'config_file': os.path.join(pkg_torque_test, 'config', 'bridge_config.yaml'),
+            'qos_overrides./tf_static.publisher.durability': 'transient_local',
+        }],
+        output='screen'
+    )
 
     return LaunchDescription([
         gz_sim,
+        bridge,
     ])

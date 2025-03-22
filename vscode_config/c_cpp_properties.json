@@ -3,6 +3,7 @@
         {
             "name": "Linux",
             "includePath": [
+                "/workspace/src/gait_generation_cpp/include",
                 "/workspace/src/**",
                 "/opt/ros/jazzy/**"
             ],

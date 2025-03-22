@@ -24,8 +24,10 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'python_energy_node = energy_pkg.python_energy_node:main',
-            'log_gazebo_gait = energy_pkg.log_gazebo_gait:main',
+            'low_pass_filter = energy_pkg.filter_torques:main',
+            'desired_data_logger = energy_pkg.desired_data_logger:main',
+            'raw_data_logger = energy_pkg.raw_data_logger:main',
+            'filtered_data_logger = energy_pkg.filtered_data_logger:main',
         ],
     },
 )
