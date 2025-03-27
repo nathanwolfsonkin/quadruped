@@ -36,6 +36,11 @@ private:
     rclcpp::Subscription<rosgraph_msgs::msg::Clock>::SharedPtr clock_sub_;
     double sim_time_ = 0.0;
 
+    // Parameters loaded from Python parameters file
+    double gait_command_rate_;
+    double start_time_;
+
+    void load_python_parameters();
     void load_yaml(const std::string &file_path);
     void generate_trajectory_functions();
     void setup_publishers();

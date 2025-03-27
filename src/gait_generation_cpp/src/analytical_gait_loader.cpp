@@ -1,9 +1,11 @@
 #include <rclcpp/rclcpp.hpp>
+#include <pybind11/embed.h>
 
 #include "gait_generation_cpp/analytical_gait_loader.hh"
 
 GaitLoader::GaitLoader() : Node("gait_loader")
 {
+  load_python_parameters();
   std::string filepath = "/workspace/install/gait_generation/share/gait_generation/gait_trajectory/gait_sin_waves.yaml";
   load_yaml(filepath);
   generate_trajectory_functions();
@@ -13,10 +15,31 @@ GaitLoader::GaitLoader() : Node("gait_loader")
   clock_sub_ = this->create_subscription<rosgraph_msgs::msg::Clock>(
       "/clock", 10, std::bind(&GaitLoader::update_clock, this, std::placeholders::_1));
 
+  double gait_command_rate_us = this->gait_command_rate_ * 1e6;
   // Timer to periodically publish joint commands
   timer_ = this->create_wall_timer(
-      std::chrono::milliseconds(10),
+      std::chrono::microseconds(static_cast<int>(gait_command_rate_us)),
       std::bind(&GaitLoader::publish_commands, this));
+}
+
+// Function to load parameters from python
+void GaitLoader::load_python_parameters()
+{
+  pybind11::scoped_interpreter guard{};
+
+  try
+  {
+    pybind11::module sim_params = pybind11::module::import("simulation.parameters");
+    this->gait_command_rate_ = sim_params.attr("gait_command_publishing_rate").cast<double>();
+    this->start_time_ = sim_params.attr("start_walking_time").cast<double>();
+
+    RCLCPP_INFO(this->get_logger(), "Loaded gait command rate: %f", gait_command_rate_);
+    RCLCPP_INFO(this->get_logger(), "Loaded start walking time: %f", start_time_);
+  }
+  catch (pybind11::error_already_set &e)
+  {
+    RCLCPP_ERROR(this->get_logger(), "Python error: %s", e.what());
+  }
 }
 
 // Function to set up publishers
@@ -24,7 +47,7 @@ void GaitLoader::setup_publishers()
 {
   for (const auto &[key, _] : trajectory_functions_)
   {
-    std::string topic_name = "quadruped_cmd_" + key + "_joint";
+    std::string topic_name = "/quadruped/cmd_" + key + "_joint";
     publishers_[key] = this->create_publisher<std_msgs::msg::Float64>(topic_name, 10);
   }
 }
@@ -38,11 +61,19 @@ void GaitLoader::update_clock(const rosgraph_msgs::msg::Clock::SharedPtr msg)
 // Function to publish joint commands
 void GaitLoader::publish_commands()
 {
-  for (const auto& [key, func] : trajectory_functions_)
+  for (const auto &[key, func] : trajectory_functions_)
   {
     std_msgs::msg::Float64 msg;
-    msg.data = func(sim_time_);
 
+    if (this->sim_time_ < this->start_time_)
+    {
+      msg.data = func(this->start_time_);
+    }
+    else
+    {
+      msg.data = func(this->sim_time_);
+    }
+    
     publishers_[key]->publish(msg);
   }
 }

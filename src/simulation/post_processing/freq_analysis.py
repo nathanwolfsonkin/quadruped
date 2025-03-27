@@ -2,11 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import find_peaks
 
-import simulation.parameters as sim_params
-from simulation.post_processing.csv_data_processer import CSVDataProcesser
-
-from simulation.post_processing.low_pass_filter import Filter
-
 def plot_power_spectrum(time, signal, title=""):
     total_frames = len(time)
     frame_time = time[1] - time[0]
@@ -45,19 +40,7 @@ def plot_power_spectrum(time, signal, title=""):
     plt.grid()
 
 def main():
-    csv_dir = sim_params.get_latest_log(sim_params.raw_logging_directory)
-    
-    # Extract data
-    data_dict = CSVDataProcesser.csv_to_dict(csv_dir)
-    pid = ' P-I-D = 20-0-1'
-    
-    filt_RL_thigh_pos = Filter.butterworth_filter(data_dict['time'], data_dict['FL_thigh_pos'], sim_params.pos_filt_cutoff_freq)
-    
-    plot_power_spectrum(data_dict['time'], data_dict['FL_thigh_pos'], title='raw_FL_thigh_pos' + pid)
-    plot_power_spectrum(data_dict['time'], filt_RL_thigh_pos, title='filt_FL_thigh_pos' + pid)
-
-    plt.show()
-
+    pass
 
 if __name__ == "__main__":
    main()

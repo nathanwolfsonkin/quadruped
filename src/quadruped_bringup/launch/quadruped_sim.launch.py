@@ -50,39 +50,18 @@ def generate_launch_description():
     )
     
     gait_loader = Node(
-        package='gait_generation',
+        package='gait_generation_cpp',
         executable='analytical_gait_loader',
-        name='analytical_gait_loader',
+        name='gait_loader',
         output='both'
     )
     
     ############################################# LOGGING NODES ############################################################
     
-    desired_data_logger = Node(
-        package='energy_pkg',
-        executable='desired_data_logger',
-        name='desired_data_logger',
-        output='both',
-    )
-    
     raw_data_logger = Node(
         package='energy_pkg',
         executable='raw_data_logger',
         name='raw_data_logger',
-        output='both'
-    )
-        
-    low_pass_filter = Node(
-        package='energy_pkg',
-        executable='low_pass_filter',
-        name='low_pass_filter',
-        output='both'
-    )
-        
-    filtered_data_logger = Node(
-        package='energy_pkg',
-        executable='filtered_data_logger',
-        name='filtered_data_logger',
         output='both'
     )
 
@@ -94,8 +73,5 @@ def generate_launch_description():
         initial_conditions,
         gait_loader,
         ######## LOGGING NODES #########
-        desired_data_logger,
         raw_data_logger,
-        # low_pass_filter,
-        # filtered_data_logger,
     ])

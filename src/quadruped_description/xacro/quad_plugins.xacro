@@ -27,15 +27,15 @@
         </plugin>
 
         <!-- Macro for Joint Controllers -->
-        <xacro:macro name="add_joint_controller" params="joint_name">
+        <xacro:macro name="add_joint_controller" params="joint_name Kp Ki Kd">
             <plugin
                 filename="libJointPositionControllerTorquePublisher.so"
                 name="quadruped_gazebo::JointPositionControllerTorquePublisher">
                 <joint_name>${joint_name}</joint_name>
                 <topic>quadruped/cmd_${joint_name}</topic>
-                <p_gain>20</p_gain>
-                <i_gain>0</i_gain>
-                <d_gain>1</d_gain>
+                <p_gain>${Kp}</p_gain>
+                <i_gain>${Ki}</i_gain>
+                <d_gain>${Kd}</d_gain>
                 <torque_topic>/quadruped/${joint_name}_torque</torque_topic>
             </plugin>
         </xacro:macro>
@@ -45,18 +45,33 @@
             <joint_name>z_trans_x_trans_joint</joint_name>
         </plugin>
 
+        <!-- Hip PID Gains -->
+        <xacro:property name="hip_Kp" value="100.0" />
+        <xacro:property name="hip_Ki" value="0.0" />
+        <xacro:property name="hip_Kd" value="2.0" />
+
+        <!-- Thigh PID Gains -->
+        <xacro:property name="thigh_Kp" value="250.0" />
+        <xacro:property name="thigh_Ki" value="0.0" />
+        <xacro:property name="thigh_Kd" value="2.5" />
+
+        <!-- Calf PID Gains -->
+        <xacro:property name="calf_Kp" value="350.0" />
+        <xacro:property name="calf_Ki" value="0.0" />
+        <xacro:property name="calf_Kd" value="3.5" />
+
         <!-- Explicitly Add All Joints -->
-        <xacro:add_joint_controller joint_name="FR_hip_joint" />
-        <xacro:add_joint_controller joint_name="FR_thigh_joint" />
-        <xacro:add_joint_controller joint_name="FR_calf_joint" />
-        <xacro:add_joint_controller joint_name="FL_hip_joint" />
-        <xacro:add_joint_controller joint_name="FL_thigh_joint" />
-        <xacro:add_joint_controller joint_name="FL_calf_joint" />
-        <xacro:add_joint_controller joint_name="RR_hip_joint" />
-        <xacro:add_joint_controller joint_name="RR_thigh_joint" />
-        <xacro:add_joint_controller joint_name="RR_calf_joint" />
-        <xacro:add_joint_controller joint_name="RL_hip_joint" />
-        <xacro:add_joint_controller joint_name="RL_thigh_joint" />
-        <xacro:add_joint_controller joint_name="RL_calf_joint" />
+        <xacro:add_joint_controller joint_name="FR_hip_joint" Kp="${hip_Kp}" Ki="${hip_Ki}" Kd="${hip_Kd}" />
+        <xacro:add_joint_controller joint_name="FR_thigh_joint" Kp="${thigh_Kp}" Ki="${thigh_Ki}" Kd="${thigh_Kd}" />
+        <xacro:add_joint_controller joint_name="FR_calf_joint" Kp="${calf_Kp}" Ki="${calf_Ki}" Kd="${calf_Kd}" />
+        <xacro:add_joint_controller joint_name="FL_hip_joint" Kp="${hip_Kp}" Ki="${hip_Ki}" Kd="${hip_Kd}" />
+        <xacro:add_joint_controller joint_name="FL_thigh_joint" Kp="${thigh_Kp}" Ki="${thigh_Ki}" Kd="${thigh_Kd}" />
+        <xacro:add_joint_controller joint_name="FL_calf_joint" Kp="${calf_Kp}" Ki="${calf_Ki}" Kd="${calf_Kd}" />
+        <xacro:add_joint_controller joint_name="RR_hip_joint" Kp="${hip_Kp}" Ki="${hip_Ki}" Kd="${hip_Kd}" />
+        <xacro:add_joint_controller joint_name="RR_thigh_joint" Kp="${thigh_Kp}" Ki="${thigh_Ki}" Kd="${thigh_Kd}" />
+        <xacro:add_joint_controller joint_name="RR_calf_joint" Kp="${calf_Kp}" Ki="${calf_Ki}" Kd="${calf_Kd}" />
+        <xacro:add_joint_controller joint_name="RL_hip_joint" Kp="${hip_Kp}" Ki="${hip_Ki}" Kd="${hip_Kd}" />
+        <xacro:add_joint_controller joint_name="RL_thigh_joint" Kp="${thigh_Kp}" Ki="${thigh_Ki}" Kd="${thigh_Kd}" />
+        <xacro:add_joint_controller joint_name="RL_calf_joint" Kp="${calf_Kp}" Ki="${calf_Ki}" Kd="${calf_Kd}" />
     </include>
 </sdf>

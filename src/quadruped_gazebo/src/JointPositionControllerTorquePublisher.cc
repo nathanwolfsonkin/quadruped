@@ -500,10 +500,41 @@ void JointPositionController::PreUpdate(
     return;
   }
 
+
+  gzdbg << "outside of for loop";
+
   for (Entity joint : this->dataPtr->jointEntities)
   {
+
+    gzdbg << "inside of for loop";
     // Update force command.
-    double force = this->dataPtr->posPid.Update(error, _info.dt);
+
+    // Original implementation used simple difference to calculate derivitive in error
+    // double force = this->dataPtr->posPid.Update(error, _info.dt);
+    
+    // New implementation uses derivitive of current state
+    double current_state =  jointPosComp->Data().at(this->dataPtr->jointIndex);
+    
+    double dt = std::chrono::duration<double>(_info.dt).count();
+
+    double derivative_state;
+
+    // Calculate the derivative state
+    if (dt > 0)
+    {
+      derivative_state = (current_state - previous_state) / dt;
+    }
+    else
+    {
+      derivative_state = 0.0;
+    }
+
+    // gzdbg << "Current derivative state: " << derivative_state;
+
+    // Update previous_state
+    previous_state = current_state;
+
+    double force = this->dataPtr->posPid.Update(error, derivative_state, _info.dt);
 
     auto forceComp =
         _ecm.Component<components::JointForceCmd>(joint);
@@ -524,7 +555,7 @@ void JointPositionController::PreUpdate(
   }
 }
 
-//////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void JointPositionControllerPrivate::OnCmdPos(const msgs::Double &_msg)
 {
   std::lock_guard<std::mutex> lock(this->jointCmdMutex);

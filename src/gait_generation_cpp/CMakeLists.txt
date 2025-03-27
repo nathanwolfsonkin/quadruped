@@ -12,11 +12,19 @@ find_package(yaml-cpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(rosgraph_msgs REQUIRED)
 
+# Dependencies for importing python params file
+find_package(pybind11 REQUIRED)
+find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
+
 # Ensure headers are found
 include_directories(include)
 
 # Add executable
 add_executable(analytical_gait_loader src/analytical_gait_loader.cpp)
+
+# Link Python and pybind11
+target_link_libraries(analytical_gait_loader Python3::Python)
+ament_target_dependencies(analytical_gait_loader rclcpp yaml-cpp std_msgs rosgraph_msgs)
 
 # Link against required libraries
 target_include_directories(analytical_gait_loader PUBLIC

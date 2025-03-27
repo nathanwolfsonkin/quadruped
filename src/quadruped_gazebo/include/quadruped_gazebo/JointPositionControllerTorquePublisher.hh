@@ -131,6 +131,7 @@ namespace gz
           std::string topic_name;
           gz::transport::Node node;
           gz::transport::Node::Publisher torquePub;
+          double previous_state;
         };
       }
     }
