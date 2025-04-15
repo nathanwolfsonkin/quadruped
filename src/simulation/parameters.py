@@ -45,9 +45,9 @@ analytical_gait_params_file = os.path.join(get_package_share_directory('gait_gen
 # Parameters no longer using in active nodes
 
 # No Longer logging desired, instead calculating directly based on analytical functions 
-synthetic_logging_interval = .0125
-desired_logging_directory = "/workspace/src/simulation/data_logs/desired_data_log/"
+# synthetic_logging_interval = .0125
+# desired_logging_directory = "/workspace/src/simulation/data_logs/desired_data_log/"
 
 # No longer using realtime filtering
-filt_sampling_rate = 1000 # Hz
-realtime_filtered_logging_directory = "/workspace/src/simulation/data_logs/filtered_data_log/"
+# filt_sampling_rate = 1000 # Hz
+# realtime_filtered_logging_directory = "/workspace/src/simulation/data_logs/filtered_data_log/"

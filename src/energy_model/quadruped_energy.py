@@ -173,6 +173,58 @@ class Leg:
         kw2 = .5*self.I[1]*(self.dt1+self.dt2)**2
         return kw1+kw2
     
+    def thigh_energy(self):
+        def potential_energy(self):
+            g = self.gravity
+            p1 = self.get_p1()
+
+            h1 = p1[1]
+
+            u1 = self.m[0]*g*h1
+            return abs(u1)
+        
+        def tranlsational_kinetic_energy(self):
+            v1 = self.get_v1()
+
+            kt1 = .5*self.m[0]*(v1.T@v1)
+            return kt1
+        
+        def rotational_kinetic_energy(self):
+            kw1 = .5*self.I[0]*self.dt1**2
+            return kw1
+        
+        u = potential_energy(self)
+        kt = tranlsational_kinetic_energy(self)
+        kw = rotational_kinetic_energy(self)
+
+        return u + kt + kw
+
+    def calf_energy(self):
+        def potential_energy(self):
+            g = self.gravity
+            p2 = self.get_p2()
+
+            h2 = p2[1]
+
+            u2 = self.m[1]*g*h2
+            return abs(u2)
+        
+        def tranlsational_kinetic_energy(self):
+            v2 = self.get_v2()
+
+            kt2 = .5*self.m[1]*(v2.T@v2)
+            return kt2
+        
+        def rotational_kinetic_energy(self):
+            kw2 = .5*self.I[1]*(self.dt1+self.dt2)**2
+            return kw2
+        
+        u = potential_energy(self)
+        kt = tranlsational_kinetic_energy(self)
+        kw = rotational_kinetic_energy(self)
+
+        return u + kt + kw
+    
     def total_energy(self):
         return (self.potential_energy() + 
                 self.translational_kinetic_energy() + 
@@ -202,10 +254,10 @@ class QuadrupedData:
         leg3_t1, leg3_t2 = leg3
         leg4_t1, leg4_t2 = leg4
 
-        self.leg_list = [LegData(timelist, leg1_t1, leg1_t2),
-                         LegData(timelist, leg2_t1, leg2_t2),
-                         LegData(timelist, leg3_t1, leg3_t2),
-                         LegData(timelist, leg4_t1, leg4_t2)]
+        self.leg_list = [LegData(timelist, quadruped.leg_list[0], leg1_t1, leg1_t2),
+                         LegData(timelist, quadruped.leg_list[1], leg2_t1, leg2_t2),
+                         LegData(timelist, quadruped.leg_list[2], leg3_t1, leg3_t2),
+                         LegData(timelist, quadruped.leg_list[3], leg4_t1, leg4_t2)]
         
     def refresh(self):
         for leg in self.leg_list:
@@ -360,12 +412,13 @@ class QuadrupedData:
 
 # Helper class to carry around leg state trajectory data
 class LegData:
-    def __init__(self, timelist, t1_list, t2_list):
+    def __init__(self, timelist, leg: Leg, t1_list, t2_list):
         self.timelist = timelist
         self.t1 = t1_list
         self.t2 = t2_list
         self.dt1 = np.gradient(self.t1, self.timelist)
         self.dt2 = np.gradient(self.t2, self.timelist)
+        self.leg = leg
 
     def refresh(self):
         self.dt1 = np.gradient(self.t1, self.timelist)
@@ -375,10 +428,29 @@ class LegData:
         self.dt1 = dt1
         self.dt2 = dt2
 
+    def energy_trajectory(self):
+        thigh_energy_trajectory = []
+        calf_energy_trajectory = []
+
+        # For each time instance
+        for time_index, time in enumerate(self.timelist):
+
+            # Calculate current energy
+            thigh_energy_trajectory.append(self.leg.thigh_energy())
+            calf_energy_trajectory.append(self.leg.calf_energy())
+        
+        return thigh_energy_trajectory, calf_energy_trajectory
+
+    def power_trajecltory(self):
+        thigh_energy_traj, calf_energy_traj = self.energy_trajectory()
+        
+        thigh_power_traj = np.gradient(thigh_energy_traj, self.timelist)
+        calf_power_traj = np.gradient(calf_energy_traj, self.timelist)
+
+        return thigh_power_traj, calf_power_traj
 
 def main():
     pass
-
 
 if __name__ == "__main__":
     main()

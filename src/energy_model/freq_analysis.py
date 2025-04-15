@@ -96,6 +96,75 @@ def get_dominant_sine_waves(timeseries, N=2):
     
     return dominant_frequencies, np.array(dominant_amplitudes), np.array(dominant_phases), total_frames
 
+def get_power_spectrum_plot_data(timeseries, N=2):
+
+    total_frames = len(timeseries[:, 0])
+    time_list = timeseries[:, 0]
+    frame_time = time_list[1] - time_list[0]
+    
+    signal = timeseries[:, 1]
+    
+    # Perform FFT
+    fft_values = np.fft.fft(signal)
+    fft_freqs = np.fft.fftfreq(total_frames, d=frame_time)
+    
+    # Compute power spectrum
+    power_spectrum = np.abs(fft_values) ** 2
+    
+    # Sort frequencies and power spectrum from lowest to highest frequency
+    sorted_indices = np.argsort(fft_freqs)
+    sorted_fft_freqs = fft_freqs[sorted_indices]
+    sorted_power_spectrum = power_spectrum[sorted_indices]
+    
+    # Only keep the positive half of the spectrum for peak detection
+    positive_half_n = total_frames // 2
+    positive_freqs = sorted_fft_freqs[positive_half_n:]
+    positive_power_spectrum = sorted_power_spectrum[positive_half_n:]
+    fft_values_positive = fft_values[sorted_indices][positive_half_n:]
+    
+    # Check the zero frequency (DC component)
+    dc_power = sorted_power_spectrum[positive_half_n]
+    
+    # Find peaks in the power spectrum excluding the DC component
+    peaks, _ = find_peaks(positive_power_spectrum[1:])  # Exclude the zero frequency
+    peaks += 1  # Adjust indices for the offset
+    
+    # Sort peaks by power and select the top N
+    dominant_peaks = peaks[np.argsort(positive_power_spectrum[peaks])[-N:]]
+    dominant_frequencies = positive_freqs[dominant_peaks]
+    dominant_powers = positive_power_spectrum[dominant_peaks]
+    
+    # Include the DC component in the results
+    dominant_frequencies = np.insert(dominant_frequencies, 0, positive_freqs[0])
+    dominant_powers = np.insert(dominant_powers, 0, dc_power)
+    
+    # Compute amplitudes and phases for the dominant sine waves
+    dominant_amplitudes = []
+    dominant_phases = []
+    
+    for i, freq in enumerate(dominant_frequencies):
+        if i == 0:
+            # DC component
+            amplitude = fft_values_positive[0].real / total_frames
+            phase = 0
+        else:
+            index = dominant_peaks[i - 1]  # Adjust for DC
+            amplitude = (2 * np.abs(fft_values_positive[index])) / total_frames  # Multiply by 2 for positive frequencies
+            phase = np.angle(fft_values_positive[index])
+        
+        dominant_amplitudes.append(amplitude)
+        dominant_phases.append(phase)
+
+    if __name__ == "__main__":
+        plt.figure()
+        plt.plot(positive_freqs, np.log10(positive_power_spectrum), label="Power Spectrum Density")
+        plt.scatter(dominant_frequencies, np.log10(dominant_powers), color='red', label="Dominant Frequencies")
+        plt.xlabel('Frequency (Hz)')
+        plt.ylabel('Power')
+        plt.title('Power Spectrum Density')
+
+    return positive_freqs, np.log10(positive_power_spectrum), dominant_frequencies, np.log10(dominant_powers)
+    
 def fourier_approx(timeseries, N=2, resolution_multiplier=1):
     """
     Generate an Nth-order Fourier approximation of the given time series with the desired resolution.

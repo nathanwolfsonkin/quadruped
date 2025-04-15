@@ -216,6 +216,89 @@ class ModelGaitPlots:
         # Show the plot
         plt.show()
 
+    def power_spectrum_comparison(self):
+        data_dict = {
+            'front' : {
+                'thigh':{},
+                'calf': {}
+            },
+            'rear' : {
+                'thigh':{},
+                'calf': {}
+            }
+        }
+        
+        # Front Thigh
+        positive_freqs, positive_power_spectrum, dominant_frequencies, dominant_powers = get_power_spectrum_plot_data(to_timeseries(self.quadruped_traj.timelist, self.quadruped_traj.leg_list[0].t1))
+        data_dict['front']['thigh']['positive_freqs'] = positive_freqs
+        data_dict['front']['thigh']['positive_power_spectrum'] = positive_power_spectrum
+        data_dict['front']['thigh']['dominant_frequencies'] = dominant_frequencies
+        data_dict['front']['thigh']['dominant_powers'] = dominant_powers
+
+        positive_freqs, positive_power_spectrum, dominant_frequencies, dominant_powers = get_power_spectrum_plot_data(to_timeseries(self.quadruped_traj.timelist, self.quadruped_traj.leg_list[0].t2))
+        data_dict['front']['calf']['positive_freqs'] = positive_freqs
+        data_dict['front']['calf']['positive_power_spectrum'] = positive_power_spectrum
+        data_dict['front']['calf']['dominant_frequencies'] = dominant_frequencies
+        data_dict['front']['calf']['dominant_powers'] = dominant_powers
+
+        positive_freqs, positive_power_spectrum, dominant_frequencies, dominant_powers = get_power_spectrum_plot_data(to_timeseries(self.quadruped_traj.timelist, self.quadruped_traj.leg_list[1].t1))
+        data_dict['rear']['thigh']['positive_freqs'] = positive_freqs
+        data_dict['rear']['thigh']['positive_power_spectrum'] = positive_power_spectrum
+        data_dict['rear']['thigh']['dominant_frequencies'] = dominant_frequencies
+        data_dict['rear']['thigh']['dominant_powers'] = dominant_powers
+
+        positive_freqs, positive_power_spectrum, dominant_frequencies, dominant_powers = get_power_spectrum_plot_data(to_timeseries(self.quadruped_traj.timelist, self.quadruped_traj.leg_list[1].t2))
+        data_dict['rear']['calf']['positive_freqs'] = positive_freqs
+        data_dict['rear']['calf']['positive_power_spectrum'] = positive_power_spectrum
+        data_dict['rear']['calf']['dominant_frequencies'] = dominant_frequencies
+        data_dict['rear']['calf']['dominant_powers'] = dominant_powers
+
+
+        # Thigh Comparison
+        plt.figure()
+        plt.plot(data_dict['front']['thigh']['positive_freqs'], data_dict['front']['thigh']['positive_power_spectrum'], label="Front Thigh")
+        plt.scatter(data_dict['front']['thigh']['dominant_frequencies'], data_dict['front']['thigh']['dominant_powers'], color='red')
+
+        plt.plot(data_dict['rear']['thigh']['positive_freqs'], data_dict['rear']['thigh']['positive_power_spectrum'], label="Rear Thigh")
+        plt.scatter(data_dict['rear']['thigh']['dominant_frequencies'], data_dict['rear']['thigh']['dominant_powers'], color='red')
+        plt.xlabel('Frequency (Hz)')
+        plt.ylabel('Power')
+        plt.legend()
+        # plt.title('Power Spectrum Density')
+
+        # Calf Comparison
+        plt.figure()
+        plt.plot(data_dict['front']['calf']['positive_freqs'], data_dict['front']['calf']['positive_power_spectrum'], label="Front calf")
+        plt.scatter(data_dict['front']['calf']['dominant_frequencies'], data_dict['front']['calf']['dominant_powers'], color='red')
+        
+        plt.plot(data_dict['rear']['calf']['positive_freqs'], data_dict['rear']['calf']['positive_power_spectrum'], label="Rear calf")
+        plt.scatter(data_dict['rear']['calf']['dominant_frequencies'], data_dict['rear']['calf']['dominant_powers'], color='red')
+        plt.xlabel('Frequency (Hz)')
+        plt.ylabel('Power')
+        plt.legend()
+        # plt.title('Power Spectrum Density')
+
+    def thigh_calf_data_comparison(self):
+        plt.figure()
+        plt.plot(self.quadruped_traj.timelist, self.quadruped_traj.leg_list[0].t1, label='Front Thigh Raw', color='b')
+        plt.plot(self.quadruped_traj_fourier.timelist, self.quadruped_traj_fourier.leg_list[0].t1, label='Front Thigh Approximation', linestyle='--', color='b')
+        plt.plot(self.quadruped_traj.timelist, self.quadruped_traj.leg_list[1].t1, label='Rear Thigh Raw', color='g')
+        plt.plot(self.quadruped_traj_fourier.timelist, self.quadruped_traj_fourier.leg_list[1].t1, label='Rear Thigh Approximation', linestyle='--', color='g')
+        # plt.title('Thigh Angle')
+        plt.legend()
+        plt.xlabel('Time (s)')
+        plt.ylabel('Angle (rad)')
+
+        plt.figure()
+        plt.plot(self.quadruped_traj.timelist, self.quadruped_traj.leg_list[0].t2, label='Front Claf Raw', color='r')
+        plt.plot(self.quadruped_traj_fourier.timelist, self.quadruped_traj_fourier.leg_list[0].t2, label='Front Approximation', linestyle='--', color='r')
+        plt.plot(self.quadruped_traj.timelist, self.quadruped_traj.leg_list[1].t2, label='Rear Raw', color='y')
+        plt.plot(self.quadruped_traj_fourier.timelist, self.quadruped_traj_fourier.leg_list[1].t2, label='Front Approximation', linestyle='--', color='y')
+        # plt.title('Calf Angle')
+        plt.legend()
+        plt.xlabel('Time (s)')
+        plt.ylabel('Angle (rad)')
+
     def data_to_cv(self):
         # Create a list of csv headers
         raw_headers = [
@@ -292,17 +375,19 @@ def main():
                                timelist=timelist)
     
     # Generate plots
-    plots.leg1_data_approx()
-    plots.leg2_data_approx()
-    plots.all_angles_approx()
-    plots.leg1_t1_t2_phase_protrait()
-    plots.leg2_t1_t2_phase_portrait()
-    plots.leg1_t1_dt1()
-    plots.leg1_pfoot_vs_time()
-    plots.leg1_vfoot_vs_time()
-    plots.all_energy_plot()
+    # plots.leg1_data_approx()
+    # plots.leg2_data_approx()
+    # plots.all_angles_approx()
+    # plots.leg1_t1_t2_phase_protrait()
+    # plots.leg2_t1_t2_phase_portrait()
+    # plots.leg1_t1_dt1()
+    # plots.leg1_pfoot_vs_time()
+    # plots.leg1_vfoot_vs_time()
+    # plots.all_energy_plot()
+    plots.power_spectrum_comparison()
+    plots.thigh_calf_data_comparison()
 
-    # plt.show()
+    plt.show()
 
     # plots.data_to_cv()
     

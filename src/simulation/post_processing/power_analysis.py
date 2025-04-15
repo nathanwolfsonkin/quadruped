@@ -11,12 +11,12 @@ class PowerAnalysis:
     def __init__(self):
         
         # Desired Data Analysis
-        desired_data_log = sim_params.get_latest_log(sim_params.desired_logging_directory)
+        # desired_data_log = sim_params.get_latest_log(sim_params.desired_logging_directory)
         
         # Raw Data Analysis
         raw_data_log = sim_params.get_latest_log(sim_params.raw_logging_directory)
         
-        pre_derivative_change_log = "/workspace/src/simulation/data_logs/raw_data_log/joint_states_2025-03-22_17-07-13.csv"
+        # pre_derivative_change_log = "/workspace/src/simulation/data_logs/raw_data_log/joint_states_2025-03-22_17-07-13.csv"
         
         # Filtering of position, velocity, and torque
         # Generate filtered CSV log
@@ -39,8 +39,8 @@ class PowerAnalysis:
                 'py': PythonEnergy(sim_params.quadruped_params_file, filtered_data_log, override_velocity=True)
             },
             'debug': {
-                'pre_derivative_change': GazeboEnergy(pre_derivative_change_log),
-                'py_computed_vel': PythonEnergy(sim_params.quadruped_params_file, desired_data_log, override_velocity=False)
+                # 'pre_derivative_change': GazeboEnergy(pre_derivative_change_log),
+                # 'py_computed_vel': PythonEnergy(sim_params.quadruped_params_file, desired_data_log, override_velocity=False)
             }
         }
     
