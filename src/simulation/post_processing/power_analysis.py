@@ -16,7 +16,7 @@ class PowerAnalysis:
         # Raw Data Analysis
         raw_data_log = sim_params.get_latest_log(sim_params.raw_logging_directory)
         
-        # pre_derivative_change_log = "/workspace/src/simulation/data_logs/raw_data_log/joint_states_2025-03-22_17-07-13.csv"
+        pre_derivative_change_log = "/workspace/src/simulation/data_logs/derivative_kick.csv"
         
         # Filtering of position, velocity, and torque
         # Generate filtered CSV log
@@ -39,7 +39,7 @@ class PowerAnalysis:
                 'py': PythonEnergy(sim_params.quadruped_params_file, filtered_data_log, override_velocity=True)
             },
             'debug': {
-                # 'pre_derivative_change': GazeboEnergy(pre_derivative_change_log),
+                'pre_derivative_change': GazeboEnergy(pre_derivative_change_log),
                 # 'py_computed_vel': PythonEnergy(sim_params.quadruped_params_file, desired_data_log, override_velocity=False)
             }
         }
@@ -191,11 +191,16 @@ class PowerAnalysis:
         
         # Plots used to compare the torque inputs before and after removal of derivitive kick
         def plugin_noise_analysis(self: PowerAnalysis):
-            plt.figure()
-            plt.title('Plugin Noise Analysis')
-            plt.plot(self.model_dict['debug']['pre_derivative_change'].data_dict['time'], self.model_dict['debug']['pre_derivative_change'].data_dict['FR_calf_tor'], label='Pre Update FR_calf Torque')
-            plt.plot(self.model_dict['raw']['gz'].data_dict['time'], self.model_dict['raw']['gz'].data_dict['FR_calf_tor'], label='Post Update FR_calf Torque')
-            plt.legend()
+            fig = plt.figure()
+            ax = fig.add_subplot(111)
+            ax.tick_params(axis='both', which='major', width=2.5)
+            # plt.title('Plugin Noise Analysis')
+            plt.plot(self.model_dict['debug']['pre_derivative_change'].data_dict['time'], self.model_dict['debug']['pre_derivative_change'].data_dict['FR_calf_tor'], label='Error Derivative Based Signal')
+            plt.plot(self.model_dict['raw']['gz'].data_dict['time'], self.model_dict['raw']['gz'].data_dict['FR_calf_tor'], label='Position Derivative Based Signal')
+            plt.legend(fontsize=14)
+            plt.xlabel('Time (s)', fontsize=14)
+            plt.ylabel(r'Applied Torque (N$\cdot$m)', fontsize=14)
+            
 
         # synthetic_energy(self)        
         # synthetic_kinematics(self)
@@ -214,11 +219,11 @@ class PowerAnalysis:
 def main():
     power_analysis = PowerAnalysis()
     # power_analysis.power_comparison()
-    power_analysis.power_spectrum_comparison()
+    # power_analysis.power_spectrum_comparison()
     # power_analysis.power()
     # power_analysis.tracking_error()
-    # power_analysis.debug()
-    power_analysis.temp()
+    power_analysis.debug()
+    # power_analysis.temp()
     plt.show()
 
 if __name__ == "__main__":

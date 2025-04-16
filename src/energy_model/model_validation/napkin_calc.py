@@ -67,8 +67,8 @@ def main():
     # Total time for approximated gait to expend battery capacity
     approx_time = total_capacity_j / work_per_hr
     
-    print('\n\nTotal work done in joules over 2.5 hours for approximated gait:', work_over_2_5_hours_kj)
-    print('Actual battery capacity in joules:                             ', total_capacity_kj)
+    print('\n\nTotal work done in kilojoules over 2.5 hours for approximated gait:', work_over_2_5_hours_kj)
+    print('Actual battery capacity in kilojoules:                             ', total_capacity_kj)
 
     print('\n\nTotal time for approximated gait to expend battery capacity:   ', approx_time)
     print('Actual maximum runtime in hours:                               ', max_runtime_hr)

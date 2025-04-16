@@ -197,7 +197,7 @@ class Leg:
         kt = tranlsational_kinetic_energy(self)
         kw = rotational_kinetic_energy(self)
 
-        return u + kt + kw
+        return (u + kt + kw).item()
 
     def calf_energy(self):
         def potential_energy(self):
@@ -223,7 +223,7 @@ class Leg:
         kt = tranlsational_kinetic_energy(self)
         kw = rotational_kinetic_energy(self)
 
-        return u + kt + kw
+        return (u + kt + kw).item()
     
     def total_energy(self):
         return (self.potential_energy() + 
@@ -357,32 +357,45 @@ class QuadrupedData:
         return stance_list, vB_list, height_list
     
     # Returns list of total quadruped energy over time
-    def energy_trajectory(self):
-                
-        leg_energy = [[],[],[],[]]
-        quad_energy_list = []
+    def energy_trajectory(self) -> list:
+        
+        energy_list = [[[],[]],[[],[]],[[],[]],[[],[]]]
 
-        # For each time instance
-        for time_index, time in enumerate(self.timelist):
-            # For each leg
-            for leg_index, leg in enumerate(self.quadruped.leg_list):
+        # For each leg
+        for leg_index, leg in enumerate(self.quadruped.leg_list):
+            
+            # For each time instance
+            for time_index, time in enumerate(self.timelist):
+                
                 # Update current state
                 leg.t1 = self.leg_list[leg_index].t1[time_index]
                 leg.t2 = self.leg_list[leg_index].t2[time_index]
                 leg.dt1 = self.leg_list[leg_index].dt1[time_index]
                 leg.dt2 = self.leg_list[leg_index].dt2[time_index]
-
+                
                 # Calculate current energy
-                leg_energy[leg_index].append(leg.total_energy())
-
-            quad_energy_list.append(self.quadruped.total_energy())
+                energy_list[leg_index][0].append(leg.thigh_energy())
+                energy_list[leg_index][1].append(leg.calf_energy())
         
-        return quad_energy_list
+        return energy_list
     
     def power_trajectory(self):
-        energy_traj = self.energy_trajectory()
-        power_traj = np.gradient(energy_traj, self.timelist)
-        return power_traj
+
+        quadruped_power_traj_list = [[[],[]],[[],[]],[[],[]],[[],[]]]
+        
+
+        energy_trajs = self.energy_trajectory()
+        for leg_index, leg in enumerate(energy_trajs):
+            for link_index, link_energy_traj in enumerate(leg):
+                quadruped_power_traj_list[leg_index][link_index] = np.gradient(link_energy_traj, self.timelist)
+        
+        abs_val_power_traj = np.zeros(len(quadruped_power_traj_list[0][0]))
+
+        for leg_index, _ in enumerate(quadruped_power_traj_list):
+            for link_index, _ in enumerate(leg):
+                abs_val_power_traj += np.abs(quadruped_power_traj_list[leg_index][link_index])
+        
+        return abs_val_power_traj
     
     def calc_work_done(self):
         work_done = 0
@@ -393,8 +406,9 @@ class QuadrupedData:
         # Time between each frame
         time = self.timelist[1] - self.timelist[0]
 
+        # Integrateto compute total work done
         for i in range(len(power_traj) - 1):
-            work_done += abs(power_traj[i] + power_traj[i+1]) * time / 2
+            work_done += (power_traj[i] + power_traj[i+1]) * time / 2
         
         return work_done
     
