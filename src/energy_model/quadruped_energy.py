@@ -174,7 +174,7 @@ class Leg:
         return kw1+kw2
     
     def thigh_energy(self):
-        def potential_energy(self):
+        def potential_energy(self: Leg):
             g = self.gravity
             p1 = self.get_p1()
 
@@ -183,13 +183,13 @@ class Leg:
             u1 = self.m[0]*g*h1
             return abs(u1)
         
-        def tranlsational_kinetic_energy(self):
+        def tranlsational_kinetic_energy(self: Leg):
             v1 = self.get_v1()
 
             kt1 = .5*self.m[0]*(v1.T@v1)
             return kt1
         
-        def rotational_kinetic_energy(self):
+        def rotational_kinetic_energy(self: Leg):
             kw1 = .5*self.I[0]*self.dt1**2
             return kw1
         
@@ -412,9 +412,18 @@ class QuadrupedData:
         
         return work_done
     
-    def calc_distance(self):
-        v = self.calculate_vel()
-        time = self.timelist[-1]
+    def calc_distance(self, time_override=False, time_index=-1, vel_override=False, vel=-1):
+        
+        if vel_override == False:
+            v = self.calculate_vel()
+        else:
+            v = vel
+        
+        if time_override == False:
+            time = self.timelist[-1]
+        else:
+            time = self.timelist[time_index]
+        
         return v * time
     
     def cost_of_transport(self):
@@ -448,6 +457,12 @@ class LegData:
 
         # For each time instance
         for time_index, time in enumerate(self.timelist):
+            
+            # Update leg state
+            self.leg.t1 = self.t1[time_index]
+            self.leg.t2 = self.t2[time_index]
+            self.leg.dt1 = self.dt1[time_index]
+            self.leg.dt2 = self.dt2[time_index]
 
             # Calculate current energy
             thigh_energy_trajectory.append(self.leg.thigh_energy())
@@ -455,7 +470,7 @@ class LegData:
         
         return thigh_energy_trajectory, calf_energy_trajectory
 
-    def power_trajecltory(self):
+    def power_trajectory(self):
         thigh_energy_traj, calf_energy_traj = self.energy_trajectory()
         
         thigh_power_traj = np.gradient(thigh_energy_traj, self.timelist)

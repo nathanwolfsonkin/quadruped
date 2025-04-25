@@ -578,4 +578,4 @@ GZ_ADD_PLUGIN(JointPositionController,
               JointPositionController::ISystemPreUpdate)
 
 GZ_ADD_PLUGIN_ALIAS(JointPositionController,
-                    "quadruped_gazebo::JointPositionControllerTorquePublisher")
+                    "torque_test::JointPositionControllerTorquePublisherTorqueTest")

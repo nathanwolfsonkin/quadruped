@@ -35,7 +35,7 @@ def plot_power_spectrum(time, signal, title=""):
     plt.scatter(positive_freqs[peaks], np.log10(positive_power_spectrum[peaks]), color='red', label="Peaks")
     plt.xlabel('Frequency (Hz)')
     plt.ylabel('Log Power')
-    plt.title(f"PSD - {title}")
+    # plt.title(f"PSD - {title}")
     plt.legend()
     plt.grid()
 

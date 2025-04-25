@@ -51,15 +51,20 @@
             </joint>
 
             <!-- Custom torque publishing plugin -->
+            <!-- <plugin
+                filename="libJointPositionControllerTorquePublisherTorqueTest.so"
+                name="torque_test::JointPositionControllerTorquePublisherTorqueTest"> -->
             <plugin
                 filename="libJointPositionControllerTorquePublisher.so"
-                name="quadruped_gazbeo::JointPositionControllerTorquePublisher">
+                name="quadruped_gazebo::JointPositionControllerTorquePublisher">
                 <joint_name>pendulum_joint</joint_name>
                 <topic>cmd_pendulum_joint</topic>
                 <p_gain>10</p_gain>
                 <i_gain>0</i_gain>
                 <d_gain>2</d_gain>
                 <torque_topic>joint_torque</torque_topic>
+                <cmd_max>10</cmd_max>
+                <cmd_min>-10</cmd_min>
             </plugin>
         </model>
     </world>

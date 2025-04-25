@@ -24,6 +24,7 @@
             <joint_name>RL_hip_joint</joint_name>
             <joint_name>RL_thigh_joint</joint_name>
             <joint_name>RL_calf_joint</joint_name>
+            <joint_name>z_trans_x_trans_joint</joint_name>
         </plugin>
 
         <!-- Macro for Joint Controllers -->
@@ -37,6 +38,8 @@
                 <i_gain>${Ki}</i_gain>
                 <d_gain>${Kd}</d_gain>
                 <torque_topic>/quadruped/${joint_name}_torque</torque_topic>
+                <cmd_max>33.5</cmd_max>
+                <cmd_min>-33.5</cmd_min>
             </plugin>
         </xacro:macro>
 

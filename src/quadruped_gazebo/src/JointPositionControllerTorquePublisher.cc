@@ -529,13 +529,24 @@ void JointPositionController::PreUpdate(
       derivative_state = 0.0;
     }
 
-    // gzdbg << "Current derivative state: " << derivative_state;
-
     // Update previous_state
     previous_state = current_state;
 
     double force = this->dataPtr->posPid.Update(error, derivative_state, _info.dt);
+    
+    
+    // double cmd_max = this->dataPtr->posPid.CmdMax();
+    // double cmd_min = -cmd_max;
 
+    // if (force > cmd_max)
+    // {
+    //   force = cmd_max;
+    // }
+    // else if (force < cmd_min)
+    // {
+    //   force = cmd_min;
+    // }
+    
     auto forceComp =
         _ecm.Component<components::JointForceCmd>(joint);
     if (forceComp == nullptr)

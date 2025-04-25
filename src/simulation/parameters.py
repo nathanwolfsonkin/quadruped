@@ -17,9 +17,9 @@ init_force = 15.0 # Newtons
 gait_command_publishing_rate = .001 # seconds
 
 # Filter Parameters
-pos_filt_cutoff_freq = 6.5 # Hz
-vel_filt_cutoff_freq = 6.5 # Hz
-tor_filt_cutoff_freq = 6.5 # Hz
+pos_filt_cutoff_freq = 20 # Hz
+vel_filt_cutoff_freq = 20 # Hz
+tor_filt_cutoff_freq = 20 # Hz
 
 # Logging related parameters
 def get_latest_log(directory):

@@ -90,6 +90,7 @@ class Filter:
                 "FR_hip_tor", "FR_thigh_tor", "FR_calf_tor",
                 "RL_hip_tor", "RL_thigh_tor", "RL_calf_tor",
                 "RR_hip_tor", "RR_thigh_tor", "RR_calf_tor",
+                "distance"
                 ])
             
             for i, value in enumerate(data_dict['time']):
@@ -107,6 +108,7 @@ class Filter:
                     data_dict['FR_hip_tor'][i], data_dict['FR_thigh_tor'][i], data_dict['FR_calf_tor'][i],
                     data_dict['RL_hip_tor'][i], data_dict['RL_thigh_tor'][i], data_dict['RL_calf_tor'][i],
                     data_dict['RR_hip_tor'][i], data_dict['RR_thigh_tor'][i], data_dict['RR_calf_tor'][i],
+                    data_dict['distance'][i]
                 ])
 
 

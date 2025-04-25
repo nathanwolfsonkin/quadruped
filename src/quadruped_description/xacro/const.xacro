@@ -4,5 +4,6 @@
 
     <!-- Constants for robot dimensions -->
     <xacro:property name="PI" value="3.1415926535897931"/>
-    
+    <xacro:property name="DAMPING_CONST" value="0.0"/>
+
 </robot>

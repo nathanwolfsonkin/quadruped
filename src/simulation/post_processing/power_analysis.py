@@ -16,7 +16,12 @@ class PowerAnalysis:
         # Raw Data Analysis
         raw_data_log = sim_params.get_latest_log(sim_params.raw_logging_directory)
         
+        # Debug Specific Logs
         pre_derivative_change_log = "/workspace/src/simulation/data_logs/derivative_kick.csv"
+        no_damping_no_saturation = "/workspace/src/simulation/data_logs/no_damping_no_saturation.csv"
+        no_damping_yes_saturation = "/workspace/src/simulation/data_logs/no_damping_yes_saturation.csv"
+        yes_damping_no_saturation = "/workspace/src/simulation/data_logs/yes_damping_no_saturation.csv"
+        yes_damping_yes_saturation = "/workspace/src/simulation/data_logs/yes_damping_yes_saturation.csv"
         
         # Filtering of position, velocity, and torque
         # Generate filtered CSV log
@@ -40,7 +45,11 @@ class PowerAnalysis:
             },
             'debug': {
                 'pre_derivative_change': GazeboEnergy(pre_derivative_change_log),
-                # 'py_computed_vel': PythonEnergy(sim_params.quadruped_params_file, desired_data_log, override_velocity=False)
+                'no_damping_no_saturation': GazeboEnergy(no_damping_no_saturation),
+                'no_damping_yes_saturation': GazeboEnergy(no_damping_yes_saturation),
+                'yes_damping_no_saturation': GazeboEnergy(yes_damping_no_saturation),
+                'yes_damping_yes_saturation': GazeboEnergy(yes_damping_yes_saturation),
+                'py_computed_vel': PythonEnergy(sim_params.quadruped_params_file, raw_data_log, override_velocity=False)
             }
         }
     
@@ -125,10 +134,10 @@ class PowerAnalysis:
             plot_power_spectrum(self.model_dict['raw']['gz'].data_dict['time'], self.model_dict['raw']['gz'].data_dict['FR_calf_pow'], title="Raw FR_calf Power")
 
         
-        # power_spectra(self)
+        power_spectra(self)
         # velocity_spectra(self)
         # torque_spectra(self) # Torque is not tracked by the python model directly, only changes in energy
-        tor_vel_pow_comparison(self)
+        # tor_vel_pow_comparison(self)
         
     def tracking_error(self):
         def position_tracking_error(self: PowerAnalysis):
@@ -176,17 +185,17 @@ class PowerAnalysis:
             plt.figure()
             plt.title('Synthetic Position Comparison')
             plt.plot(self.model_dict['synth']['py'].quadruped_data.timelist, self.model_dict['synth']['py'].quadruped_data.leg_list[0].t1, label='Synthetic Thigh Pos')
-            plt.plot(self.model_dict['synth']['py'].quadruped_data.timelist, self.model_dict['synth']['py'].quadruped_data.leg_list[0].t2, label='Synthetic Calf Pos')
+            # plt.plot(self.model_dict['synth']['py'].quadruped_data.timelist, self.model_dict['synth']['py'].quadruped_data.leg_list[0].t2, label='Synthetic Calf Pos')
             plt.plot(self.model_dict['debug']['py_computed_vel'].quadruped_data.timelist, self.model_dict['debug']['py_computed_vel'].quadruped_data.leg_list[0].t1, label='Synthetic Thigh Pos (Num)')
-            plt.plot(self.model_dict['debug']['py_computed_vel'].quadruped_data.timelist, self.model_dict['debug']['py_computed_vel'].quadruped_data.leg_list[0].t2, label='Synthetic Calf Pos (Num)')
+            # plt.plot(self.model_dict['debug']['py_computed_vel'].quadruped_data.timelist, self.model_dict['debug']['py_computed_vel'].quadruped_data.leg_list[0].t2, label='Synthetic Calf Pos (Num)')
             plt.legend()
             
             plt.figure()
             plt.title('Synthetic Velocity Comparison')
             plt.plot(self.model_dict['synth']['py'].quadruped_data.timelist, self.model_dict['synth']['py'].quadruped_data.leg_list[0].dt1, label='Synthetic Thigh Velocity')
-            plt.plot(self.model_dict['synth']['py'].quadruped_data.timelist, self.model_dict['synth']['py'].quadruped_data.leg_list[0].dt2, label='Synthetic Calf Velocity')
+            # plt.plot(self.model_dict['synth']['py'].quadruped_data.timelist, self.model_dict['synth']['py'].quadruped_data.leg_list[0].dt2, label='Synthetic Calf Velocity')
             plt.plot(self.model_dict['debug']['py_computed_vel'].quadruped_data.timelist, self.model_dict['debug']['py_computed_vel'].quadruped_data.leg_list[0].dt1, label='Synthetic Thigh Vel (Num)')
-            plt.plot(self.model_dict['debug']['py_computed_vel'].quadruped_data.timelist, self.model_dict['debug']['py_computed_vel'].quadruped_data.leg_list[0].dt2, label='Synthetic Calf Vel (Num)')
+            # plt.plot(self.model_dict['debug']['py_computed_vel'].quadruped_data.timelist, self.model_dict['debug']['py_computed_vel'].quadruped_data.leg_list[0].dt2, label='Synthetic Calf Vel (Num)')
             plt.legend()
         
         # Plots used to compare the torque inputs before and after removal of derivitive kick
@@ -200,12 +209,44 @@ class PowerAnalysis:
             plt.legend(fontsize=14)
             plt.xlabel('Time (s)', fontsize=14)
             plt.ylabel(r'Applied Torque (N$\cdot$m)', fontsize=14)
-            
+        
+        def power_spectra_and_signals(self):
+            plot_power_spectrum(self.model_dict['debug']['no_damping_no_saturation'].data_dict['time'], self.model_dict['debug']['no_damping_no_saturation'].data_dict['power'], title="no_damping_no_saturation")
+            plot_power_spectrum(self.model_dict['debug']['no_damping_yes_saturation'].data_dict['time'], self.model_dict['debug']['no_damping_yes_saturation'].data_dict['power'], title="no_damping_yes_saturation")
+            plot_power_spectrum(self.model_dict['debug']['yes_damping_no_saturation'].data_dict['time'], self.model_dict['debug']['yes_damping_no_saturation'].data_dict['power'], title="yes_damping_no_saturation")
+            plot_power_spectrum(self.model_dict['debug']['yes_damping_yes_saturation'].data_dict['time'], self.model_dict['debug']['yes_damping_yes_saturation'].data_dict['power'], title="yes_damping_yes_saturation")
 
+            plt.figure()
+            plt.title('Power Signals')
+            plt.plot(self.model_dict['debug']['no_damping_no_saturation'].data_dict['time'], self.model_dict['debug']['no_damping_no_saturation'].data_dict['power'], label='no_damping_no_saturation')
+            plt.plot(self.model_dict['debug']['no_damping_yes_saturation'].data_dict['time'], self.model_dict['debug']['no_damping_yes_saturation'].data_dict['power'], label='no_damping_yes_saturation')
+            plt.plot(self.model_dict['debug']['yes_damping_no_saturation'].data_dict['time'], self.model_dict['debug']['yes_damping_no_saturation'].data_dict['power'], label='yes_damping_no_saturation')
+            plt.plot(self.model_dict['debug']['yes_damping_yes_saturation'].data_dict['time'], self.model_dict['debug']['yes_damping_yes_saturation'].data_dict['power'], label='yes_damping_yes_saturation')
+            plt.legend()
+
+            plt.figure()
+            plt.title('Position Signals')
+            plt.plot(self.model_dict['synth']['py'].quadruped_data.timelist, self.model_dict['synth']['py'].quadruped_data.leg_list[0].t1, label='Synthetic')
+            plt.plot(self.model_dict['debug']['no_damping_no_saturation'].data_dict['time'], self.model_dict['debug']['no_damping_no_saturation'].data_dict['FR_thigh_pos'], label='no_damping_no_saturation')
+            plt.plot(self.model_dict['debug']['no_damping_yes_saturation'].data_dict['time'], self.model_dict['debug']['no_damping_yes_saturation'].data_dict['FR_thigh_pos'], label='no_damping_yes_saturation')
+            plt.plot(self.model_dict['debug']['yes_damping_no_saturation'].data_dict['time'], self.model_dict['debug']['yes_damping_no_saturation'].data_dict['FR_thigh_pos'], label='yes_damping_no_saturation')
+            plt.plot(self.model_dict['debug']['yes_damping_yes_saturation'].data_dict['time'], self.model_dict['debug']['yes_damping_yes_saturation'].data_dict['FR_thigh_pos'], label='yes_damping_yes_saturation')
+            plt.legend()
+
+            plt.figure()
+            plt.title('Torque Signals')
+            plt.plot(self.model_dict['debug']['no_damping_no_saturation'].data_dict['time'], self.model_dict['debug']['no_damping_no_saturation'].data_dict['FR_thigh_tor'], label='no_damping_no_saturation')
+            plt.plot(self.model_dict['debug']['no_damping_yes_saturation'].data_dict['time'], self.model_dict['debug']['no_damping_yes_saturation'].data_dict['FR_thigh_tor'], label='no_damping_yes_saturation')
+            plt.plot(self.model_dict['debug']['yes_damping_no_saturation'].data_dict['time'], self.model_dict['debug']['yes_damping_no_saturation'].data_dict['FR_thigh_tor'], label='yes_damping_no_saturation')
+            plt.plot(self.model_dict['debug']['yes_damping_yes_saturation'].data_dict['time'], self.model_dict['debug']['yes_damping_yes_saturation'].data_dict['FR_thigh_tor'], label='yes_damping_yes_saturation')
+            plt.legend()
+
+        
         # synthetic_energy(self)        
-        # synthetic_kinematics(self)
+        synthetic_kinematics(self)
         # manual_vel_test(self)
-        plugin_noise_analysis(self)
+        # plugin_noise_analysis(self)
+        # power_spectra_and_signals(self)
         
     def temp(self):
         plt.figure()
@@ -219,10 +260,10 @@ class PowerAnalysis:
 def main():
     power_analysis = PowerAnalysis()
     # power_analysis.power_comparison()
-    # power_analysis.power_spectrum_comparison()
+    power_analysis.power_spectrum_comparison()
     # power_analysis.power()
     # power_analysis.tracking_error()
-    power_analysis.debug()
+    # power_analysis.debug()
     # power_analysis.temp()
     plt.show()
 

@@ -50,6 +50,8 @@ class PythonEnergy(CSVDataProcesser):
         
         self.quadruped_data = QuadrupedData(quadruped=quadruped, timelist=timelist, gait_data=gait_data_pos)
         
+        self.generate_distance_list()
+
         if override_velocity == True:
             self.manual_velocity_override()
         
@@ -61,3 +63,13 @@ class PythonEnergy(CSVDataProcesser):
             [self.data_dict['RR_thigh_vel'], self.data_dict['RR_calf_vel']]
             ]
         self.quadruped_data.manual_set_velocity(gait_data_vel)
+
+    def generate_distance_list(self):
+        self.dist_list = []
+        velocity = self.quadruped_data.calculate_vel()
+        for index, value in enumerate(self.quadruped_data.timelist):
+            if index == 0:
+                offset = value
+            
+            current_dist = self.quadruped_data.calc_distance(time_override=True, time_index=index, vel_override=True, vel=velocity) - offset
+            self.dist_list.append(current_dist)

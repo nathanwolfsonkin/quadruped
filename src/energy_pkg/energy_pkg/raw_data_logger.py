@@ -65,6 +65,7 @@ class RawDataLogger(Node):
                 "FR_hip_tor", "FR_thigh_tor", "FR_calf_tor",
                 "RL_hip_tor", "RL_thigh_tor", "RL_calf_tor",
                 "RR_hip_tor", "RR_thigh_tor", "RR_calf_tor",
+                "distance"
                 ])
         
         ##########################  INITILIZATIONS  #################################################
@@ -113,7 +114,7 @@ class RawDataLogger(Node):
             return
 
         data = [
-            self.sim_time,
+            self.sim_time - sim_params.start_recording_time,
             self.state_dict['FL']['hip']['pos'], self.state_dict['FL']['thigh']['pos'], self.state_dict['FL']['calf']['pos'],  # FL position
             self.state_dict['FR']['hip']['pos'], self.state_dict['FR']['thigh']['pos'], self.state_dict['FR']['calf']['pos'],  # FR position
             self.state_dict['RL']['hip']['pos'], self.state_dict['RL']['thigh']['pos'], self.state_dict['RL']['calf']['pos'],  # RL position
@@ -126,6 +127,7 @@ class RawDataLogger(Node):
             self.state_dict['FR']['hip']['tor'], self.state_dict['FR']['thigh']['tor'], self.state_dict['FR']['calf']['tor'],  # FR torque
             self.state_dict['RL']['hip']['tor'], self.state_dict['RL']['thigh']['tor'], self.state_dict['RL']['calf']['tor'],  # RL torque
             self.state_dict['RR']['hip']['tor'], self.state_dict['RR']['thigh']['tor'], self.state_dict['RR']['calf']['tor'],  # RR torque
+            self.state_dict['distance'] - self.dist_offset,
         ]
 
         # Append data to CSV file
@@ -207,6 +209,10 @@ class RawDataLogger(Node):
                         # Failed to match
                         case _:
                             raise ValueError('Case was not matched for id: ', leg + '_' + joint + '_' + state)
+        
+        self.state_dict['distance'] = msg_in.position[12]
+        if self.sim_time < sim_params.start_recording_time:
+            self.dist_offset = msg_in.position[12]
                         
     def clock_callback(self, msg_in: Clock):        
         self.sim_time = msg_in.clock.sec + msg_in.clock.nanosec * 1e-9

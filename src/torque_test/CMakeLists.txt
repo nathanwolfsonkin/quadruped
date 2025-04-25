@@ -67,33 +67,18 @@ endif()
 # target_link_libraries(FullSystem PRIVATE
 #   gz-sim${GZ_SIM_VER}::gz-sim${GZ_SIM_VER})
 
+  ############## SPECIFY JointPositionControllerTorquePublisherTorqueTest TARGET #####################
 
-############## SPECIFY JointTorquePublisher TARGET #####################
-
-add_library(JointTorquePublisher
-  SHARED
-  src/JointTorquePublisher.cc
-)
-
-target_include_directories(
-  JointTorquePublisher PRIVATE include
-)
-
-target_link_libraries(JointTorquePublisher PRIVATE
-  gz-sim${GZ_SIM_VER}::gz-sim${GZ_SIM_VER})
-
-  ############## SPECIFY JointPositionControllerTorquePublisher TARGET #####################
-
-add_library(JointPositionControllerTorquePublisher
+add_library(JointPositionControllerTorquePublisherTorqueTest
 SHARED
-src/JointPositionControllerTorquePublisher.cc
+src/JointPositionControllerTorquePublisherTorqueTest.cc
 )
 
 target_include_directories(
-  JointPositionControllerTorquePublisher PRIVATE include
+  JointPositionControllerTorquePublisherTorqueTest PRIVATE include
 )
 
-target_link_libraries(JointPositionControllerTorquePublisher PRIVATE
+target_link_libraries(JointPositionControllerTorquePublisherTorqueTest PRIVATE
 gz-sim${GZ_SIM_VER}::gz-sim${GZ_SIM_VER})
 ####################################################################
 
@@ -102,7 +87,7 @@ gz-sim${GZ_SIM_VER}::gz-sim${GZ_SIM_VER})
 # of the 'BasicSystem' and 'FullSystem' targets will be copied
 # to the subfolder 'lib/ros_gz_example_gazebo' of the install directory.
 install(
-  TARGETS JointTorquePublisher JointPositionControllerTorquePublisher
+  TARGETS JointPositionControllerTorquePublisherTorqueTest
   DESTINATION lib/${PROJECT_NAME}
 )
 
