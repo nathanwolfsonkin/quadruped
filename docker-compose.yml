@@ -2,16 +2,27 @@ services:
   gazebo:
     build: .
     container_name: quadruped
-    devices:
-      - /dev/dri:/dev/dri
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
     environment:
-      - LIBVA_DRIVER_NAME=iHD # Set Intel GPU driver environment
-      - DISPLAY=${DISPLAY} # Set DISPLAY environment variable for X11
+      - DISPLAY=${DISPLAY}
+      - LIBGL_ALWAYS_INDIRECT=0
+      - QT_X11_NO_MITSHM=1
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all,compute,graphics,utility,video,display
+      - __NV_PRIME_RENDER_OFFLOAD=1
+      - __GLX_VENDOR_LIBRARY_NAME=nvidia
     volumes:
-      - /etc/OpenCL/vendors:/etc/OpenCL/vendors # Mount OpenCL vendors
-      - /tmp/.X11-unix:/tmp/.X11-unix # Mount X11 socket
-      - ${PWD}/src:/workspace/src # Mount workspace source
-      - ${PWD}/energy_logs:/workspace/energy_logs # Mount energy logs
-      - ${PWD}/vscode_config:/workspace/.vscode # Keep VScode configs
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /dev/dri:/dev/dri
+      - /etc/machine-id:/etc/machine-id
+      - /run/dbus:/run/dbus
+      - ${PWD}/src:/workspace/src
+      - ${PWD}/energy_logs:/workspace/energy_logs
+      - ${PWD}/vscode_config:/workspace/.vscode
     entrypoint: /bin/bash
-    network_mode: "host"
+    network_mode: host
