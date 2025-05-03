@@ -13,7 +13,7 @@ class ModelComparison:
         self.tsi = 400
         self.left_stance_time = .28
         self.left_swing_time = .55
-        self.right_stance_time = 0.545
+        self.right_stance_time = 0.530
         self.right_swing_time = 0.77
 
         self.left_stance_time2 = self.left_stance_time + .5
@@ -27,8 +27,8 @@ class ModelComparison:
         
         # Filtering of position, velocity, and torque
         # Generate filtered CSV log
-        Filter.generate_filtered_csv(raw_data_log)
-        filtered_data_log = sim_params.get_latest_log(sim_params.postprocess_filtered_logging_directory)
+        # Filter.generate_filtered_csv(raw_data_log)
+        # filtered_data_log = sim_params.get_latest_log(sim_params.postprocess_filtered_logging_directory)
         timelist = GazeboEnergy(raw_data_log).data_dict['time']
 
         self.model_dict = {
@@ -96,13 +96,13 @@ class ModelComparison:
             ax.axvline(x=swing_time, color='red', linestyle='--', linewidth=1)
             ax.axvline(x=stance_time2, color='red', linestyle='--', linewidth=1)
 
-            ax.text(stance_time+.05, 0, 'Stance Phase', color='red', rotation=90,
+            ax.text(stance_time+.05, .85, 'Stance Phase', color='red', rotation=90,
                     va='bottom', ha='left', transform=ax.get_xaxis_transform())
 
-            ax.text(swing_time+.05, 0, 'Swing Phase', color='red', rotation=90,
+            ax.text(swing_time+.05, .85, 'Swing Phase', color='red', rotation=90,
                     va='bottom', ha='left', transform=ax.get_xaxis_transform())
             
-            ax.text(stance_time2+.05, 0, 'Stance Phase', color='red', rotation=90,
+            ax.text(stance_time2+.05, .85, 'Stance Phase', color='red', rotation=90,
                     va='bottom', ha='left', transform=ax.get_xaxis_transform())
             
             ax.tick_params(axis='both', which='major', width=2.5)
@@ -110,12 +110,48 @@ class ModelComparison:
             ax.set_ylabel(leg_joint + ' Position (rad)', fontsize=14)
             ax.legend(loc=4, fontsize=10)
 
-        fig = plt.figure()
-        generate_subplot(self, fig, 221, "FL Thigh")
-        generate_subplot(self, fig, 222, "FR Thigh")
-        generate_subplot(self, fig, 223, "FL Calf")
-        generate_subplot(self, fig, 224, "FR Calf")
+        # fig = plt.figure()
+        # generate_subplot(self, fig, 221, "FL Thigh")
+        # generate_subplot(self, fig, 222, "FR Thigh")
+        # generate_subplot(self, fig, 223, "FL Calf")
+        # generate_subplot(self, fig, 224, "FR Calf")
     
+        fig = plt.figure()
+        generate_subplot(self, fig, 111, "FL Thigh")
+        fig = plt.figure()
+        generate_subplot(self, fig, 111, "FL Calf")
+
+
+
+    def test_position(self):
+        fig = plt.figure()
+        ax = fig.add_subplot(211)
+        ax.plot(self.model_dict['synth']['py'].quadruped_data.timelist[:self.tsi], 
+            self.model_dict['synth']['py'].quadruped_data.leg_list[0].t1[:self.tsi], 
+            lw=2, label='FL Calf')
+        
+        ax.plot(self.model_dict['synth']['py'].quadruped_data.timelist[:self.tsi], 
+            self.model_dict['synth']['py'].quadruped_data.leg_list[1].t1[:self.tsi], 
+            lw=2, label='FR Thigh')
+        
+        ax.tick_params(axis='both', which='major', width=2.5)
+        ax.set_xlabel('Time (s)', fontsize=14)
+        ax.set_ylabel('Thigh Position (rad)', fontsize=14)
+        ax.legend(loc=4, fontsize=10)
+        
+        ax = fig.add_subplot(212)
+        ax.plot(self.model_dict['synth']['py'].quadruped_data.timelist[:self.tsi], 
+            self.model_dict['synth']['py'].quadruped_data.leg_list[0].t2[:self.tsi], 
+            lw=2, label='FL Calf')
+        ax.plot(self.model_dict['synth']['py'].quadruped_data.timelist[:self.tsi], 
+            self.model_dict['synth']['py'].quadruped_data.leg_list[1].t2[:self.tsi], 
+            lw=2, label='FR Calf')
+
+        ax.tick_params(axis='both', which='major', width=2.5)
+        ax.set_xlabel('Time (s)', fontsize=14)
+        ax.set_ylabel('Calf Position (rad)', fontsize=14)
+        ax.legend(loc=4, fontsize=10)
+
     def velocity(self):
         def generate_subplot(self, fig, index, leg_joint):
             ax = fig.add_subplot(index)
@@ -164,28 +200,33 @@ class ModelComparison:
             ax.axvline(x=stance_time, color='red', linestyle='--', linewidth=1)
             ax.axvline(x=swing_time, color='red', linestyle='--', linewidth=1)
             ax.axvline(x=stance_time2, color='red', linestyle='--', linewidth=1)
-            ax.text(stance_time+.05, 0, 'Stance Phase', color='red', rotation=90,
+            ax.text(stance_time+.025, .05, 'Stance Phase', color='red', rotation=90,
                     va='bottom', ha='left', transform=ax.get_xaxis_transform())
-            ax.text(swing_time+.05, 0, 'Swing Phase', color='red', rotation=90,
+            ax.text(swing_time+.025, .75, 'Swing Phase', color='red', rotation=90,
                     va='bottom', ha='left', transform=ax.get_xaxis_transform())
-            ax.text(stance_time2+.05, 0, 'Stance Phase', color='red', rotation=90,
+            ax.text(stance_time2+.025, .05, 'Stance Phase', color='red', rotation=90,
                     va='bottom', ha='left', transform=ax.get_xaxis_transform())
             ax.tick_params(axis='both', which='major', width=2.5)
             ax.set_xlabel('Time (s)', fontsize=14)
             ax.set_ylabel(leg_joint + ' Velocity (rad/s)', fontsize=14)
             ax.legend(loc=4, fontsize=10)
         
+        # fig = plt.figure()
+        # generate_subplot(self, fig, 221, "FL Thigh")
+        # generate_subplot(self, fig, 222, "FR Thigh")
+        # generate_subplot(self, fig, 223, "FL Calf")
+        # generate_subplot(self, fig, 224, "FR Calf")
+        
         fig = plt.figure()
-        generate_subplot(self, fig, 221, "FL Thigh")
-        generate_subplot(self, fig, 222, "FR Thigh")
-        generate_subplot(self, fig, 223, "FL Calf")
-        generate_subplot(self, fig, 224, "FR Calf")
+        generate_subplot(self, fig, 111, "FL Thigh")
+        fig = plt.figure()
+        generate_subplot(self, fig, 111, "FL Calf")
 
     def power(self):
         def thigh(self):
             fig = plt.figure()
             ax = fig.add_subplot(111)
-
+            
             # Synthetic
             thigh_power_traj, calf_power_traj = self.model_dict['synth']['py'].quadruped_data.leg_list[0].power_trajectory()
             power_traj = np.abs(thigh_power_traj)
@@ -200,12 +241,12 @@ class ModelComparison:
                     power_traj[:self.tsi], 
                     label='Kinematic', lw=2)
 
-            # Dynamic
             power_traj = self.model_dict['raw']['gz'].data_dict['FR_thigh_pow']
             power_traj = np.abs(power_traj)
             ax.plot(self.model_dict['raw']['gz'].data_dict['time'][:self.tsi], 
                     power_traj[:self.tsi], 
-                    label='Dynamic', lw=2)
+                    label='Dynamic', lw=2, color='w')
+
             
             ax.tick_params(axis='both', which='major', width=2.5)
             ax.set_xlabel('Time (s)', fontsize=14)
@@ -272,6 +313,14 @@ class ModelComparison:
             fig = plt.figure()
             ax = fig.add_subplot(111)
 
+            # Sizing
+            thigh_power_traj = self.model_dict['raw']['gz'].data_dict['FR_thigh_pow']
+            calf_power_traj = self.model_dict['raw']['gz'].data_dict['FR_calf_pow']
+            power_traj = np.abs(thigh_power_traj) + np.abs(calf_power_traj)
+            ax.plot(self.model_dict['raw']['gz'].data_dict['time'][:self.tsi], 
+                    power_traj[:self.tsi], 
+                    label='', color='w', lw=2)
+            
             # Synthetic
             thigh_power_traj, calf_power_traj = self.model_dict['synth']['py'].quadruped_data.leg_list[0].power_trajectory()
             power_traj = np.abs(thigh_power_traj) + np.abs(calf_power_traj)
@@ -454,6 +503,7 @@ def main():
     # model_comparison.cost_of_transport()
     # model_comparison.torque_velocity_power()
     # model_comparison.power_spectrum_comparison()
+    # model_comparison.test_position()
     plt.show()
 
 if __name__ == "__main__":

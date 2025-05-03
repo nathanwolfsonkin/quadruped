@@ -25,8 +25,8 @@ class PowerAnalysis:
         
         # Filtering of position, velocity, and torque
         # Generate filtered CSV log
-        Filter.generate_filtered_csv(raw_data_log)
-        filtered_data_log = sim_params.get_latest_log(sim_params.postprocess_filtered_logging_directory)
+        # Filter.generate_filtered_csv(raw_data_log)
+        # filtered_data_log = sim_params.get_latest_log(sim_params.postprocess_filtered_logging_directory)
         
         timelist = GazeboEnergy(raw_data_log).data_dict['time']
 
@@ -40,16 +40,16 @@ class PowerAnalysis:
                 'py': PythonEnergy(sim_params.quadruped_params_file, raw_data_log, override_velocity=True)
             },
             'filt': {
-                'gz': GazeboEnergy(filtered_data_log),
-                'py': PythonEnergy(sim_params.quadruped_params_file, filtered_data_log, override_velocity=True)
+                # 'gz': GazeboEnergy(filtered_data_log),
+                # 'py': PythonEnergy(sim_params.quadruped_params_file, filtered_data_log, override_velocity=True)
             },
             'debug': {
-                'pre_derivative_change': GazeboEnergy(pre_derivative_change_log),
-                'no_damping_no_saturation': GazeboEnergy(no_damping_no_saturation),
-                'no_damping_yes_saturation': GazeboEnergy(no_damping_yes_saturation),
-                'yes_damping_no_saturation': GazeboEnergy(yes_damping_no_saturation),
-                'yes_damping_yes_saturation': GazeboEnergy(yes_damping_yes_saturation),
-                'py_computed_vel': PythonEnergy(sim_params.quadruped_params_file, raw_data_log, override_velocity=False)
+                # 'pre_derivative_change': GazeboEnergy(pre_derivative_change_log),
+                # 'no_damping_no_saturation': GazeboEnergy(no_damping_no_saturation),
+                # 'no_damping_yes_saturation': GazeboEnergy(no_damping_yes_saturation),
+                # 'yes_damping_no_saturation': GazeboEnergy(yes_damping_no_saturation),
+                # 'yes_damping_yes_saturation': GazeboEnergy(yes_damping_yes_saturation),
+                # 'py_computed_vel': PythonEnergy(sim_params.quadruped_params_file, raw_data_log, override_velocity=False)
             }
         }
     
@@ -260,7 +260,7 @@ class PowerAnalysis:
 def main():
     power_analysis = PowerAnalysis()
     # power_analysis.power_comparison()
-    power_analysis.power_spectrum_comparison()
+    # power_analysis.power_spectrum_comparison()
     # power_analysis.power()
     # power_analysis.tracking_error()
     # power_analysis.debug()

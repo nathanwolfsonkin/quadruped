@@ -87,12 +87,14 @@ def get_dominant_sine_waves(timeseries, N=2):
         dominant_phases.append(phase)
 
     if __name__ == "__main__":
-        plt.figure()
-        plt.plot(positive_freqs, np.log10(positive_power_spectrum), label="Power Spectrum Density")
-        plt.scatter(dominant_frequencies, np.log10(dominant_powers), color='red', label="Dominant Frequencies")
-        plt.xlabel('Frequency (Hz)')
-        plt.ylabel('Power')
-        plt.title('Power Spectrum Density')
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        ax.plot(positive_freqs, np.log10(positive_power_spectrum), label="Power Spectrum Density", lw=3)
+        ax.scatter(dominant_frequencies, np.log10(dominant_powers), color='red', label="Dominant Frequencies", lw=3)
+        ax.set_xlabel('Frequency (Hz)', fontsize=14)
+        ax.set_ylabel('Power', fontsize=14)
+        ax.tick_params(axis='both', which='major', width=2.5)
+        # ax.set_title('Power Spectrum Density')
     
     return dominant_frequencies, np.array(dominant_amplitudes), np.array(dominant_phases), total_frames
 
@@ -156,12 +158,13 @@ def get_power_spectrum_plot_data(timeseries, N=2):
         dominant_phases.append(phase)
 
     if __name__ == "__main__":
-        plt.figure()
-        plt.plot(positive_freqs, np.log10(positive_power_spectrum), label="Power Spectrum Density")
-        plt.scatter(dominant_frequencies, np.log10(dominant_powers), color='red', label="Dominant Frequencies")
-        plt.xlabel('Frequency (Hz)')
-        plt.ylabel('Power')
-        plt.title('Power Spectrum Density')
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        ax.plot(positive_freqs, np.log10(positive_power_spectrum), label="Power Spectrum Density")
+        ax.scatter(dominant_frequencies, np.log10(dominant_powers), color='red', label="Dominant Frequencies")
+        ax.add_xlabel('Frequency (Hz)')
+        ax.add_ylabel('Power')
+        ax.add_title('Power Spectrum Density')
 
     return positive_freqs, np.log10(positive_power_spectrum), dominant_frequencies, np.log10(dominant_powers)
     
@@ -223,7 +226,7 @@ def main():
     # Create timeseries with time in the first column and the angle in the second column
     timeseries = np.zeros([total_frames, 2])
     timeseries[:, 0] = np.linspace(0, total_time, total_frames)
-    timeseries[:, 1] = leg1_t2
+    timeseries[:, 1] = leg1_t1
 
     # Define number of peaks and resolution multiplier
     N = 2
@@ -236,13 +239,15 @@ def main():
     high_res_timeseries = np.array([high_res_timelist, high_res_approx])
     
     # Plot results
-    plt.figure()
-    plt.plot(timeseries[:, 0], timeseries[:, 1], label="Original Signal")
-    plt.plot(high_res_timeseries[0,:], high_res_timeseries[1, :], label="High-Resolution Approximation", linestyle="--")
-    plt.xlabel('Time (s)')
-    plt.ylabel('Signal')
-    plt.title('Original Signal vs. Fourier Approximation')
-    plt.legend()
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.plot(timeseries[:, 0], timeseries[:, 1], label="Raw Thigh Position Signal", lw=3)
+    # ax.plot(high_res_timeseries[0,:], high_res_timeseries[1, :], label="Fourier Approximation", linestyle="--", lw=3)
+    ax.set_xlabel('Time (s)', fontsize=14)
+    ax.set_ylabel('Position (rad)', fontsize=14)
+    # ax.title('Original Signal vs. Fourier Approximation')
+    ax.tick_params(axis='both', which='major', width=2.5)
+    ax.legend(loc=3, fontsize=14)
     plt.show()
 
 if __name__ == "__main__":

@@ -279,25 +279,31 @@ class ModelGaitPlots:
         # plt.title('Power Spectrum Density')
 
     def thigh_calf_data_comparison(self):
-        plt.figure()
-        plt.plot(self.quadruped_traj.timelist, self.quadruped_traj.leg_list[0].t1, label='Front Thigh Raw', color='b')
-        plt.plot(self.quadruped_traj_fourier.timelist, self.quadruped_traj_fourier.leg_list[0].t1, label='Front Thigh Approximation', linestyle='--', color='b')
-        plt.plot(self.quadruped_traj.timelist, self.quadruped_traj.leg_list[1].t1, label='Rear Thigh Raw', color='g')
-        plt.plot(self.quadruped_traj_fourier.timelist, self.quadruped_traj_fourier.leg_list[1].t1, label='Rear Thigh Approximation', linestyle='--', color='g')
-        # plt.title('Thigh Angle')
-        plt.legend()
-        plt.xlabel('Time (s)')
-        plt.ylabel('Angle (rad)')
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        # ax.plot(self.quadruped_traj.timelist, self.quadruped_traj.leg_list[0].t1, label='Front Thigh Raw', color='b')
+        ax.plot(self.quadruped_traj_fourier.timelist, self.quadruped_traj_fourier.leg_list[0].t1, label='Front Thigh Position', lw=3)#, linestyle='--', color='b')
+        # ax.plot(self.quadruped_traj.timelist, self.quadruped_traj.leg_list[1].t1, label='Rear Thigh Raw', color='g')
+        ax.plot(self.quadruped_traj_fourier.timelist, self.quadruped_traj_fourier.leg_list[1].t1, label='Rear Thigh Position', lw=3)#, linestyle='--', color='g')
+        # ax.title('Thigh Angle')
+        ax.set_xlabel('Time (s)', fontsize=14)
+        ax.set_ylabel('Angle (rad)', fontsize=14)
+        ax.tick_params(axis='both', which='major', width=2.5)
+        ax.legend(loc=4, fontsize=14)
 
-        plt.figure()
-        plt.plot(self.quadruped_traj.timelist, self.quadruped_traj.leg_list[0].t2, label='Front Claf Raw', color='r')
-        plt.plot(self.quadruped_traj_fourier.timelist, self.quadruped_traj_fourier.leg_list[0].t2, label='Front Approximation', linestyle='--', color='r')
-        plt.plot(self.quadruped_traj.timelist, self.quadruped_traj.leg_list[1].t2, label='Rear Raw', color='y')
-        plt.plot(self.quadruped_traj_fourier.timelist, self.quadruped_traj_fourier.leg_list[1].t2, label='Front Approximation', linestyle='--', color='y')
-        # plt.title('Calf Angle')
-        plt.legend()
-        plt.xlabel('Time (s)')
-        plt.ylabel('Angle (rad)')
+
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        # ax.plot(self.quadruped_traj.timelist, self.quadruped_traj.leg_list[0].t2, label='Front Claf Raw', color='r')
+        ax.plot(self.quadruped_traj_fourier.timelist, self.quadruped_traj_fourier.leg_list[0].t2, label='Front Calf Position', lw=3)#, linestyle='--', color='r')
+        # ax.plot(self.quadruped_traj.timelist, self.quadruped_traj.leg_list[1].t2, label='Rear Raw', color='y')
+        ax.plot(self.quadruped_traj_fourier.timelist, self.quadruped_traj_fourier.leg_list[1].t2, label='Rear Calf Position', lw=3)#, linestyle='--', color='y')
+        # ax.title('Calf Angle')
+        ax.set_xlabel('Time (s)', fontsize=14)
+        ax.set_ylabel('Angle (rad)', fontsize=14)
+        ax.tick_params(axis='both', which='major', width=2.5)
+        ax.legend(loc=4, fontsize=14)
 
     def data_to_cv(self):
         # Create a list of csv headers
@@ -384,7 +390,7 @@ def main():
     # plots.leg1_pfoot_vs_time()
     # plots.leg1_vfoot_vs_time()
     # plots.all_energy_plot()
-    plots.power_spectrum_comparison()
+    # plots.power_spectrum_comparison()
     plots.thigh_calf_data_comparison()
 
     plt.show()
