@@ -33,8 +33,8 @@ void GaitLoader::load_python_parameters()
     this->gait_command_rate_ = sim_params.attr("gait_command_publishing_rate").cast<double>();
     this->start_time_ = sim_params.attr("start_walking_time").cast<double>();
 
-    RCLCPP_INFO(this->get_logger(), "Loaded gait command rate: %f", gait_command_rate_);
-    RCLCPP_INFO(this->get_logger(), "Loaded start walking time: %f", start_time_);
+    RCLCPP_DEBUG(this->get_logger(), "Loaded gait command rate: %f", gait_command_rate_);
+    RCLCPP_DEBUG(this->get_logger(), "Loaded start walking time: %f", start_time_);
   }
   catch (pybind11::error_already_set &e)
   {
@@ -109,7 +109,7 @@ void GaitLoader::generate_trajectory_functions()
   // Print confirmation
   for (const auto &[key, func] : trajectory_functions_)
   {
-    RCLCPP_INFO(this->get_logger(), "Generated function for %s", key.c_str());
+    RCLCPP_DEBUG(this->get_logger(), "Generated function for %s", key.c_str());
   }
 }
 
@@ -148,13 +148,13 @@ void GaitLoader::load_yaml(const std::string &file_path)
     // Print loaded data
     for (const auto &[leg, joints] : gait_data_)
     {
-      RCLCPP_INFO(this->get_logger(), "Leg: %s", leg.c_str());
+      RCLCPP_DEBUG(this->get_logger(), "Leg: %s", leg.c_str());
       for (const auto &[joint, values] : joints)
       {
-        RCLCPP_INFO(this->get_logger(), "  Joint: %s", joint.c_str());
+        RCLCPP_DEBUG(this->get_logger(), "  Joint: %s", joint.c_str());
         for (const auto &[freq, amp, phase] : values)
         {
-          RCLCPP_INFO(this->get_logger(), "    Freq: %.3f, Amp: %.3f, Phase: %.3f", freq, amp, phase);
+          RCLCPP_DEBUG(this->get_logger(), "    Freq: %.3f, Amp: %.3f, Phase: %.3f", freq, amp, phase);
         }
       }
     }

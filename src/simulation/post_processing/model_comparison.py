@@ -241,17 +241,19 @@ class ModelComparison:
                     power_traj[:self.tsi], 
                     label='Kinematic', lw=2)
 
+            # Dynamic
             power_traj = self.model_dict['raw']['gz'].data_dict['FR_thigh_pow']
             power_traj = np.abs(power_traj)
             ax.plot(self.model_dict['raw']['gz'].data_dict['time'][:self.tsi], 
                     power_traj[:self.tsi], 
-                    label='Dynamic', lw=2, color='w')
+                    label='Dynamic', lw=2)
 
             
             ax.tick_params(axis='both', which='major', width=2.5)
             ax.set_xlabel('Time (s)', fontsize=14)
             ax.set_ylabel('Power Consumption (W)', fontsize=14)
             ax.legend(fontsize=10)
+            ax.set_title('Thigh Power')
 
             ax.axvline(x=self.right_stance_time, color='red', linestyle='--', linewidth=1)
             ax.axvline(x=self.right_swing_time, color='red', linestyle='--', linewidth=1)
@@ -295,6 +297,7 @@ class ModelComparison:
             ax.set_xlabel('Time (s)', fontsize=14)
             ax.set_ylabel('Power Consumption (W)', fontsize=14)
             ax.legend(fontsize=10)
+            ax.set_title('Calf Power')
 
             ax.axvline(x=self.right_stance_time, color='red', linestyle='--', linewidth=1)
             ax.axvline(x=self.right_swing_time, color='red', linestyle='--', linewidth=1)
@@ -348,6 +351,7 @@ class ModelComparison:
             ax.set_xlabel('Time (s)', fontsize=14)
             ax.set_ylabel('Power Consumption (W)', fontsize=14)
             ax.legend(fontsize=10)
+            ax.set_title('Leg Power')
 
             ax.axvline(x=self.right_stance_time, color='red', linestyle='--', linewidth=1)
             ax.axvline(x=self.right_swing_time, color='red', linestyle='--', linewidth=1)
@@ -388,6 +392,7 @@ class ModelComparison:
             ax.set_xlabel('Time (s)', fontsize=14)
             ax.set_ylabel('Power Consumption (W)', fontsize=14)
             ax.legend(fontsize=10)
+            ax.set_title('Quadruped Power')
     
         thigh(self)
         calf(self)
@@ -498,9 +503,9 @@ def main():
     model_comparison = ModelComparison()
     # model_comparison.position()
     # model_comparison.velocity()
-    model_comparison.power()
+    # model_comparison.power()
     # model_comparison.distance()
-    # model_comparison.cost_of_transport()
+    model_comparison.cost_of_transport()
     # model_comparison.torque_velocity_power()
     # model_comparison.power_spectrum_comparison()
     # model_comparison.test_position()

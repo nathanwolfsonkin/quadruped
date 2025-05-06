@@ -78,6 +78,6 @@ def main():
     yaml_data = load_yaml(input_file)
     updated_data = process_robot_config(yaml_data)
     save_yaml(updated_data, output_file)
-    
+
 if __name__ == "__main__":
     main()

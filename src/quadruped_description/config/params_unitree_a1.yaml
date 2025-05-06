@@ -1,0 +1,150 @@
+# This is the single source of truth for all information on the quadrupedal parameters
+
+# Note: By default, inertial values will be calculated based off of uniform mass distribution
+# assumptions if no value is provided. If values are provided for the inertial tensor, those values
+# will override the default.
+
+# The framing of the base follows the guidelines of REP-103 (https://www.ros.org/reps/rep-0103.html)
+# x-direction = forward
+# y-direction = left
+# z-direction = up
+
+# Legs are mounted to the corners of the base by default.
+# The hips rotates about axes parallel to the body x-axis which
+# passes thorough the right and right sides of the body respectivley.
+# The legs are modeled as kinematic chains of cylindrical bodies, analagous to a
+# planar 2-link manipulator which can rotate into the 3rd dimension
+
+# CURRENT INERTIAL VALUES ARE BASED ON THE UNITREE A1 
+# https://github.com/unitreerobotics/unitree_ros/blob/master/robots/a1_description/urdf/a1.urdf
+
+# Base: Rectangular prisum with dimensions Lx, Ly, Lz, and mass m
+base:  
+  Lx: 0.267 # Length - x direction
+  Ly: 0.194 # Length - y direction
+  Lz: 0.114 # Length - z direction
+  m: 5.660 # Total mass of body
+  I:
+    Ixx: 0.016839930 # (mass / 12) * (L_y*L_y + L_z*L_z)
+    Iyy: 0.056579028 # (mass / 12) * (L_x*L_x + L_z*L_z)
+    Izz: 0.064713601 # (mass / 12) * (L_x*L_x + L_y*L_y)
+
+# Front Right Leg
+FR:
+  rad: 0.01 # Radius of cylindrical leg links
+  L1: 0.04 # Length - hip link
+  L2: 0.2 # Length - thigh link
+  L3: 0.2 # Length - calf link
+  m1: 0.696 # Mass - hip link
+  I1: # Commented value is uniform distribution inertia
+    Ixx: 0.000469246 # (1/2) * mass * rad*rad
+    Iyy: 0.00080749 # (1/12) * (length*length + 3*rad*rad) * mass
+    Izz: 0.000552929 # (1/12) * (length*length + 3*rad*rad) * mass
+
+  m2: 1.013 # Mass - thigh link
+  I2: # Commented value is uniform distribution inertia
+    Ixx: 0.005529065 # (1/2) * mass * rad*rad
+    Iyy: 0.005139339 # (1/12) * (length*length + 3*rad*rad) * mass
+    Izz: 0.001367788 # (1/12) * (length*length + 3*rad*rad) * mass
+
+  m3: 0.166 # Mass - calf link
+  I3: # Commented value is uniform distribution inertia
+    Ixx: 0.002997972 # (1/2) * mass * rad*rad
+    Iyy: 0.003014022 # (1/12) * (length*length + 3*rad*rad) * mass
+    Izz: .000032426 # (1/12) * (length*length + 3*rad*rad) * mass
+
+  m4: 0.06 # Mass - foot link
+  I4: # Commented value is uniform distribution inertia
+    Ixx: .0000096 # (2/5) * (mass*rad*rad)
+    Iyy: .0000096 # (83/320) * (mass*rad*rad)
+    Izz: .0000096 # (83/320) * (mass*rad*rad)
+
+# Front Left Leg
+FL:
+  rad: 0.01 # Radius of cylindrical leg links
+  L1: 0.04 # Length - hip link
+  L2: 0.2 # Length - thigh link
+  L3: 0.2 # Length - calf link
+  m1: 0.696 # Mass - hip link
+  I1: # Commented value is uniform distribution inertia
+    Ixx: 0.000469246 # (1/2) * mass * rad*rad
+    Iyy: 0.00080749 # (1/12) * (length*length + 3*rad*rad) * mass
+    Izz: 0.000552929 # (1/12) * (length*length + 3*rad*rad) * mass
+
+  m2: 1.013 # Mass - thigh link
+  I2: # Commented value is uniform distribution inertia
+    Ixx: 0.005529065 # (1/2) * mass * rad*rad
+    Iyy: 0.005139339 # (1/12) * (length*length + 3*rad*rad) * mass
+    Izz: 0.001367788 # (1/12) * (length*length + 3*rad*rad) * mass
+
+  m3: 0.166 # Mass - calf link
+  I3: # Commented value is uniform distribution inertia
+    Ixx: 0.002997972 # (1/2) * mass * rad*rad
+    Iyy: 0.003014022 # (1/12) * (length*length + 3*rad*rad) * mass
+    Izz: .000032426 # (1/12) * (length*length + 3*rad*rad) * mass
+
+  m4: 0.06 # Mass - foot link
+  I4: # Commented value is uniform distribution inertia
+    Ixx: .0000096 # (2/5) * (mass*rad*rad)
+    Iyy: .0000096 # (83/320) * (mass*rad*rad)
+    Izz: .0000096 # (83/320) * (mass*rad*rad)
+
+# Rear Left Leg
+RL:
+  rad: 0.01 # Radius of cylindrical leg links
+  L1: 0.04 # Length - hip link
+  L2: 0.2 # Length - thigh link
+  L3: 0.2 # Length - calf link
+  m1: 0.696 # Mass - hip link
+  I1: # Commented value is uniform distribution inertia
+    Ixx: 0.000469246 # (1/2) * mass * rad*rad
+    Iyy: 0.00080749 # (1/12) * (length*length + 3*rad*rad) * mass
+    Izz: 0.000552929 # (1/12) * (length*length + 3*rad*rad) * mass
+
+  m2: 1.013 # Mass - thigh link
+  I2: # Commented value is uniform distribution inertia
+    Ixx: 0.005529065 # (1/2) * mass * rad*rad
+    Iyy: 0.005139339 # (1/12) * (length*length + 3*rad*rad) * mass
+    Izz: 0.001367788 # (1/12) * (length*length + 3*rad*rad) * mass
+
+  m3: 0.166 # Mass - calf link
+  I3: # Commented value is uniform distribution inertia
+    Ixx: 0.002997972 # (1/2) * mass * rad*rad
+    Iyy: 0.003014022 # (1/12) * (length*length + 3*rad*rad) * mass
+    Izz: .000032426 # (1/12) * (length*length + 3*rad*rad) * mass
+
+  m4: 0.06 # Mass - foot link
+  I4: # Commented value is uniform distribution inertia
+    Ixx: .0000096 # (2/5) * (mass*rad*rad)
+    Iyy: .0000096 # (83/320) * (mass*rad*rad)
+    Izz: .0000096 # (83/320) * (mass*rad*rad)
+
+# Rear Right Leg
+RR:
+  rad: 0.01 # Radius of cylindrical leg links
+  L1: 0.04 # Length - hip link
+  L2: 0.2 # Length - thigh link
+  L3: 0.2 # Length - calf link
+  m1: 0.696 # Mass - hip link
+  I1: # Commented value is uniform distribution inertia
+    Ixx: 0.000469246 # (1/2) * mass * rad*rad
+    Iyy: 0.00080749 # (1/12) * (length*length + 3*rad*rad) * mass
+    Izz: 0.000552929 # (1/12) * (length*length + 3*rad*rad) * mass
+  
+  m2: 1.013 # Mass - thigh link
+  I2: # Commented value is uniform distribution inertia
+    Ixx: 0.005529065 # (1/2) * mass * rad*rad
+    Iyy: 0.005139339 # (1/12) * (length*length + 3*rad*rad) * mass
+    Izz: 0.001367788 # (1/12) * (length*length + 3*rad*rad) * mass
+
+  m3: 0.166 # Mass - calf link
+  I3: # Commented value is uniform distribution inertia
+    Ixx: 0.002997972 # (1/2) * mass * rad*rad
+    Iyy: 0.003014022 # (1/12) * (length*length + 3*rad*rad) * mass
+    Izz: .000032426 # (1/12) * (length*length + 3*rad*rad) * mass
+
+  m4: 0.06 # Mass - foot link
+  I4: # Commented value is uniform distribution inertia
+    Ixx: .0000096 # (2/5) * (mass*rad*rad)
+    Iyy: .0000096 # (83/320) * (mass*rad*rad)
+    Izz: .0000096 # (83/320) * (mass*rad*rad)
