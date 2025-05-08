@@ -3,12 +3,13 @@ from scipy.integrate import cumtrapz
 import yaml
 
 from simulation.post_processing.csv_data_processer import CSVDataProcesser
-import simulation.parameters as sim_params
 
 
 class GazeboEnergy(CSVDataProcesser):
-    def __init__(self, file: str):
-        self.data_dict = self.csv_to_dict(file)
+    def __init__(self, datafile: str, paramfile: str):
+        self.quadruped_param_file = paramfile
+        self.data_dict = self.csv_to_dict(datafile)
+        self.mass = self.calc_total_mass()
         self.calc_power()
         self.calc_total_energy()
 
@@ -49,7 +50,7 @@ class GazeboEnergy(CSVDataProcesser):
         self.total_energy = cumtrapz(self.data_dict['power'], x=self.data_dict['time'])
     
     def calc_total_mass(self):
-        with open(sim_params.quadruped_params_file, 'r') as file:
+        with open(self.quadruped_param_file, 'r') as file:
             quadruped_params = yaml.safe_load(file)
         
         mass = (quadruped_params['base']['m'] + 
@@ -77,7 +78,7 @@ class GazeboEnergy(CSVDataProcesser):
         return mass
         
     def cost_of_transport(self):
-        cot = self.total_energy[-1] / (self.calc_total_mass() * self.data_dict['distance'][-1])
+        cot = self.total_energy[-1] / (self.mass * self.data_dict['distance'][-1])
         return cot
 
 def main():

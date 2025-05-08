@@ -9,7 +9,7 @@ from simulation.post_processing.low_pass_filter import Filter
 from simulation.post_processing.freq_analysis import plot_power_spectrum
 
 class ModelComparison:
-    def __init__(self):
+    def __init__(self, raw_data_log, quad_param_file):
         self.tsi = 400
         self.left_stance_time = .28
         self.left_swing_time = .55
@@ -22,27 +22,24 @@ class ModelComparison:
         # Desired Data Analysis
         # desired_data_log = sim_params.get_latest_log(sim_params.desired_logging_directory)
         
-        # Raw Data Analysis
-        raw_data_log = sim_params.get_latest_log(sim_params.raw_logging_directory)
-        
         # Filtering of position, velocity, and torque
         # Generate filtered CSV log
         # Filter.generate_filtered_csv(raw_data_log)
         # filtered_data_log = sim_params.get_latest_log(sim_params.postprocess_filtered_logging_directory)
-        timelist = GazeboEnergy(raw_data_log).data_dict['time']
+        timelist = GazeboEnergy(raw_data_log, quad_param_file).data_dict['time']
 
         self.model_dict = {
             'synth': {
                 'gz': None,
-                'py': SyntheticEnergy(sim_params.quadruped_params_file, sim_params.analytical_gait_params_file, timelist)
+                'py': SyntheticEnergy(quad_param_file, sim_params.analytical_gait_params_file, timelist)
             },
             'raw': {
-                'gz': GazeboEnergy(raw_data_log),
-                'py': PythonEnergy(sim_params.quadruped_params_file, raw_data_log, override_velocity=True)
+                'gz': GazeboEnergy(raw_data_log, quad_param_file),
+                'py': PythonEnergy(quad_param_file, raw_data_log, override_velocity=True)
             },
             'filt': {
                 # 'gz': GazeboEnergy(filtered_data_log),
-                # 'py': PythonEnergy(sim_params.quadruped_params_file, filtered_data_log, override_velocity=True)
+                # 'py': PythonEnergy(quad_param_file, filtered_data_log, override_velocity=True)
             },
         }
     
@@ -500,7 +497,8 @@ class ModelComparison:
         power_spectra(self)
 
 def main():
-    model_comparison = ModelComparison()
+    raw_data_log = sim_params.get_latest_log(sim_params.raw_logging_directory)
+    model_comparison = ModelComparison(raw_data_log, sim_params.quadruped_params_file)
     # model_comparison.position()
     # model_comparison.velocity()
     # model_comparison.power()

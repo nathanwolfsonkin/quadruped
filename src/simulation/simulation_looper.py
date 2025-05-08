@@ -3,6 +3,7 @@ import time
 import os
 import signal
 import yaml
+import shutil
 
 import simulation.parameters as sim_params
 
@@ -73,32 +74,75 @@ def update_yaml_file(existing_yaml_path, new_data_dict, output_path=None):
     with open(output_path, 'w') as f:
         yaml.dump(data, f, sort_keys=False)
 
+def copy_simulation_data(filename, dest_dir):
+    latest_log_path = sim_params.get_latest_log(sim_params.raw_logging_directory)
+    dest_path = os.path.join(dest_dir, filename)
+    shutil.copy(latest_log_path, dest_path)
+    print(f"Copied simulation data to: {dest_path}")
+
 def main():
+    test_name = "thigh_mass_variations"
     workspace_path = "/workspace"  # Set your workspace root here
 
-    for i, index in enumerate([5.660, 5.760, 5.860, 5.960]):
-        new_quad_params = {
-            'base': {
-                'm': index
-            },
-            # other leg updates...
-        }
+    def define_leg_config(index):
+        rule = 1.013 + index/2
+        leg_config = {
+                'FR': {
+                    'm2': rule
+                },
+                'FL': {
+                    'm2': rule
+                },
+                'RR': {
+                    'm2': rule
+                },
+                'RL': {
+                    'm2': rule
+                },
+            }
+        return leg_config
+    
+    param_config_list = []
+    for i in range(10):
+        param_config_list.append(define_leg_config(i))
 
+
+    results_root_dir = f"{workspace_path}/src/simulation/data_logs/{test_name}"
+    os.makedirs(results_root_dir, exist_ok=True)
+    
+    for i, value in enumerate(param_config_list):
+        quadruped_params = param_config_list[i]
+
+        # 1. Update the YAML file used by the simulation
+        base_config_path = f'{workspace_path}/src/quadruped_description/config/params_unitree_a1.yaml'
+        active_config_path = f'{workspace_path}/src/quadruped_description/config/params.yaml'
         update_yaml_file(
-            existing_yaml_path=f'{workspace_path}/src/quadruped_description/config/params_unitree_a1.yaml',
-            new_data_dict=new_quad_params,
-            output_path=f'{workspace_path}/src/quadruped_description/config/params.yaml'
+            existing_yaml_path=base_config_path,
+            new_data_dict=quadruped_params,
+            output_path=active_config_path
         )
 
+        # 2. Rebuild
         rebuild_workspace(workspace_path)
 
-        print(f"--- Running simulation with mass = {index} ---")
+        # 3. Run simulation
+        print(f"--- Running simulation with quadruped configuration #{i} ---")
         crashed = run_simulation_until_logger_crashes(
             "quadruped_bringup", "quadruped_sim.launch.py"
         )
-
         print(f"Simulation #{i+1} stopped due to logger crash.")
         time.sleep(2)
+
+        # 4. Create subdirectory for this simulation
+        sim_name = f"test_{i}"
+        sim_dir = os.path.join(results_root_dir, sim_name)
+        os.makedirs(sim_dir, exist_ok=True)
+
+        # 5. Copy updated YAML to that simulation folder
+        shutil.copy(src=active_config_path, dst=os.path.join(sim_dir, "params.yaml"))
+
+        # 6. Copy log data to that simulation folder
+        copy_simulation_data(filename="raw_data.csv", dest_dir=sim_dir)
 
 if __name__ == "__main__":
     main()
