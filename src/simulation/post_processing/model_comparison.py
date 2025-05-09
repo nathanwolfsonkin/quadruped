@@ -118,8 +118,6 @@ class ModelComparison:
         fig = plt.figure()
         generate_subplot(self, fig, 111, "FL Calf")
 
-
-
     def test_position(self):
         fig = plt.figure()
         ax = fig.add_subplot(211)
@@ -498,10 +496,12 @@ class ModelComparison:
 
 def main():
     raw_data_log = sim_params.get_latest_log(sim_params.raw_logging_directory)
-    model_comparison = ModelComparison(raw_data_log, sim_params.quadruped_params_file)
+    quad_params_file = sim_params.quadruped_params_file
+
+    model_comparison = ModelComparison(raw_data_log, quad_params_file)
     # model_comparison.position()
     # model_comparison.velocity()
-    # model_comparison.power()
+    model_comparison.power()
     # model_comparison.distance()
     model_comparison.cost_of_transport()
     # model_comparison.torque_velocity_power()

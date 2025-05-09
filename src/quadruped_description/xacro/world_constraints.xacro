@@ -37,9 +37,9 @@
             </axis>
         </joint>
         <!-- <link name="x_rotation" /> -->
-        <joint name="x_rotation_joint" type="revolute">
+        <!-- <joint name="x_rotation_joint" type="revolute">
             <parent>x_translation</parent>
-            <child>base</child>
+            <child>x_rotation</child>
             <axis>
                 <xyz>1 0 0</xyz>
                 <limit>
@@ -47,17 +47,17 @@
                     <upper>${PI/2}</upper>
                 </limit>
             </axis>
-        </joint>
-        <!-- <joint name="y_rotation_joint" type="revolute">
-            <parent>x_rotation</parent>
+        </joint> -->
+        <joint name="y_rotation_joint" type="revolute">
+            <parent>x_translation</parent>
             <child>base</child>
             <axis>
                 <xyz>0 1 0</xyz>
                 <limit>
-                    <lower>${-PI/75}</lower>
-                    <upper>${PI/75}</upper>
+                    <lower>${-PI/12}</lower>
+                    <upper>${PI/12}</upper>
                 </limit>
             </axis>
-        </joint> -->
+        </joint>
     </gazebo>
 </robot>

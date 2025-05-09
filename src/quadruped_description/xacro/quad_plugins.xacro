@@ -49,7 +49,12 @@
         </plugin>
 
         <!-- Hip PID Gains -->
-        <xacro:property name="hip_Kp" value="100.0" />
+        <!-- originial -->
+        <!-- <xacro:property name="hip_Kp" value="100.0" />
+        <xacro:property name="hip_Ki" value="0.0" />
+        <xacro:property name="hip_Kd" value="2.0" />
+         -->
+        <xacro:property name="hip_Kp" value="10.0" />
         <xacro:property name="hip_Ki" value="0.0" />
         <xacro:property name="hip_Kd" value="2.0" />
 
@@ -59,9 +64,9 @@
         <xacro:property name="thigh_Kd" value="2.5" />
 
         <!-- Calf PID Gains -->
-        <xacro:property name="calf_Kp" value="350.0" />
+        <xacro:property name="calf_Kp" value="250.0" />
         <xacro:property name="calf_Ki" value="0.0" />
-        <xacro:property name="calf_Kd" value="3.5" />
+        <xacro:property name="calf_Kd" value="2.5" />
 
         <!-- Explicitly Add All Joints -->
         <xacro:add_joint_controller joint_name="FR_hip_joint" Kp="${hip_Kp}" Ki="${hip_Ki}" Kd="${hip_Kd}" />

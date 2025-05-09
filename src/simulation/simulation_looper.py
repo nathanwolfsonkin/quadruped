@@ -81,11 +81,11 @@ def copy_simulation_data(filename, dest_dir):
     print(f"Copied simulation data to: {dest_path}")
 
 def main():
-    test_name = "thigh_mass_variations"
+    test_name = "body_mass_variations_3"
     workspace_path = "/workspace"  # Set your workspace root here
 
     def define_leg_config(index):
-        rule = 1.013 + index/2
+        rule = 1.013 + index*.075 * (-1) ** index
         leg_config = {
                 'FR': {
                     'm2': rule
@@ -102,9 +102,18 @@ def main():
             }
         return leg_config
     
+    def define_base_config(index):
+        rule = 5.660 + index * .5 * (-1) ** index
+        body_config = {
+                'base': {
+                    'm': rule
+                },
+            }
+        return body_config
+    
     param_config_list = []
     for i in range(10):
-        param_config_list.append(define_leg_config(i))
+        param_config_list.append(define_base_config(i))
 
 
     results_root_dir = f"{workspace_path}/src/simulation/data_logs/{test_name}"
